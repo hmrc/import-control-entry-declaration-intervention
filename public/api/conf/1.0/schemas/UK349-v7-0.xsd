@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dt="http://www.govtalk.gov.uk/enforcement/ICS/datatypes/7" xmlns:cm="http://www.govtalk.gov.uk/enforcement/ICS/commontypes/7" xmlns:ie="http://www.govtalk.gov.uk/enforcement/ICS/uk349/7" targetNamespace="http://www.govtalk.gov.uk/enforcement/ICS/uk349/7" elementFormDefault="qualified" attributeFormDefault="unqualified" version="7.0">
+	<xs:import namespace="http://www.govtalk.gov.uk/enforcement/ICS/datatypes/7" schemaLocation="data_types-v7-0.xsd"/>
+	<xs:import namespace="http://www.govtalk.gov.uk/enforcement/ICS/commontypes/7" schemaLocation="ICS_cm-v7-0.xsd"/>
+	<xs:complexType name="CC349A">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Root element type for CC349A message.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MesSenMES3" type="cm:MesSenMES3"/>
+			<xs:element name="MesRecMES6" type="cm:MesRecMES6UK"/>
+			<xs:element name="DatOfPreMES9" type="dt:dateYYMMDD"/>
+			<xs:element name="TimOfPreMES10" type="dt:time24HHMM"/>
+			<xs:element name="PriMES15" type="dt:a1" minOccurs="0"/>
+			<xs:element name="TesIndMES18" type="dt:n1" minOccurs="0"/>
+			<xs:element name="MesIdeMES19" type="cm:MesIdeMES19"/>
+			<xs:element name="MesTypMES20" type="cm:MesTypMES20"/>
+			<xs:element name="CorIdeMES25" type="cm:CorIdeMES25"/>
+			<xs:element ref="ie:HEAHEA"/>
+			<xs:element ref="ie:FUNERRER1" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="HEAHEA">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Header element type for CC349A message.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ArrivalReferenceNumber" type="cm:DivRefNumHEA119"/>
+			<xs:element name="RejDatTimHEA126" type="dt:datetimeYYYYMMDDHHMM"/>
+			<xs:element name="RejReaHEA127" type="cm:RejReaHEA127" minOccurs="0"/>
+			<xs:element name="RejReaHEA128LNG" type="dt:a2" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FUNERRER1">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				MESSAGE - FUNCTIONAL ERROR
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ErrTypER11" type="cm:ErrTypER11"/>
+			<xs:element name="ErrPoiER12" type="cm:ErrPoiER12"/>
+			<xs:element name="ErrReaER13" type="cm:ErrReaER13" minOccurs="0"/>
+			<xs:element name="OriAttValER14" type="cm:OriAttValER14" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="CC349A" type="ie:CC349A">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Root element type for CC349A message.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="HEAHEA" type="ie:HEAHEA">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Header element  for CC349A message.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="FUNERRER1" type="ie:FUNERRER1">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				MESSAGE - FUNCTIONAL ERROR
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

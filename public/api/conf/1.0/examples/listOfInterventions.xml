@@ -1,0 +1,12 @@
+<advancedNotifications>
+  <response>
+    <correlationId>1234567890</correlationId>
+    <notificationId>1D45fQ563</notificationId>
+    <link>/customs/imports/notifications/1D45fQ563</link>
+  </response>
+  <response>
+    <correlationId>0987654321</correlationId>
+    <notificationId>ABx4414f4</notificationId>
+    <link>/customs/imports/notifications/ABx4414f4</link>
+  </response>
+</advancedNotifications>

@@ -1,0 +1,109 @@
+#%RAML 1.0
+
+uses:
+  sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
+  headers: headers.raml
+  annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
+  types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+  errors: errors.raml
+
+title: Safety and security import control entry summary declaration notifications
+version: v1
+protocols: [ HTTPS ]
+baseUri: https://api.service.hmrc.gov.uk/
+mediaType: application/xml
+
+documentation:
+  - title: Overview
+    content: !include docs/overview.md
+  - title: Versioning
+    content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
+  - title: Errors
+    content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/errors.md
+
+/customs/imports:
+  /notifications:
+    /:
+      get:
+        is:
+          - headers.acceptXml
+        displayName: Get a list of notifications
+        description: |
+          This endpoint allows a developer to retrieve a list of advanced notifications that are yet to be acknowledged.
+        (annotations.scope): "write:import-control-system"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "write:import-control-system" ] } ]
+        responses:
+          200:
+            body:
+              application/xml:
+                example:
+                  (annotations.documentation): |
+                    The response will contain a list
+                    (schema [here](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/listInterventions.xsd))
+                    of Notication IDs corresponding to advanced notifications for ENS submissions.
+                    Each one will be listed along with the Correlation ID that identifies the submission.
+
+                    The list will include only those notifications that have not been acknowledged.
+
+                    This is an example response:
+                  value: !include examples/listOfInterventions.xml
+          204:
+            body:
+              application/xml:
+                example:
+                  (annotations.documentation): There are no notifications available.
+                  value: ""
+    /{notificationId}:
+      uriParameters:
+        notificationId:
+          description: 'The Notification ID that uniquely identifies the notification.'
+          required: true
+      get:
+        is:
+          - headers.acceptXml
+          - errors.noSuchNotification
+        displayName: Retrieve a notification
+        description: |
+          This endpoint allows a developer to retrieve an advanced notification for a given Notification ID.
+        (annotations.scope): "write:import-control-system"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "write:import-control-system" ] } ]
+        responses:
+          200:
+            body:
+              application/xml:
+                example:
+                  (annotations.documentation): |
+                    A notification for the Notification ID
+                    (schema [here](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/advancedNotification.xsd)).
+
+                    The content of response element will be determined by the type of notification. Currently
+                    the following types of notification can be returned:
+                    * Do Not Load: schema [http://ics.dgtaxud.ec/CC351A](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/CC351A-v10-0.xsd).
+
+                    This schema imports a number of other schemas:
+
+                    * [http://ics.dgtaxud.ec/doc](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/doc-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/complex_ics](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/complex_types_ics-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/simple](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/simple_types-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/simple_ics](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/simple_types_ics-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/tcl](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/tcl-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/tcl_ics](/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/tcl_ics-v10-0.xsd)
+
+                    This is an example response:
+                  value: !include examples/advancedNotification.xml
+      delete:
+        is:
+          - headers.acceptXml
+          - errors.noSuchNotification
+        displayName: Acknowledge a notification
+        description: |
+          This endpoint allows a developer to acknowledge the receipt of an advanced notification for a given Notification ID.
+        (annotations.scope): "write:import-control-system"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "write:import-control-system" ] } ]
+        responses:
+          200:
+            body:
+              application/xml:
+                example:
+                  (annotations.documentation): The notification has successfully been acknowledged.
+                  value: ""

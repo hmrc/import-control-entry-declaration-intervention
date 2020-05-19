@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dt="http://www.govtalk.gov.uk/enforcement/ICS/datatypes/7" xmlns:cm="http://www.govtalk.gov.uk/enforcement/ICS/commontypes/7" xmlns:uk="http://www.govtalk.gov.uk/enforcement/ICS/uk348/7" targetNamespace="http://www.govtalk.gov.uk/enforcement/ICS/uk348/7" elementFormDefault="qualified" attributeFormDefault="unqualified" version="7.0">
+	<xs:import namespace="http://www.govtalk.gov.uk/enforcement/ICS/datatypes/7" schemaLocation="data_types-v7-0.xsd"/>
+	<xs:import namespace="http://www.govtalk.gov.uk/enforcement/ICS/commontypes/7" schemaLocation="ICS_cm-v7-0.xsd"/>
+	<xs:complexType name="UK348A">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Root element type for the UK-specific UK348A message.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MesSenMES3" type="cm:MesSenMES3"/>
+			<xs:element name="MesRecMES6" type="cm:MesRecMES6UK"/>
+			<xs:element name="DatOfPreMES9" type="dt:dateYYMMDD"/>
+			<xs:element name="TimOfPreMES10" type="dt:time24HHMM"/>
+			<xs:element name="PriMES15" type="dt:a1" minOccurs="0"/>
+			<xs:element name="TesIndMES18" type="dt:n1" minOccurs="0"/>
+			<xs:element name="MesIdeMES19" type="cm:MesIdeMES19"/>
+			<xs:element name="MesTypMES20" type="cm:MesTypMES20"/>
+			<xs:element name="CorIdeMES25" type="cm:CorIdeMES25"/>
+			<xs:element ref="uk:HEAHEA"/>
+			<xs:element ref="uk:CUSTOMSOFFICEOFARRIVAL"/>
+			<xs:element ref="uk:TRADERATENTRY"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="UK348A" type="uk:UK348A">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Root element  for UK348A message.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="HEAHEA">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+					HEADER type
+				</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TraModAtBorHEA76" type="cm:TraModAtBorHEA76"/>
+			<xs:element name="InfTypHEA122" type="cm:InfTypHEA122"/>
+			<xs:element name="ArrivalReferenceNumber" type="cm:DivRefNumHEA119"/>
+			<xs:element name="UniIdeDivHEA132" type="cm:UniIdeDivHEA132" minOccurs="0"/>
+			<xs:element name="ExpDatArrHEA701" type="dt:dateYYYYMMDD" minOccurs="0"/>
+			<xs:element name="ActualDateOfArrival" type="dt:dateYYYYMMDD" minOccurs="0"/>
+			<xs:element name="IntendedFirstOffice" type="dt:yn"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CUSTOMSOFFICEOFARRIVAL">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+					MESSAGE - (CUSTOMS OFFICE OF ARRIVAL) CUSTOMS OFFICE type
+				</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ReferenceNumber" type="cm:RefNumCUSOFFENTACTOFF701"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TRADERATENTRY">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				MESSAGE - (TRADER PERFORMING ARRIVAL) TRADER type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="dt:PartyName" minOccurs="0"/>
+			<xs:element name="StreetAndNumber" type="dt:PartyAddress1" minOccurs="0"/>
+			<xs:element name="City" type="dt:PartyCity" minOccurs="0"/>
+			<xs:element name="Country" type="dt:PartyCountry" minOccurs="0"/>
+			<xs:element name="Postcode" type="dt:PartyPostcode" minOccurs="0"/>
+			<xs:element name="Language" type="dt:PartyNAD" minOccurs="0"/>
+			<xs:element name="EORI" type="dt:TIN"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="HEAHEA" type="uk:HEAHEA">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				HEADER element
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="CUSTOMSOFFICEOFARRIVAL" type="uk:CUSTOMSOFFICEOFARRIVAL">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+					MESSAGE - (ACTUAL OFFICE OF ENTRY) CUSTOMS OFFICE element
+				</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TRADERATENTRY" type="uk:TRADERATENTRY">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				MESSAGE - (REQUESTING DIVERSION) TRADER element
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

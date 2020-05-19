@@ -1,0 +1,19 @@
+#%RAML 1.0 Library
+
+uses:
+  types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+
+traits:
+  noSuchNotification:
+    responses:
+      404:
+        body:
+          application/xml:
+            type: types.errorResponse
+            examples:
+              eoriMismatch:
+                description: |
+                  No notification for the submission with the specified Notification ID is currently available or
+                  the notification has already been acknowledged.
+                value:
+                  code: NOTIFICATION_NOT_FOUND

@@ -1,0 +1,131 @@
+{
+  "submissionId": "c75f40a6-a3df-4429-a697-471eeec46435",
+  "metadata": {
+    "senderEORI": "ABCDEFGHIJKLMN",
+    "senderBranch": "ABCDEFGHIJKLMNO",
+    "preparationDateTime": "2020-12-23T14:46:01.000Z",
+    "messageType": "IE351",
+    "messageIdentification": "ABCDE",
+    "receivedDateTime": "2020-12-23T14:46:01.000Z",
+    "correlationId": "12345678901234"
+  },
+  "parties": {
+    "declarant": {"eori": "GB00123456789"},
+    "representative": {
+      "name": "M. MARCHAND",
+      "address": {
+        "streetAndNumber": "13 MARCHAND BL",
+        "city": "MARCHANDVILLE",
+        "postalCode": "FR198754",
+        "countryCode": "FR"
+      },
+      "language": "FR",
+      "eori": "FR00123456789"
+    },
+    "carrier": {
+      "eori": "GB00123456789"
+    }
+  },
+  "goods": {
+    "numberOfItems": 1,
+    "goodsItems": [
+      {
+        "itemNumber": "1",
+        "commercialReferenceNumber": "ABCDEFGHIJ",
+        "documents": [
+          {
+            "type": "ABCD",
+            "reference": "ABCDEFGHIJ",
+            "language": "EN"
+          },
+          {
+            "type": "ABCD",
+            "reference": "ABCDEFGHIJ",
+            "language": "EN"
+          }
+        ],
+        "containers": [
+          {
+            "containerNumber": "ABCDEFGHIJKLMNO"
+          },
+          {
+            "containerNumber": "ABCDEFGHIJKLMNO"
+          }
+        ],
+        "identityOfMeansOfCrossingBorder": [
+          {
+            "identity": "ABCDEFG",
+            "nationality": "GB",
+            "language": "EN"
+          },
+          {
+            "identity": "ABCDEFG",
+            "nationality": "GB",
+            "language": "EN"
+          }
+        ]
+      },
+      {
+        "itemNumber": "2",
+        "commercialReferenceNumber": "ABCDEFGHIJ",
+        "documents": [
+          {
+            "type": "ABCD",
+            "reference": "ABCDEFGHIJ",
+            "language": "EN"
+          }
+        ],
+        "containers": [
+          {
+            "containerNumber": "ABCDEFGHIJKLMNO"
+          }
+        ],
+        "identityOfMeansOfCrossingBorder": [
+          {
+            "identity": "ABCDEFG",
+            "nationality": "GB",
+            "language": "EN"
+          }
+        ]
+      }
+    ]
+  },
+  "declaration": {
+    "localReferenceNumber": "ABCDEFGHIJKLMNOPQRST",
+    "movementReferenceNumber": "12AB3C4D5E6F7G8H90",
+    "registeredDateTime": "2020-12-23T14:46:01.000Z",
+    "submittedDateTime": "2020-12-23T14:46:01.000Z",
+    "officeOfLodgement": "ABCDEFGH"
+  },
+  "itinerary": {
+    "officeOfFirstEntry": {
+      "reference": "ABCDEFGH",
+      "expectedDateTimeOfArrival": "2020-12-23T14:46:01.000Z"
+    },
+    "modeOfTransportAtBorder": "1",
+    "identityOfMeansOfCrossingBorder": {
+      "identity": "ABCDEFGHIJKLM",
+      "nationality": "GB",
+      "language": "EN"
+    },
+    "commercialReferenceNumber": "ABCDEFGHI",
+    "conveyanceReference": "ABCDEFG"
+  },
+  "customsIntervention": {
+    "notificationDateTime": "2020-12-23T14:46:01.000Z",
+    "interventions": [
+      {
+        "code": "A001",
+        "itemNumber": "1",
+        "text": "GOODS NOT TO BE LOADED",
+        "language": "EN"
+      },
+      {
+        "code": "A001",
+        "itemNumber": "2",
+        "text": "GOODS NOT TO BE LOADED",
+        "language": "EN"
+      }
+    ]
+  }
+}

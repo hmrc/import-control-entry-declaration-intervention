@@ -1,0 +1,9 @@
+# microservice specific routes
+
+GET        /           uk.gov.hmrc.entrydeclarationintervention.controllers.InterventionRetrievalController.listInterventions
+
+GET        /:id       uk.gov.hmrc.entrydeclarationintervention.controllers.InterventionRetrievalController.getIntervention(id)
+
+DELETE     /:id       uk.gov.hmrc.entrydeclarationintervention.controllers.InterventionRetrievalController.acknowledgeIntervention(id)
+
+POST       /import-control/advanced-intervention    uk.gov.hmrc.entrydeclarationintervention.controllers.InterventionSubmissionController.postIntervention
