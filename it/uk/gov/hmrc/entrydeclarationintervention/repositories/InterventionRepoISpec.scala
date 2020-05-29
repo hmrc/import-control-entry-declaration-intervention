@@ -250,4 +250,18 @@ class InterventionRepoISpec
       }
     }
   }
+  "looking up a NotificationId" when {
+    "submission exists" must {
+      "return the notificationId" in {
+        await(repository.removeAll())
+        await(repository.save(intervention))
+        await(repository.lookupNotificationId(submissionId)) shouldBe Some(NotificationId(correlationId))
+      }
+    }
+    "submission does not exist" must {
+      "return None" in {
+        await(repository.lookupNotificationId("unknownSubmissionId")) shouldBe None
+      }
+    }
+  }
 }

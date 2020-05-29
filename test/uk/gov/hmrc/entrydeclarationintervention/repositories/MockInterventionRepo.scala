@@ -30,6 +30,9 @@ trait MockInterventionRepo extends MockFactory {
     def saveIntervention(intervention: InterventionModel): CallHandler[Future[Option[SaveError]]] =
       interventionRepo.save _ expects intervention
 
+    def lookupNotificationId(submissionId: String): CallHandler[Future[Option[NotificationId]]] =
+      interventionRepo.lookupNotificationId _ expects submissionId
+
     def lookupIntervention(
       eori: String,
       notificationId: NotificationId): CallHandler[Future[Option[InterventionModel]]] =

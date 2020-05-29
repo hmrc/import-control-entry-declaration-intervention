@@ -16,4 +16,11 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.models
 
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
+
 case class NotificationId(value: String) extends AnyVal
+
+object NotificationId {
+  implicit val writes: Writes[NotificationId] = Json.writes[NotificationId]
+  implicit val reads: Reads[NotificationId]   = (JsPath \ "correlationId").read[String].map(NotificationId.apply)
+}
