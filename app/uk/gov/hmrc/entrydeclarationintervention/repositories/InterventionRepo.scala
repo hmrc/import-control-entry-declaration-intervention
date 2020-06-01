@@ -36,6 +36,8 @@ import scala.concurrent.{ExecutionContext, Future}
 trait InterventionRepo {
   def save(intervention: InterventionModel): Future[Option[SaveError]]
 
+  def lookupNotificationId(submissionId: String): Future[Option[NotificationId]]
+
   def lookupIntervention(eori: String, notificationId: NotificationId): Future[Option[InterventionModel]]
 
   /**
@@ -97,6 +99,9 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
           }
       }
   }
+
+  def lookupNotificationId(submissionId: String): Future[Option[NotificationId]] =
+    collection.find(Json.obj("submissionId" -> submissionId), Some(Json.obj("correlationId" -> 1))).one[NotificationId]
 
   def lookupIntervention(eori: String, notificationId: NotificationId): Future[Option[InterventionModel]] = {
     // For now they are based on each other...
