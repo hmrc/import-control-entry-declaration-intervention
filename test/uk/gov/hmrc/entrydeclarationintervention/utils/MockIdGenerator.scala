@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.models
+package uk.gov.hmrc.entrydeclarationintervention.utils
 
-import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
 
-case class NotificationId(value: String) extends AnyVal
+trait MockIdGenerator extends MockFactory {
+  val mockIdGenerator: IdGenerator = mock[IdGenerator]
 
-object NotificationId {
-  implicit val writes: Writes[NotificationId] = new Writes[NotificationId] {
-    def writes(notificationId: NotificationId): JsValue = Json.obj("notificationId" -> notificationId.value)
+  object MockIdGenerator {
+    def generateNotificationId: CallHandler[String] = mockIdGenerator.generateNotificationId _ expects ()
   }
-  implicit val reads: Reads[NotificationId] = (JsPath \ "notificationId").read[String].map(NotificationId.apply)
 }

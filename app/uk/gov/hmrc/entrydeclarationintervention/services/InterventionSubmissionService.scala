@@ -22,7 +22,7 @@ import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionModel, NotificationId}
 import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
 import uk.gov.hmrc.entrydeclarationintervention.repositories.InterventionRepo
-import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, SaveError, Timer}
+import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, IdGenerator, SaveError, Timer}
 import uk.gov.hmrc.entrydeclarationintervention.validators.SchemaValidator
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,6 +35,7 @@ class InterventionSubmissionService @Inject()(
   xmlWrapper: XMLWrapper,
   interventionRepo: InterventionRepo,
   schemaValidator: SchemaValidator,
+  idGenerator: IdGenerator,
   override val metrics: Metrics)(implicit ec: ExecutionContext)
     extends Timer
     with EventLogger {
@@ -43,11 +44,12 @@ class InterventionSubmissionService @Inject()(
     timeFuture("Service processIntervention", "processIntervention.total") {
       val rawXml = buildXML(intervention)
       validateSchema(rawXml)
-      val wrappedXml = xmlWrapper.wrapXml(NotificationId(intervention.metadata.correlationId), rawXml)
-      saveIntervention(intervention, wrappedXml)
+      val notificationId = idGenerator.generateNotificationId
+      val wrappedXml = xmlWrapper.wrapXml(notificationId, rawXml)
+      saveIntervention(notificationId, intervention, wrappedXml)
     }
 
-  private def saveIntervention(intervention: InterventionReceived, interventionXml: Node): Future[Option[SaveError]] =
+  private def saveIntervention(notificationId: String, intervention: InterventionReceived, interventionXml: Node): Future[Option[SaveError]] =
     timeFuture("Service saveIntervention", "saveIntervention.total") {
       import intervention._
       val xmlString = Utility.trim(interventionXml).toString
@@ -56,6 +58,7 @@ class InterventionSubmissionService @Inject()(
         InterventionModel(
           eori             = metadata.senderEORI,
           correlationId    = metadata.correlationId,
+          notificationId   = notificationId,
           receivedDateTime = metadata.receivedDateTime,
           submissionId     = submissionId,
           interventionXml  = xmlString

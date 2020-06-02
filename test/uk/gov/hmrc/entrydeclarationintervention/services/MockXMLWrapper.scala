@@ -26,7 +26,7 @@ trait MockXMLWrapper extends MockFactory {
   val mockXMLWrapper: XMLWrapper = mock[XMLWrapper]
 
   object MockXMLWrapper {
-    def wrapXml(notificationId: NotificationId, xml: Elem): CallHandler[Elem] =
+    def wrapXml(notificationId: String, xml: Elem): CallHandler[Elem] =
       mockXMLWrapper.wrapXml _ expects (notificationId, xml)
   }
 

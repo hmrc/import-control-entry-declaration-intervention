@@ -33,14 +33,10 @@ trait MockInterventionRepo extends MockFactory {
     def lookupNotificationId(submissionId: String): CallHandler[Future[Option[NotificationId]]] =
       interventionRepo.lookupNotificationId _ expects submissionId
 
-    def lookupIntervention(
-      eori: String,
-      notificationId: NotificationId): CallHandler[Future[Option[InterventionModel]]] =
+    def lookupIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
       interventionRepo.lookupIntervention _ expects (eori, notificationId)
 
-    def acknowledgeIntervention(
-      eori: String,
-      notificationId: NotificationId): CallHandler[Future[Option[InterventionModel]]] =
+    def acknowledgeIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
       interventionRepo.acknowledgeIntervention _ expects (eori, notificationId)
 
     def listInterventions(eori: String): CallHandler[Future[List[InterventionIds]]] =

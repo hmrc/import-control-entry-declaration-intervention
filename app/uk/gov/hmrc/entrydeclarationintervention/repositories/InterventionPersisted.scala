@@ -17,10 +17,11 @@
 package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import play.api.libs.json._
-import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
+import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionModel, NotificationId}
 
 private[repositories] case class InterventionPersisted(
   eori: String,
+  notificationId: String,
   correlationId: String,
   acknowledged: Boolean = false,
   receivedDateTime: PersistableDateTime,
@@ -29,6 +30,7 @@ private[repositories] case class InterventionPersisted(
   def toIntervention: InterventionModel =
     InterventionModel(
       eori             = eori,
+      notificationId   = notificationId,
       correlationId    = correlationId,
       acknowledged     = acknowledged,
       receivedDateTime = receivedDateTime.toInstant,
@@ -43,6 +45,7 @@ private[repositories] object InterventionPersisted {
 
     InterventionPersisted(
       eori             = eori,
+      notificationId   = notificationId,
       correlationId    = correlationId,
       acknowledged     = acknowledged,
       receivedDateTime = PersistableDateTime(receivedDateTime),

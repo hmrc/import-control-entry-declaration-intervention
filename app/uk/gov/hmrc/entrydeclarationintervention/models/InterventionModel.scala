@@ -21,12 +21,13 @@ import java.time.Instant
 import play.api.libs.json.{Format, Json}
 
 case class InterventionModel(
-                         eori: String,
-                         correlationId: String,
-                         acknowledged: Boolean = false,
-                         receivedDateTime: Instant,
-                         submissionId: String,
-                         interventionXml: String)
+  eori: String,
+  notificationId: String,
+  correlationId: String,
+  acknowledged: Boolean = false,
+  receivedDateTime: Instant,
+  submissionId: String,
+  interventionXml: String)
 
 object InterventionModel {
   implicit val format: Format[InterventionModel] = Json.format[InterventionModel]

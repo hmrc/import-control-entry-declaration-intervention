@@ -14,15 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.models
+package uk.gov.hmrc.entrydeclarationintervention.utils
 
-import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
+import uk.gov.hmrc.play.test.UnitSpec
 
-case class NotificationId(value: String) extends AnyVal
+class IdGeneratorSpec extends UnitSpec {
 
-object NotificationId {
-  implicit val writes: Writes[NotificationId] = new Writes[NotificationId] {
-    def writes(notificationId: NotificationId): JsValue = Json.obj("notificationId" -> notificationId.value)
+  val idGenerator = new IdGenerator
+
+  "IdGenerator" when {
+    "generating submissionIds" must {
+      "generate ids that are different" in {
+        val num = 1000000
+        val ids = for (_ <- 1 to num) yield idGenerator.generateNotificationId
+
+        ids.toSet.size shouldBe num
+      }
+
+      "generate ids that are uuids" in {
+        idGenerator.generateNotificationId should fullyMatch regex """([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})""".r
+      }
+    }
   }
-  implicit val reads: Reads[NotificationId] = (JsPath \ "notificationId").read[String].map(NotificationId.apply)
 }

@@ -47,18 +47,21 @@ class InterventionRepoISpec
     .configure("metrics.enabled" -> "false", "response.max.list" -> listInterventionsLimit.toString)
     .build()
 
-  val listInterventionsLimit    = 2
-  val correlationId             = "correlationId"
-  val submissionId              = "submissionId"
-  val eori                      = "eori"
-  val acknowledgedCorrelationId = "acknowledgedCorrelationId"
-  val acknowledgedSubmissionId  = "acknowledgedsubmissionId"
-  val acknowledgedEori          = "acknowledgedEori"
-  val interventionXml           = "somexml"
-  val receivedDateTime: Instant = Instant.parse("2020-12-31T23:59:00Z")
+  val listInterventionsLimit     = 2
+  val notificationId             = "notificationId"
+  val correlationId              = "correlationId"
+  val submissionId               = "submissionId"
+  val eori                       = "eori"
+  val acknowledgedNotificationId = "acknowledgedNotificationId"
+  val acknowledgedCorrelationId  = "acknowledgedCorrelationId"
+  val acknowledgedSubmissionId   = "acknowledgedsubmissionId"
+  val acknowledgedEori           = "acknowledgedEori"
+  val interventionXml            = "somexml"
+  val receivedDateTime: Instant  = Instant.parse("2020-12-31T23:59:00Z")
 
   val intervention: InterventionModel = InterventionModel(
     eori,
+    notificationId,
     correlationId,
     acknowledged = false,
     receivedDateTime,
@@ -68,6 +71,7 @@ class InterventionRepoISpec
 
   val acknowledgedIntervention: InterventionModel = InterventionModel(
     eori,
+    acknowledgedNotificationId,
     acknowledgedCorrelationId,
     acknowledged = true,
     receivedDateTime,
@@ -118,24 +122,20 @@ class InterventionRepoISpec
     "looking up by eori and correlation id" when {
       "it exists in the database" must {
         "return it" in {
-          await(repository.lookupIntervention(eori, InterventionIds.toNotificationId(correlationId))) shouldBe Some(
-            intervention)
+          await(repository.lookupIntervention(eori, notificationId)) shouldBe Some(intervention)
         }
       }
 
       "it exists in the database and has been acknowledged" must {
         "ignore it" in {
           await(repository.save(acknowledgedIntervention))
-          await(
-            repository.lookupIntervention(
-              acknowledgedEori,
-              InterventionIds.toNotificationId(acknowledgedCorrelationId))) shouldBe None
+          await(repository.lookupIntervention(acknowledgedEori, acknowledgedNotificationId)) shouldBe None
         }
       }
 
       "it does not exist in the database" must {
         "return None" in {
-          await(repository.lookupIntervention("unknownEori", NotificationId("unknownId"))) shouldBe None
+          await(repository.lookupIntervention("unknownEori", "unknownId")) shouldBe None
         }
       }
     }
@@ -143,7 +143,7 @@ class InterventionRepoISpec
     "acknowledging an intervention" when {
       "intervention exists and is unacknowledged" must {
         "return the updated intervention" in {
-          await(repository.acknowledgeIntervention(eori, InterventionIds.toNotificationId(correlationId))) shouldBe Some(
+          await(repository.acknowledgeIntervention(eori, notificationId)) shouldBe Some(
             intervention.copy(acknowledged = true))
         }
         "update it" in {
@@ -153,24 +153,25 @@ class InterventionRepoISpec
 
       "intervention exists and is acknowledged" must {
         "return None" in {
-          await(repository.acknowledgeIntervention(eori, InterventionIds.toNotificationId(correlationId))) shouldBe None
+          await(repository.acknowledgeIntervention(eori, notificationId)) shouldBe None
         }
       }
 
       "intervention does not exist" must {
         "return None" in {
-          await(repository.acknowledgeIntervention("unknownEori", InterventionIds.toNotificationId("unknownId"))) shouldBe None
+          await(repository.acknowledgeIntervention("unknownEori", notificationId)) shouldBe None
         }
       }
     }
 
     "listing interventions" when {
-      def correlationId(i: Int)  = s"corId$i"
-      def notificationId(i: Int) = InterventionIds.toNotificationId(correlationId(i))
+      def correlationId(i: Int): String  = s"corId$i"
+      def notificationId(i: Int): String = s"notId$i"
 
       val listedIntervention =
         InterventionModel(
           "testEori",
+          notificationId(1),
           correlationId(1),
           acknowledged = false,
           receivedDateTime,
@@ -183,8 +184,8 @@ class InterventionRepoISpec
           await(repository.save(listedIntervention))
           await(repository.save(listedIntervention.copy(correlationId = correlationId(2), submissionId = "subId2")))
           await(repository.listInterventions("testEori")) shouldBe List(
-            InterventionIds(correlationId(1), notificationId(1).value),
-            InterventionIds(correlationId(2), notificationId(2).value))
+            InterventionIds(correlationId(1), notificationId(1)),
+            InterventionIds(correlationId(2), notificationId(2)))
         }
         "return a sequence of the messages in order of the receivedDateTime" in {
           await(repository.removeAll())
@@ -197,8 +198,8 @@ class InterventionRepoISpec
               .copy(correlationId = correlationId(2), submissionId = "subId2", receivedDateTime = time1)))
           await(repository.listInterventions("testEori")) shouldBe
             List(
-              InterventionIds(correlationId(2), notificationId(2).value),
-              InterventionIds(correlationId(1), notificationId(1).value))
+              InterventionIds(correlationId(2), notificationId(2)),
+              InterventionIds(correlationId(1), notificationId(1)))
         }
         "return a sequence of the messages in order of the receivedDateTime when oldest ends in 0" in {
           await(repository.removeAll())
@@ -211,8 +212,8 @@ class InterventionRepoISpec
               .copy(correlationId = correlationId(2), submissionId = "subId2", receivedDateTime = time1)))
           await(repository.listInterventions("testEori")) shouldBe
             List(
-              InterventionIds(correlationId(2), notificationId(2).value),
-              InterventionIds(correlationId(1), notificationId(1).value))
+              InterventionIds(correlationId(2), notificationId(2)),
+              InterventionIds(correlationId(1), notificationId(1)))
         }
         //Limit is set to 2 in app startup
         "limit the number of messages to the value set in appConfig" in {
@@ -239,8 +240,8 @@ class InterventionRepoISpec
             repository.save(listedIntervention
               .copy(correlationId = correlationId(3), submissionId = "subId3", receivedDateTime = time1)))
           await(repository.listInterventions("testEori")) shouldBe List(
-            InterventionIds(correlationId(3), notificationId(3).value),
-            InterventionIds(correlationId(1), notificationId(1).value))
+            InterventionIds(correlationId(3), notificationId(3)),
+            InterventionIds(correlationId(1), notificationId(1)))
         }
       }
       "no unacknowledged messages exist" must {

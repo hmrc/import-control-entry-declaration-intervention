@@ -32,7 +32,7 @@ class XMLWrapperSpec extends UnitSpec {
       val namespace = "http://ics.dgtaxud.ec/CC351A"
       val wrapped = Utility.trim(
         xmlWrapper.wrapXml(
-          NotificationId("someNotificationId"),
+          "someNotificationId",
           <cc3:parent>
             <a>
               <b/>
@@ -60,7 +60,7 @@ class XMLWrapperSpec extends UnitSpec {
 
     "only include the namespace once in the string representation" in {
       val xml     = ResourceUtils.withInputStreamFor("xmls/Intervention.xml")(XML.load)
-      val wrapped = xmlWrapper.wrapXml(NotificationId("someNotificationId"), xml)
+      val wrapped = xmlWrapper.wrapXml("someNotificationId", xml)
 
       StringUtils.countMatches(wrapped.toString(), xml.namespace) shouldBe 1
     }

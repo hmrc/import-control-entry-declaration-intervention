@@ -37,14 +37,15 @@ class InterventionRetrievalControllerSpec extends UnitSpec with MockIntervention
       Helpers.stubControllerComponents(),
       mockInterventionRetrievalService)
 
-  val payloadXml                     = "payloadXml"
-  val submissionId                   = "someSubmissionId"
-  val eori                           = "someEori"
-  val correlationId                  = "someCorrelationId"
-  val notificationId: NotificationId = NotificationId("someNotificationId")
+  val payloadXml     = "payloadXml"
+  val submissionId   = "someSubmissionId"
+  val eori           = "someEori"
+  val correlationId  = "someCorrelationId"
+  val notificationId = "someNotificationId"
 
   val intervention: InterventionModel = InterventionModel(
     eori,
+    notificationId,
     correlationId,
     acknowledged = false,
     Instant.parse("2020-12-31T23:59:00Z"),
@@ -65,7 +66,7 @@ class InterventionRetrievalControllerSpec extends UnitSpec with MockIntervention
         MockInterventionRetrievalService.retrieveIntervention(eori, notificationId) returns Future.successful(
           Some(intervention))
 
-        val result = controller.getIntervention(notificationId.value)(FakeRequest())
+        val result = controller.getIntervention(notificationId)(FakeRequest())
 
         status(result)          shouldBe OK
         contentAsString(result) shouldBe payloadXml
@@ -77,7 +78,7 @@ class InterventionRetrievalControllerSpec extends UnitSpec with MockIntervention
         MockAuthService.authenticate() returns Future.successful(Some(eori))
         MockInterventionRetrievalService.retrieveIntervention(eori, notificationId) returns Future.successful(None)
 
-        val result = controller.getIntervention(notificationId.value)(FakeRequest())
+        val result = controller.getIntervention(notificationId)(FakeRequest())
 
         status(result)                              shouldBe NOT_FOUND
         xml.XML.loadString(contentAsString(result)) shouldBe notFoundXml
@@ -88,7 +89,7 @@ class InterventionRetrievalControllerSpec extends UnitSpec with MockIntervention
       "the user is not-authenticated" in {
         MockAuthService.authenticate() returns Future.successful(None)
 
-        val result = controller.getIntervention(notificationId.value)(FakeRequest())
+        val result = controller.getIntervention(notificationId)(FakeRequest())
 
         status(result) shouldBe UNAUTHORIZED
       }
@@ -102,7 +103,7 @@ class InterventionRetrievalControllerSpec extends UnitSpec with MockIntervention
         MockInterventionRetrievalService.acknowledgeIntervention(eori, notificationId) returns Future.successful(
           Some(intervention))
 
-        val result = controller.acknowledgeIntervention(notificationId.value)(FakeRequest())
+        val result = controller.acknowledgeIntervention(notificationId)(FakeRequest())
 
         status(result) shouldBe OK
       }
@@ -112,7 +113,7 @@ class InterventionRetrievalControllerSpec extends UnitSpec with MockIntervention
         MockAuthService.authenticate() returns Future.successful(Some(eori))
         MockInterventionRetrievalService.acknowledgeIntervention(eori, notificationId) returns Future.successful(None)
 
-        val result = controller.acknowledgeIntervention(notificationId.value)(FakeRequest())
+        val result = controller.acknowledgeIntervention(notificationId)(FakeRequest())
 
         status(result)                              shouldBe NOT_FOUND
         xml.XML.loadString(contentAsString(result)) shouldBe notFoundXml
@@ -123,7 +124,7 @@ class InterventionRetrievalControllerSpec extends UnitSpec with MockIntervention
       "the user is not-authenticated" in {
         MockAuthService.authenticate() returns Future.successful(None)
 
-        val result = controller.acknowledgeIntervention(notificationId.value)(FakeRequest())
+        val result = controller.acknowledgeIntervention(notificationId)(FakeRequest())
 
         status(result) shouldBe UNAUTHORIZED
       }

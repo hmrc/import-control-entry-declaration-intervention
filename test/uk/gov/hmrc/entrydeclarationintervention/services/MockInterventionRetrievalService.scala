@@ -26,14 +26,10 @@ trait MockInterventionRetrievalService extends MockFactory {
   val mockInterventionRetrievalService: InterventionRetrievalService = mock[InterventionRetrievalService]
 
   object MockInterventionRetrievalService {
-    def retrieveIntervention(
-      eori: String,
-      notificationId: NotificationId): CallHandler[Future[Option[InterventionModel]]] =
+    def retrieveIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
       mockInterventionRetrievalService.retrieveIntervention _ expects (eori, notificationId)
 
-    def acknowledgeIntervention(
-      eori: String,
-      notificationId: NotificationId): CallHandler[Future[Option[InterventionModel]]] =
+    def acknowledgeIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
       mockInterventionRetrievalService.acknowledgeIntervention _ expects (eori, notificationId)
 
     def listInterventions(eori: String): CallHandler[Future[List[InterventionIds]]] =
