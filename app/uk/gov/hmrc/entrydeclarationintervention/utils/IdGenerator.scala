@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.models
+package uk.gov.hmrc.entrydeclarationintervention.utils
 
-import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
+import java.util.UUID
 
-case class NotificationId(value: String) extends AnyVal
-
-object NotificationId {
-  implicit val writes: Writes[NotificationId] = new Writes[NotificationId] {
-    def writes(notificationId: NotificationId): JsValue = Json.obj("notificationId" -> notificationId.value)
-  }
-  implicit val reads: Reads[NotificationId] = (JsPath \ "notificationId").read[String].map(NotificationId.apply)
+class IdGenerator {
+ def generateNotificationId: String = UUID.randomUUID.toString
 }

@@ -38,12 +38,12 @@ trait InterventionRepo {
 
   def lookupNotificationId(submissionId: String): Future[Option[NotificationId]]
 
-  def lookupIntervention(eori: String, notificationId: NotificationId): Future[Option[InterventionModel]]
+  def lookupIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]]
 
   /**
     * @return the acknowledged intervention
     */
-  def acknowledgeIntervention(eori: String, notificationId: NotificationId): Future[Option[InterventionModel]]
+  def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]]
 
   def listInterventions(eori: String): Future[List[InterventionIds]]
 }
@@ -58,18 +58,25 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
     with InterventionRepo {
 
   override def indexes: Seq[Index] = Seq(
-    Index(Seq(("submissionId", Ascending)), name = Some("submissionIdIndex"), unique = true),
+    //is this one necessary?
+    Index(Seq(("notificationId", Ascending)), name = Some("notificationIdIndex"), unique = true),
+    Index(
+      Seq(("submissionId", Ascending), ("notificationId", Ascending)),
+      name   = Some("lookupNotificationIdIndex"),
+      unique = true),
     // Covering index for list...
     Index(
       Seq(
         ("eori", Ascending),
         ("acknowledged", Ascending),
         ("receivedDateTime", Ascending),
+        ("notificationId", Ascending),
         ("correlationId", Ascending)),
-      name = Some("listIndex")),
+      name = Some("listIndex")
+    ),
     Index(
-      Seq(("eori", Ascending), ("correlationId", Ascending)),
-      name   = Some("eoriPlusCorrelationIdIndex"),
+      Seq(("eori", Ascending), ("notificationId", Ascending)),
+      name   = Some("eoriPlusNotificationIdIndex"),
       unique = true)
   )
 
@@ -101,24 +108,18 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
   }
 
   def lookupNotificationId(submissionId: String): Future[Option[NotificationId]] =
-    collection.find(Json.obj("submissionId" -> submissionId), Some(Json.obj("correlationId" -> 1))).one[NotificationId]
+    collection.find(Json.obj("submissionId" -> submissionId), Some(Json.obj("notificationId" -> 1))).one[NotificationId]
 
-  def lookupIntervention(eori: String, notificationId: NotificationId): Future[Option[InterventionModel]] = {
-    // For now they are based on each other...
-    val correlationId = InterventionIds.toCorrelationId(notificationId)
-
+  def lookupIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     collection
-      .find(Json.obj("eori" -> eori, "correlationId" -> correlationId, "acknowledged" -> false), Option.empty[JsObject])
+      .find(Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false), Option.empty[JsObject])
       .one[InterventionPersisted]
       .map(_.map(_.toIntervention))
-  }
 
-  def acknowledgeIntervention(eori: String, notificationId: NotificationId): Future[Option[InterventionModel]] = {
-    // For now they are based on each other...
-    val correlationId = InterventionIds.toCorrelationId(notificationId)
 
+  def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     findAndUpdate(
-      query          = Json.obj("eori" -> eori, "correlationId" -> correlationId, "acknowledged" -> false),
+      query          = Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
       update         = Json.obj("$set" -> Json.obj("acknowledged" -> true)),
       fetchNewObject = true
     ).map(result => result.result[InterventionPersisted].map(_.toIntervention)).recover {
@@ -126,11 +127,12 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
         logger.error(s"Unable to acknowledge intervention with eori=$eori and notificationId=$notificationId", e)
         None
     }
-  }
 
   def listInterventions(eori: String): Future[List[InterventionIds]] =
     collection
-      .find(Json.obj("eori" -> eori, "acknowledged" -> false), Some(Json.obj("correlationId" -> 1)))
+      .find(
+        Json.obj("eori" -> eori, "acknowledged" -> false),
+        Some(Json.obj("correlationId" -> 1, "notificationId" -> 1)))
       .sort(Json.obj("receivedDateTime" -> 1))
       .cursor[InterventionIds]()
       .collect[List](maxDocs = appConfig.listInterventionsLimit, err = Cursor.FailOnError[List[InterventionIds]]())

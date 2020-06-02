@@ -29,12 +29,12 @@ class InterventionRetrievalService @Inject()(interventionRepo: InterventionRepo,
   implicit ec: ExecutionContext)
     extends Timer
     with EventLogger {
-  def retrieveIntervention(eori: String, notificationId: NotificationId): Future[Option[InterventionModel]] =
+  def retrieveIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     timeFuture("Service retrieveIntervention", "retrieveIntervention.total") {
       interventionRepo.lookupIntervention(eori, notificationId)
     }
 
-  def acknowledgeIntervention(eori: String, notificationId: NotificationId): Future[Option[InterventionModel]] =
+  def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     timeFuture("Service acknowledgeIntervention", "acknowledgeIntervention.total") {
       interventionRepo.acknowledgeIntervention(eori, notificationId)
     }

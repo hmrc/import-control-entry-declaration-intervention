@@ -39,7 +39,7 @@ class InterventionRetrievalController @Inject()(
   }
 
   def getIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async { implicit userRequest =>
-    service.retrieveIntervention(userRequest.eori, NotificationId(notificationId)) map {
+    service.retrieveIntervention(userRequest.eori, notificationId) map {
       case None               => NotFound(StandardError.notFound)
       case Some(intervention) => Ok(intervention.interventionXml).as(MimeTypes.XML)
     }
@@ -47,7 +47,7 @@ class InterventionRetrievalController @Inject()(
 
   def acknowledgeIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async {
     implicit userRequest =>
-      service.acknowledgeIntervention(userRequest.eori, NotificationId(notificationId)) map {
+      service.acknowledgeIntervention(userRequest.eori, notificationId) map {
         case None    => NotFound(StandardError.notFound)
         case Some(_) => Ok
       }

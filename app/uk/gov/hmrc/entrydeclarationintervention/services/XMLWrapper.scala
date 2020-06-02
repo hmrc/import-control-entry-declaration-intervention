@@ -23,13 +23,13 @@ import scala.xml.Elem
 
 @Singleton
 class XMLWrapper {
-  def wrapXml(notificationId: NotificationId, xml: Elem): Elem =
-    //@formatter:off
+  def wrapXml(notificationId: String, xml: Elem): Elem =
+  //@formatter:off
     <notificationResponse xmlns:cc3="http://ics.dgtaxud.ec/CC351A">
       <response>
         {xml}
       </response>
-      <acknowledgement method='DELETE' href={s"/customs/imports/notifications/${notificationId.value}"}/>
+      <acknowledgement method='DELETE' href={s"/customs/imports/notifications/$notificationId"}/>
     </notificationResponse>
   //@formatter:on
 }

@@ -40,14 +40,15 @@ class InterventionRetrievalServiceSpec extends UnitSpec with MockInterventionRep
 
   val service = new InterventionRetrievalService(interventionRepo, mockedMetrics)
 
-  val submissionId                   = "submissionId"
-  val eori                           = "eori"
-  val correlationId                  = "correlationId"
-  val notificationId: NotificationId = NotificationId("notificationId")
-  val xml                            = "somexml"
+  val submissionId   = "submissionId"
+  val eori           = "eori"
+  val correlationId  = "correlationId"
+  val notificationId = "notificationId"
+  val xml            = "somexml"
 
   val intervention: InterventionModel = InterventionModel(
     eori,
+    notificationId,
     correlationId,
     acknowledged = false,
     Instant.parse("2020-12-31T23:59:00Z"),
