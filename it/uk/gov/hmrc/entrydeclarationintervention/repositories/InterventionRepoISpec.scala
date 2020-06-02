@@ -182,7 +182,9 @@ class InterventionRepoISpec
         "return a sequence of the messages" in {
           await(repository.removeAll())
           await(repository.save(listedIntervention))
-          await(repository.save(listedIntervention.copy(correlationId = correlationId(2), submissionId = "subId2")))
+          await(
+            repository.save(
+              listedIntervention.copy(notificationId = notificationId(2), correlationId = correlationId(2), submissionId = "subId2")))
           await(repository.listInterventions("testEori")) shouldBe List(
             InterventionIds(correlationId(1), notificationId(1)),
             InterventionIds(correlationId(2), notificationId(2)))
@@ -195,7 +197,7 @@ class InterventionRepoISpec
           await(repository.save(listedIntervention.copy(receivedDateTime = time2)))
           await(
             repository.save(listedIntervention
-              .copy(correlationId = correlationId(2), submissionId = "subId2", receivedDateTime = time1)))
+              .copy(notificationId = notificationId(2), correlationId = correlationId(2), receivedDateTime = time1)))
           await(repository.listInterventions("testEori")) shouldBe
             List(
               InterventionIds(correlationId(2), notificationId(2)),
@@ -209,7 +211,7 @@ class InterventionRepoISpec
           await(repository.save(listedIntervention.copy(receivedDateTime = time2)))
           await(
             repository.save(listedIntervention
-              .copy(correlationId = correlationId(2), submissionId = "subId2", receivedDateTime = time1)))
+              .copy(notificationId = notificationId(2), correlationId = correlationId(2), receivedDateTime = time1)))
           await(repository.listInterventions("testEori")) shouldBe
             List(
               InterventionIds(correlationId(2), notificationId(2)),
@@ -219,8 +221,12 @@ class InterventionRepoISpec
         "limit the number of messages to the value set in appConfig" in {
           await(repository.removeAll())
           await(repository.save(listedIntervention))
-          await(repository.save(listedIntervention.copy(correlationId = correlationId(2), submissionId = "subId2")))
-          await(repository.save(listedIntervention.copy(correlationId = correlationId(3), submissionId = "subId3")))
+          await(
+            repository.save(
+              listedIntervention.copy(notificationId = notificationId(2), correlationId = correlationId(2))))
+          await(
+            repository.save(
+              listedIntervention.copy(notificationId = notificationId(2), correlationId = correlationId(3))))
           await(repository.listInterventions("testEori")).length shouldBe listInterventionsLimit
         }
 
@@ -232,13 +238,13 @@ class InterventionRepoISpec
           await(repository.removeAll())
           await(
             repository.save(listedIntervention
-              .copy(correlationId = correlationId(1), submissionId = "subId1", receivedDateTime = time2)))
+              .copy(notificationId = notificationId(1), correlationId = correlationId(1), receivedDateTime = time2)))
           await(
             repository.save(listedIntervention
-              .copy(correlationId = correlationId(2), submissionId = "subId2", receivedDateTime = time3)))
+              .copy(notificationId = notificationId(2), correlationId = correlationId(2), receivedDateTime = time3)))
           await(
             repository.save(listedIntervention
-              .copy(correlationId = correlationId(3), submissionId = "subId3", receivedDateTime = time1)))
+              .copy(notificationId = notificationId(3), correlationId = correlationId(3), receivedDateTime = time1)))
           await(repository.listInterventions("testEori")) shouldBe List(
             InterventionIds(correlationId(3), notificationId(3)),
             InterventionIds(correlationId(1), notificationId(1)))
@@ -256,7 +262,7 @@ class InterventionRepoISpec
       "return the notificationId" in {
         await(repository.removeAll())
         await(repository.save(intervention))
-        await(repository.lookupNotificationId(submissionId)) shouldBe Some(NotificationId(correlationId))
+        await(repository.lookupNotificationId(submissionId)) shouldBe Some(NotificationId(notificationId))
       }
     }
     "submission does not exist" must {
