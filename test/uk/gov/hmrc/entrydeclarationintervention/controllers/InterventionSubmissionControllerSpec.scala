@@ -18,7 +18,7 @@ package uk.gov.hmrc.entrydeclarationintervention.controllers
 
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.http.Status
+import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -37,8 +37,11 @@ class InterventionSubmissionControllerSpec
     with MockInterventionSubmissionService
     with MockAppConfig {
 
-  private val fakeRequest =
-    FakeRequest("POST", "/import-control-entry-declaration-decision/import-control/entry-summary-declaration-response")
+  val validIntervention: JsValue = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
+  val accessToken: String        = "accessToken"
+  val bearerToken: String        = s"Bearer $accessToken"
+  val request: FakeRequest[JsValue] =
+    FakeRequest().withBody(validIntervention).withHeaders(HeaderNames.AUTHORIZATION -> bearerToken)
 
   private val controller =
     new InterventionSubmissionController(
@@ -48,11 +51,9 @@ class InterventionSubmissionControllerSpec
 
   private val submissionId = "submissionId"
 
-  val validIntervention: JsValue = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
-
   "Post a valid intervention message" should {
     "return a 201 Created " in {
-      val request = fakeRequest.withBody(validIntervention)
+      MockAppConfig.eisInboundBearerToken.returns(accessToken)
       MockAppConfig.validateIncomingJson.returns(false)
       MockInterventionSubmissionService
         .processIntervention(validIntervention.as[InterventionReceived])
@@ -68,7 +69,7 @@ class InterventionSubmissionControllerSpec
     "convert error codes from the service to the appropriate responses" when {
       def run(saveError: SaveError, expectedStatus: Int): Unit =
         s"a $saveError error is returned from the service" in {
-          val request = fakeRequest.withBody(validIntervention)
+          MockAppConfig.eisInboundBearerToken.returns(accessToken)
           MockAppConfig.validateIncomingJson.returns(false)
           MockInterventionSubmissionService
             .processIntervention(validIntervention.as[InterventionReceived])
@@ -89,7 +90,7 @@ class InterventionSubmissionControllerSpec
 
   "Post a valid message when schema validation is enabled" must {
     "return a 201 Created" in {
-      val request = fakeRequest.withBody(validIntervention)
+      MockAppConfig.eisInboundBearerToken.returns(accessToken)
       MockAppConfig.validateIncomingJson.returns(true)
       MockInterventionSubmissionService
         .processIntervention(validIntervention.as[InterventionReceived])
@@ -103,77 +104,89 @@ class InterventionSubmissionControllerSpec
 
   "Post an invalid message" should {
     "return a 400 Bad Request when schema validation is enabled" in {
-      val request = fakeRequest.withBody(Json.parse(s"""
-                                                       |{
-                                                       |  "submissionId": "$submissionId",
-                                                       |  "metadata": {
-                                                       |    "senderEORI": "ABCDEFGHIJKLMN",
-                                                       |    "senderBranch": "ABCDEFGHIJKLMNO",
-                                                       |    "preparationDateTime": "2020-12-23T14:46:01.000Z",
-                                                       |    "messageType": "IE351",
-                                                       |    "messageIdentification": "ABCDE",
-                                                       |    "receivedDateTime": "2020-12-23T14:46:01.000Z",
-                                                       |    "correlationId": "BAD_CORRELATION_ID"
-                                                       |  },
-                                                       |  "parties": {
-                                                       |    "declarant": {"eori": "GB00123456789"}
-                                                       |  },
-                                                       |  "goods": {
-                                                       |    "numberOfItems": 0
-                                                       |  },
-                                                       |  "declaration": {
-                                                       |    "localReferenceNumber": "ABCDEFGHIJKLMNOPQRST",
-                                                       |    "movementReferenceNumber": "ABCDEFGHIJKLMNOPQR",
-                                                       |    "registeredDateTime": "2020-12-23T14:46:01.000Z",
-                                                       |    "submittedDateTime": "2020-12-23T14:46:01.000Z"
-                                                       |  },
-                                                       |  "itinerary": {
-                                                       |    "officeOfFirstEntry": {
-                                                       |      "reference": "ABCDEFGH",
-                                                       |      "expectedDateTimeOfArrival": "2020-12-23T14:46:01.000Z"
-                                                       |    }
-                                                       |  },
-                                                       |  "customsIntervention": {
-                                                       |    "notificationDateTime": "2020-12-23T14:46:01.000Z",
-                                                       |    "interventions": [
-                                                       |      {
-                                                       |        "code": "A001",
-                                                       |        "itemNumber": "1",
-                                                       |        "text": "GOODS NOT TO BE LOADED",
-                                                       |        "language": "EN"
-                                                       |      }
-                                                       |    ]
-                                                       |  }
-                                                       |}
-                                                       |""".stripMargin))
+      val intervention = Json.parse(s"""
+                                       |{
+                                       |  "submissionId": "$submissionId",
+                                       |  "metadata": {
+                                       |    "senderEORI": "ABCDEFGHIJKLMN",
+                                       |    "senderBranch": "ABCDEFGHIJKLMNO",
+                                       |    "preparationDateTime": "2020-12-23T14:46:01.000Z",
+                                       |    "messageType": "IE351",
+                                       |    "messageIdentification": "ABCDE",
+                                       |    "receivedDateTime": "2020-12-23T14:46:01.000Z",
+                                       |    "correlationId": "BAD_CORRELATION_ID"
+                                       |  },
+                                       |  "parties": {
+                                       |    "declarant": {"eori": "GB00123456789"}
+                                       |  },
+                                       |  "goods": {
+                                       |    "numberOfItems": 0
+                                       |  },
+                                       |  "declaration": {
+                                       |    "localReferenceNumber": "ABCDEFGHIJKLMNOPQRST",
+                                       |    "movementReferenceNumber": "ABCDEFGHIJKLMNOPQR",
+                                       |    "registeredDateTime": "2020-12-23T14:46:01.000Z",
+                                       |    "submittedDateTime": "2020-12-23T14:46:01.000Z"
+                                       |  },
+                                       |  "itinerary": {
+                                       |    "officeOfFirstEntry": {
+                                       |      "reference": "ABCDEFGH",
+                                       |      "expectedDateTimeOfArrival": "2020-12-23T14:46:01.000Z"
+                                       |    }
+                                       |  },
+                                       |  "customsIntervention": {
+                                       |    "notificationDateTime": "2020-12-23T14:46:01.000Z",
+                                       |    "interventions": [
+                                       |      {
+                                       |        "code": "A001",
+                                       |        "itemNumber": "1",
+                                       |        "text": "GOODS NOT TO BE LOADED",
+                                       |        "language": "EN"
+                                       |      }
+                                       |    ]
+                                       |  }
+                                       |}
+                                       |""".stripMargin)
 
       MockAppConfig.validateIncomingJson.returns(true)
+      val request = FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> bearerToken)
+      MockAppConfig.eisInboundBearerToken.returns(accessToken)
       val result = controller.postIntervention(request)
 
       status(result) shouldBe Status.BAD_REQUEST
     }
 
     "return 400 Bad Request for un-parsable json" in {
-      val decision = Json.parse(s"""
-                                   |{
-                                   |  "submissionId": "$submissionId",
-                                   |  "metadata": {
-                                   |    "senderEORI": "volup",
-                                   |    "senderBranch": "pariat",
-                                   |    "preparationDateTime": "2020-12-31T23:59:00.000Z",
-                                   |    "messageType": "IE305",
-                                   |    "messageIdentification": "msgId",
-                                   |    "correlationId": "correlationId",
-                                   |    "receivedDateTime": "2020-12-31T23:59:00.000Z"
-                                   |  },
-                                   |  "response": "beans"
-                                   |}
-                                   |""".stripMargin)
+      val intervention = Json.parse(s"""
+                                       |{
+                                       |  "submissionId": "$submissionId",
+                                       |  "metadata": {
+                                       |    "senderEORI": "volup",
+                                       |    "senderBranch": "pariat",
+                                       |    "preparationDateTime": "2020-12-31T23:59:00.000Z",
+                                       |    "messageType": "IE305",
+                                       |    "messageIdentification": "msgId",
+                                       |    "correlationId": "correlationId",
+                                       |    "receivedDateTime": "2020-12-31T23:59:00.000Z"
+                                       |  },
+                                       |  "response": "beans"
+                                       |}
+                                       |""".stripMargin)
 
-      val request = fakeRequest.withBody(decision)
-      val result  = controller.postIntervention(request)
+      val request = FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> bearerToken)
+      MockAppConfig.eisInboundBearerToken.returns(accessToken)
+      val result = controller.postIntervention(request)
 
       status(result) shouldBe Status.BAD_REQUEST
+    }
+    "return 401" when {
+      "no authentication fails" in {
+        MockAppConfig.eisInboundBearerToken returns "XXXX"
+
+        val result = controller.postIntervention(request)
+
+        status(result) shouldBe UNAUTHORIZED
+      }
     }
   }
 }

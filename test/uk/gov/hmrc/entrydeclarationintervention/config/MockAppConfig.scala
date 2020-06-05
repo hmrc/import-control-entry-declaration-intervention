@@ -27,6 +27,8 @@ trait MockAppConfig extends MockFactory {
 
     def apiGatewayContext: CallHandler[String] = mockAppConfig.apiGatewayContext _ expects ()
 
+    def eisInboundBearerToken: CallHandler[String] = mockAppConfig.eisInboundBearerToken _ expects ()
+
     def listInterventionsLimit: CallHandler[Int] = mockAppConfig.listInterventionsLimit _ expects ()
 
     def validateIncomingJson: CallHandler[Boolean] = (mockAppConfig.validateIncomingJson _).expects()
