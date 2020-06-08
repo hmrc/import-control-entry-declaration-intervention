@@ -32,6 +32,8 @@ trait AppConfig {
 
   def apiStatus: String
 
+  def eisInboundBearerToken: String
+
   def listInterventionsLimit: Int
 
   def auditingEnabled: Boolean
@@ -51,14 +53,17 @@ class AppConfigImpl @Inject()(config: Configuration, servicesConfig: ServicesCon
   val authBaseUrl: String  = servicesConfig.baseUrl("auth")
   lazy val appName: String = AppName.fromConfiguration(config)
 
-  val apiGatewayContext: String = config.get[String]("api.gateway.context")
+  val apiGatewayContext: String    = config.get[String]("api.gateway.context")
   val apiEndpointsEnabled: Boolean = config.get[Boolean]("api.endpoints.enabled")
-  val apiStatus: String = config.get[String]("api.status")
+  val apiStatus: String            = config.get[String]("api.status")
 
   val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
   val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
 
   val apiSubscriptionFieldsHost: String = servicesConfig.baseUrl("api-subscription-fields")
+
+  lazy val eisInboundBearerToken: String =
+    config.get[String]("microservice.services.import-control-entry-declaration-eis.inboundBearerToken")
 
   lazy val listInterventionsLimit: Int   = config.get[Int]("response.max.list")
   lazy val validateIncomingJson: Boolean = config.getOptional[Boolean]("validateIncomingJson").getOrElse(false)

@@ -33,10 +33,10 @@ class InterventionSubmissionController @Inject()(
   appConfig: AppConfig,
   cc: ControllerComponents,
   service: InterventionSubmissionService)(implicit ec: ExecutionContext)
-    extends BackendController(cc)
+    extends EisInboundAuthorisedController(cc, appConfig)
     with EventLogger {
 
-  val postIntervention: Action[JsValue] = Action.async(parse.json) { implicit request =>
+  val postIntervention: Action[JsValue] = authorisedAction.async(parse.json) { implicit request =>
     val model: JsResult[InterventionReceived] = request.body.validate[InterventionReceived]
 
     if (model.isSuccess) {
