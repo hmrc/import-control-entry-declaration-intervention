@@ -38,10 +38,9 @@ class InterventionSubmissionControllerSpec
     with MockAppConfig {
 
   val validIntervention: JsValue = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
-  val accessToken: String        = "accessToken"
-  val bearerToken: String        = s"Bearer $accessToken"
+  val bearerToken: String        = "bearerToken"
   val request: FakeRequest[JsValue] =
-    FakeRequest().withBody(validIntervention).withHeaders(HeaderNames.AUTHORIZATION -> bearerToken)
+    FakeRequest().withBody(validIntervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
 
   private val controller =
     new InterventionSubmissionController(
@@ -53,7 +52,7 @@ class InterventionSubmissionControllerSpec
 
   "Post a valid intervention message" should {
     "return a 201 Created " in {
-      MockAppConfig.eisInboundBearerToken.returns(accessToken)
+      MockAppConfig.eisInboundBearerToken.returns(bearerToken)
       MockAppConfig.validateIncomingJson.returns(false)
       MockInterventionSubmissionService
         .processIntervention(validIntervention.as[InterventionReceived])
@@ -69,7 +68,7 @@ class InterventionSubmissionControllerSpec
     "convert error codes from the service to the appropriate responses" when {
       def run(saveError: SaveError, expectedStatus: Int): Unit =
         s"a $saveError error is returned from the service" in {
-          MockAppConfig.eisInboundBearerToken.returns(accessToken)
+          MockAppConfig.eisInboundBearerToken.returns(bearerToken)
           MockAppConfig.validateIncomingJson.returns(false)
           MockInterventionSubmissionService
             .processIntervention(validIntervention.as[InterventionReceived])
@@ -90,7 +89,7 @@ class InterventionSubmissionControllerSpec
 
   "Post a valid message when schema validation is enabled" must {
     "return a 201 Created" in {
-      MockAppConfig.eisInboundBearerToken.returns(accessToken)
+      MockAppConfig.eisInboundBearerToken.returns(bearerToken)
       MockAppConfig.validateIncomingJson.returns(true)
       MockInterventionSubmissionService
         .processIntervention(validIntervention.as[InterventionReceived])
@@ -149,8 +148,8 @@ class InterventionSubmissionControllerSpec
                                        |""".stripMargin)
 
       MockAppConfig.validateIncomingJson.returns(true)
-      val request = FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> bearerToken)
-      MockAppConfig.eisInboundBearerToken.returns(accessToken)
+      val request = FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
+      MockAppConfig.eisInboundBearerToken.returns(bearerToken)
       val result = controller.postIntervention(request)
 
       status(result) shouldBe Status.BAD_REQUEST
@@ -173,8 +172,8 @@ class InterventionSubmissionControllerSpec
                                        |}
                                        |""".stripMargin)
 
-      val request = FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> bearerToken)
-      MockAppConfig.eisInboundBearerToken.returns(accessToken)
+      val request = FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
+      MockAppConfig.eisInboundBearerToken.returns(bearerToken)
       val result = controller.postIntervention(request)
 
       status(result) shouldBe Status.BAD_REQUEST

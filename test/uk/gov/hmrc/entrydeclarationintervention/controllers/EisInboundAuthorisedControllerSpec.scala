@@ -22,7 +22,6 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, ResultExtractors}
-import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
@@ -38,14 +37,13 @@ class EisInboundAuthorisedControllerSpec
     with MockAppConfig {
 
   lazy val cc: ControllerComponents = stubControllerComponents()
-  lazy val accessToken              = "accessToken"
-  lazy val bearerToken              = s"Bearer $accessToken"
+  lazy val bearerToken              = "bearerToken"
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
 
     class TestController extends EisInboundAuthorisedController(cc, mockAppConfig) {
-      def action(): Action[AnyContent] = basicAuthorisedAction.async {
+      def action(): Action[AnyContent] = authorisedAction.async {
         Future.successful(Ok(Json.obj()))
       }
     }
@@ -57,10 +55,10 @@ class EisInboundAuthorisedControllerSpec
 
     "return a 200" when {
       "the user is authorised" in new Test {
-        MockAppConfig.eisInboundBearerToken returns accessToken
+        MockAppConfig.eisInboundBearerToken returns bearerToken
 
         val fakeGetRequest: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest().withHeaders(HeaderNames.AUTHORIZATION -> bearerToken)
+          FakeRequest().withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
         private val result: Future[Result] = controller.action()(fakeGetRequest)
 
         status(await(result)) shouldBe OK
@@ -69,11 +67,11 @@ class EisInboundAuthorisedControllerSpec
 
     "return a 401" when {
       "user is not authorised" in new Test {
-        MockAppConfig.eisInboundBearerToken returns accessToken
+        MockAppConfig.eisInboundBearerToken returns bearerToken
 
         val badBearerToken = "xxx"
         val fakeGetRequest: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest().withHeaders(HeaderNames.AUTHORIZATION -> badBearerToken)
+          FakeRequest().withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $badBearerToken")
         private val result: Future[Result] = controller.action()(fakeGetRequest)
 
         status(await(result)) shouldBe UNAUTHORIZED

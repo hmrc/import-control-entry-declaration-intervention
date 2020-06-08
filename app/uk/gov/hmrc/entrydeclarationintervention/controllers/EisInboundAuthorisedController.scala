@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 abstract class EisInboundAuthorisedController(cc: ControllerComponents, appConfig: AppConfig)
     extends BackendController(cc) {
-  def basicAuthorisedAction: ActionBuilder[Request, AnyContent] =
+  def authorisedAction: ActionBuilder[Request, AnyContent] =
     new ActionBuilder[Request, AnyContent] {
 
       override def parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
