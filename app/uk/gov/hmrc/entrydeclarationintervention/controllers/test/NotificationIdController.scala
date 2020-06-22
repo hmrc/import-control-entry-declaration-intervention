@@ -27,11 +27,9 @@ import scala.concurrent.ExecutionContext
 class NotificationIdController @Inject()(cc: ControllerComponents, service: NotificationIdRetrievalService)(
   implicit ec: ExecutionContext
 ) extends BackendController(cc) {
-  def getNotificationId(submissionId: String): Action[AnyContent] = Action.async { implicit request =>
-    service.retrieveNotificationId(submissionId).map {
-      case Some(notificationId) =>
-        Ok(Json.toJson(notificationId))
-      case None => NotFound
+  def getNotificationIds(submissionId: String): Action[AnyContent] = Action.async { implicit request =>
+    service.retrieveNotificationIds(submissionId).map { notificationIds =>
+      Ok(Json.toJson(notificationIds))
     }
   }
 }

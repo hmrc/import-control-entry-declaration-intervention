@@ -17,7 +17,6 @@
 package uk.gov.hmrc.entrydeclarationintervention.services.test
 
 import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.entrydeclarationintervention.models.NotificationId
 import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRepo
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -26,24 +25,15 @@ import scala.concurrent.Future
 class NotificationIdRetrievalServiceSpec extends UnitSpec with MockInterventionRepo with ScalaFutures {
   val notificationIdRetrievalService = new NotificationIdRetrievalService(interventionRepo)
 
-  val submissionId: String           = "submissionId"
-  val notificationId: NotificationId = NotificationId("notificationId")
+  val submissionId: String = "submissionId"
+  val notificationId       = "notificationId"
 
   "NotificationIdRetrievalService" when {
-    "retrieving notificationId from submissionId" when {
-      "successfully found" must {
-        "return it" in {
-          MockInterventionRepo.lookupNotificationId(submissionId).returns(Future.successful(Some(notificationId)))
+    "retrieving notificationIds from submissionId" must {
+      "return it what is found" in {
+        MockInterventionRepo.lookupNotificationIds(submissionId) returns Future.successful(Seq(notificationId))
 
-          notificationIdRetrievalService.retrieveNotificationId(submissionId).futureValue shouldBe Some(notificationId)
-        }
-      }
-      "not found" must {
-        "return None" in {
-          MockInterventionRepo.lookupNotificationId(submissionId).returns(Future.successful(None))
-
-          notificationIdRetrievalService.retrieveNotificationId(submissionId).futureValue shouldBe None
-        }
+        notificationIdRetrievalService.retrieveNotificationIds(submissionId).futureValue shouldBe Seq(notificationId)
       }
     }
   }

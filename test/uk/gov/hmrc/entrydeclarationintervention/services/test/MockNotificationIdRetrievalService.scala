@@ -26,7 +26,7 @@ trait MockNotificationIdRetrievalService extends MockFactory {
   val mockNotificationIdRetrievalService: NotificationIdRetrievalService = mock[NotificationIdRetrievalService]
 
   object MockNotificationIdRetrievalService {
-    def retrieveNotificationId(submissionId: String): CallHandler[Future[Option[NotificationId]]] =
-      mockNotificationIdRetrievalService.retrieveNotificationId _ expects submissionId
+    def retrieveNotificationIds(submissionId: String): CallHandler[Future[Seq[String]]] =
+      mockNotificationIdRetrievalService.retrieveNotificationIds _ expects submissionId
   }
 }
