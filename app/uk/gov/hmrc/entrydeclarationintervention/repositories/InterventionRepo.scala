@@ -109,6 +109,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
   def lookupNotificationIds(submissionId: String): Future[Seq[String]] =
     collection
       .find(Json.obj("submissionId" -> submissionId), Some(Json.obj("notificationId" -> 1)))
+      .sort(Json.obj("receivedDateTime" -> 1))
       .cursor[NotificationId](ReadPreference.primaryPreferred)
       .collect(maxDocs = -1, FailOnError[Seq[NotificationId]]())
       .map(_.map(_.value))

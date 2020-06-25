@@ -16,6 +16,7 @@
 package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import java.time.Instant
+import java.util.UUID
 
 import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -59,7 +60,9 @@ class InterventionRepoISpec
   val interventionXml            = "somexml"
   val receivedDateTime: Instant  = Instant.parse("2020-12-31T23:59:00Z")
 
-  def intervention(notificationId: String = notificationId1): InterventionModel = InterventionModel(
+  def intervention(
+    notificationId: String    = notificationId1,
+    receivedDateTime: Instant = receivedDateTime): InterventionModel = InterventionModel(
     eori,
     notificationId,
     correlationId,
@@ -279,13 +282,19 @@ class InterventionRepoISpec
       }
     }
     "multiple nofifications exist" must {
-      "return all notificationIds" in {
+      "return all notificationIds in increasing receivedDateTime order" in {
         await(repository.removeAll())
-        val notificationId2 = "notificationId2"
 
-        await(repository.save(intervention(notificationId1)))
-        await(repository.save(intervention(notificationId2)))
-        await(repository.lookupNotificationIds(submissionId)) should contain allOf (notificationId1, notificationId2)
+        // Use random ids to avoid ascending index on submissionId and notificationId
+        // giving us a false pass...
+        val notificationIds = (1 to 10).map(_ => UUID.randomUUID.toString)
+
+        notificationIds.zipWithIndex.foreach {
+          case (notificationId, idx) =>
+            await(repository.save(intervention(notificationId, receivedDateTime.plusSeconds(idx))))
+        }
+
+        await(repository.lookupNotificationIds(submissionId)) shouldBe notificationIds
       }
     }
     "no notifications exist" must {
