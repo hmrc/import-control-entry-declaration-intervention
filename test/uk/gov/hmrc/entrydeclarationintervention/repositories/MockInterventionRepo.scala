@@ -18,7 +18,7 @@ package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel, NotificationId}
+import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel}
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 
 import scala.concurrent.Future
@@ -30,8 +30,8 @@ trait MockInterventionRepo extends MockFactory {
     def saveIntervention(intervention: InterventionModel): CallHandler[Future[Option[SaveError]]] =
       interventionRepo.save _ expects intervention
 
-    def lookupNotificationId(submissionId: String): CallHandler[Future[Option[NotificationId]]] =
-      interventionRepo.lookupNotificationId _ expects submissionId
+    def lookupNotificationIds(submissionId: String): CallHandler[Future[Seq[String]]] =
+      interventionRepo.lookupNotificationIds _ expects submissionId
 
     def lookupIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
       interventionRepo.lookupIntervention _ expects (eori, notificationId)

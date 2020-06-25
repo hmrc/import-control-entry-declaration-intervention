@@ -16,6 +16,7 @@
 package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import java.time.Instant
+import java.util.UUID
 
 import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -48,7 +49,7 @@ class InterventionRepoISpec
     .build()
 
   val listInterventionsLimit     = 2
-  val notificationId             = "notificationId"
+  val notificationId1            = "notificationId1"
   val correlationId              = "correlationId"
   val submissionId               = "submissionId"
   val eori                       = "eori"
@@ -59,7 +60,9 @@ class InterventionRepoISpec
   val interventionXml            = "somexml"
   val receivedDateTime: Instant  = Instant.parse("2020-12-31T23:59:00Z")
 
-  val intervention: InterventionModel = InterventionModel(
+  def intervention(
+    notificationId: String    = notificationId1,
+    receivedDateTime: Instant = receivedDateTime): InterventionModel = InterventionModel(
     eori,
     notificationId,
     correlationId,
@@ -79,18 +82,19 @@ class InterventionRepoISpec
     interventionXml
   )
 
-  def lookupIntervention(submissionId: String): Option[InterventionModel] =
-    await(repository.find("submissionId" -> submissionId).map(_.map(_.toIntervention))).headOption
+  def lookupIntervention(notificationId: String): Option[InterventionModel] =
+    await(repository.find("notificationId" -> notificationId).map(_.map(_.toIntervention))).headOption
 
   "InterventionRepo" when {
     "saving an intervention" when {
+
       "successful" must {
         "return None" in {
-          await(repository.save(intervention)) shouldBe None
+          await(repository.save(intervention())) shouldBe None
         }
 
         "store it in the database" in {
-          lookupIntervention(submissionId) shouldBe Some(intervention)
+          lookupIntervention(notificationId1) shouldBe Some(intervention())
         }
       }
 
@@ -100,20 +104,20 @@ class InterventionRepoISpec
         }
 
         "store it in the database" in {
-          lookupIntervention(acknowledgedSubmissionId) shouldBe Some(acknowledgedIntervention)
+          lookupIntervention(acknowledgedNotificationId) shouldBe Some(acknowledgedIntervention)
         }
       }
 
-      "unique submissionId constraint violated" must {
+      "unique submissionId + notificationId constraint would be violated" must {
         "return duplicate" in {
-          val duplicate = intervention.copy(eori = "otherEori")
+          val duplicate = intervention().copy(eori = "otherEori")
           await(repository.save(duplicate)) shouldBe Some(SaveError.Duplicate)
         }
       }
 
-      "unique eori + correlationId constraint violated" must {
+      "unique eori + notificationId constraint would be violated" must {
         "return duplicate error" in {
-          val duplicate = intervention.copy(submissionId = "other")
+          val duplicate = intervention().copy(submissionId = "other")
           await(repository.save(duplicate)) shouldBe Some(SaveError.Duplicate)
         }
       }
@@ -122,7 +126,7 @@ class InterventionRepoISpec
     "looking up by eori and correlation id" when {
       "it exists in the database" must {
         "return it" in {
-          await(repository.lookupIntervention(eori, notificationId)) shouldBe Some(intervention)
+          await(repository.lookupIntervention(eori, notificationId1)) shouldBe Some(intervention())
         }
       }
 
@@ -138,28 +142,40 @@ class InterventionRepoISpec
           await(repository.lookupIntervention("unknownEori", "unknownId")) shouldBe None
         }
       }
+
+      "it does not exist in the database for the eori" must {
+        "return None" in {
+          await(repository.lookupIntervention("otherEori", notificationId1)) shouldBe None
+        }
+      }
     }
 
     "acknowledging an intervention" when {
       "intervention exists and is unacknowledged" must {
         "return the updated intervention" in {
-          await(repository.acknowledgeIntervention(eori, notificationId)) shouldBe Some(
-            intervention.copy(acknowledged = true))
+          await(repository.acknowledgeIntervention(eori, notificationId1)) shouldBe Some(
+            intervention().copy(acknowledged = true))
         }
         "update it" in {
-          lookupIntervention(submissionId) shouldBe Some(intervention.copy(acknowledged = true))
-        }
-      }
-
-      "intervention exists and is acknowledged" must {
-        "return None" in {
-          await(repository.acknowledgeIntervention(eori, notificationId)) shouldBe None
+          lookupIntervention(notificationId1) shouldBe Some(intervention().copy(acknowledged = true))
         }
       }
 
       "intervention does not exist" must {
         "return None" in {
-          await(repository.acknowledgeIntervention("unknownEori", notificationId)) shouldBe None
+          await(repository.acknowledgeIntervention("unknownEori", "unknownId")) shouldBe None
+        }
+      }
+
+      "intervention does not exist for the eori" must {
+        "return None" in {
+          await(repository.acknowledgeIntervention("otherEori", notificationId1)) shouldBe None
+        }
+      }
+
+      "intervention exists and is already acknowledged" must {
+        "return None" in {
+          await(repository.acknowledgeIntervention(eori, notificationId1)) shouldBe None
         }
       }
     }
@@ -183,8 +199,8 @@ class InterventionRepoISpec
           await(repository.removeAll())
           await(repository.save(listedIntervention))
           await(
-            repository.save(
-              listedIntervention.copy(notificationId = notificationId(2), correlationId = correlationId(2), submissionId = "subId2")))
+            repository.save(listedIntervention
+              .copy(notificationId = notificationId(2), correlationId = correlationId(2), submissionId = "subId2")))
           await(repository.listInterventions("testEori")) shouldBe List(
             InterventionIds(correlationId(1), notificationId(1)),
             InterventionIds(correlationId(2), notificationId(2)))
@@ -257,17 +273,33 @@ class InterventionRepoISpec
       }
     }
   }
-  "looking up a NotificationId" when {
-    "submission exists" must {
+  "looking up notificationIds" when {
+    "a single notification exists" must {
       "return the notificationId" in {
         await(repository.removeAll())
-        await(repository.save(intervention))
-        await(repository.lookupNotificationId(submissionId)) shouldBe Some(NotificationId(notificationId))
+        await(repository.save(intervention(notificationId1)))
+        await(repository.lookupNotificationIds(submissionId)) shouldBe Seq(notificationId1)
       }
     }
-    "submission does not exist" must {
-      "return None" in {
-        await(repository.lookupNotificationId("unknownSubmissionId")) shouldBe None
+    "multiple nofifications exist" must {
+      "return all notificationIds in increasing receivedDateTime order" in {
+        await(repository.removeAll())
+
+        // Use random ids to avoid ascending index on submissionId and notificationId
+        // giving us a false pass...
+        val notificationIds = (1 to 10).map(_ => UUID.randomUUID.toString)
+
+        notificationIds.zipWithIndex.foreach {
+          case (notificationId, idx) =>
+            await(repository.save(intervention(notificationId, receivedDateTime.plusSeconds(idx))))
+        }
+
+        await(repository.lookupNotificationIds(submissionId)) shouldBe notificationIds
+      }
+    }
+    "no notifications exist" must {
+      "return an empty list" in {
+        await(repository.lookupNotificationIds("unknownSubmissionId")) shouldBe Nil
       }
     }
   }

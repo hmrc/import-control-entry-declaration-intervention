@@ -17,11 +17,10 @@
 package uk.gov.hmrc.entrydeclarationintervention.controllers.test
 
 import play.api.http.MimeTypes
-import play.api.libs.json.Json
+import play.api.libs.json.{JsArray, Json}
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.entrydeclarationintervention.models.NotificationId
 import uk.gov.hmrc.entrydeclarationintervention.services.test.MockNotificationIdRetrievalService
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -32,34 +31,35 @@ class NotificationIdControllerSpec extends UnitSpec with MockNotificationIdRetri
 
   val controller = new NotificationIdController(Helpers.stubControllerComponents(), mockNotificationIdRetrievalService)
 
-  val submissionId: String           = "submissionId"
-  val notificationId: NotificationId = NotificationId("notificationId")
+  val submissionId: String = "submissionId"
+  val notificationId1      = "notificationId1"
+  val notificationId2      = "notificationId2"
 
   "EntryDeclarationRetrievalController" when {
-    "getting submissionId from eori and correlationId" when {
-      "id exists" must {
-        "return OK with the submissionId in a JSON object" in {
+    "getting notificationIds from submissionId" when {
+      "interventions exist" must {
+        "return OK with a JSON array of notificationIds" in {
           MockNotificationIdRetrievalService
-            .retrieveNotificationId(submissionId)
-            .returns(Future.successful(Some(notificationId)))
+            .retrieveNotificationIds(submissionId) returns Future.successful(Seq(notificationId1, notificationId2))
 
-          val result: Future[Result] = controller.getNotificationId(submissionId)(FakeRequest())
+          val result: Future[Result] = controller.getNotificationIds(submissionId)(FakeRequest())
 
           status(result)        shouldBe OK
-          contentAsJson(result) shouldBe Json.toJson(notificationId)
+          contentAsJson(result) shouldBe Json.arr(notificationId1, notificationId2)
           contentType(result)   shouldBe Some(MimeTypes.JSON)
         }
       }
 
-      "id does not exist" must {
-        "return NOT_FOUND" in {
+      "no interventions exist" must {
+        "return OK with an empty JSON array off notificationIds" in {
           MockNotificationIdRetrievalService
-            .retrieveNotificationId(submissionId)
-            .returns(Future.successful(None))
+            .retrieveNotificationIds(submissionId) returns Future.successful(Nil)
 
-          val result: Future[Result] = controller.getNotificationId(submissionId)(FakeRequest())
+          val result: Future[Result] = controller.getNotificationIds(submissionId)(FakeRequest())
 
-          status(result) shouldBe NOT_FOUND
+          status(result)        shouldBe OK
+          contentAsJson(result) shouldBe JsArray.empty
+          contentType(result)   shouldBe Some(MimeTypes.JSON)
         }
       }
     }

@@ -19,7 +19,8 @@ package uk.gov.hmrc.entrydeclarationintervention.repositories
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.Cursor
+import reactivemongo.api.Cursor.FailOnError
+import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.api.indexes.Index
 import reactivemongo.api.indexes.IndexType.Ascending
 import reactivemongo.bson.BSONObjectID
@@ -36,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait InterventionRepo {
   def save(intervention: InterventionModel): Future[Option[SaveError]]
 
-  def lookupNotificationId(submissionId: String): Future[Option[NotificationId]]
+  def lookupNotificationIds(submissionId: String): Future[Seq[String]]
 
   def lookupIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]]
 
@@ -58,8 +59,6 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
     with InterventionRepo {
 
   override def indexes: Seq[Index] = Seq(
-    //is this one necessary?
-    Index(Seq(("notificationId", Ascending)), name = Some("notificationIdIndex"), unique = true),
     Index(
       Seq(("submissionId", Ascending), ("notificationId", Ascending)),
       name   = Some("lookupNotificationIdIndex"),
@@ -107,15 +106,21 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
       }
   }
 
-  def lookupNotificationId(submissionId: String): Future[Option[NotificationId]] =
-    collection.find(Json.obj("submissionId" -> submissionId), Some(Json.obj("notificationId" -> 1))).one[NotificationId]
+  def lookupNotificationIds(submissionId: String): Future[Seq[String]] =
+    collection
+      .find(Json.obj("submissionId" -> submissionId), Some(Json.obj("notificationId" -> 1)))
+      .sort(Json.obj("receivedDateTime" -> 1))
+      .cursor[NotificationId](ReadPreference.primaryPreferred)
+      .collect(maxDocs = -1, FailOnError[Seq[NotificationId]]())
+      .map(_.map(_.value))
 
   def lookupIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     collection
-      .find(Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false), Option.empty[JsObject])
+      .find(
+        Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
+        Option.empty[JsObject])
       .one[InterventionPersisted]
       .map(_.map(_.toIntervention))
-
 
   def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     findAndUpdate(

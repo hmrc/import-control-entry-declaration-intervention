@@ -17,7 +17,6 @@
 package uk.gov.hmrc.entrydeclarationintervention.services.test
 
 import javax.inject.Inject
-import uk.gov.hmrc.entrydeclarationintervention.models.NotificationId
 import uk.gov.hmrc.entrydeclarationintervention.repositories.InterventionRepo
 
 import scala.concurrent.Future
@@ -40,7 +39,7 @@ import scala.concurrent.Future
 
 class NotificationIdRetrievalService @Inject()(interventionRepo: InterventionRepo) {
 
-  def retrieveNotificationId(submissionId: String): Future[Option[NotificationId]] =
-    interventionRepo.lookupNotificationId(submissionId)
+  def retrieveNotificationIds(submissionId: String): Future[Seq[String]] =
+    interventionRepo.lookupNotificationIds(submissionId)
 
 }
