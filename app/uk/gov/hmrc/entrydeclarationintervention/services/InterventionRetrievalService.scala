@@ -18,7 +18,7 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import com.kenshoo.play.metrics.Metrics
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel, NotificationId}
+import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel, LoggerMetadata}
 import uk.gov.hmrc.entrydeclarationintervention.repositories.InterventionRepo
 import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, Timer}
 
@@ -31,16 +31,24 @@ class InterventionRetrievalService @Inject()(interventionRepo: InterventionRepo,
     with EventLogger {
   def retrieveIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     timeFuture("Service retrieveIntervention", "retrieveIntervention.total") {
-      interventionRepo.lookupIntervention(eori, notificationId)
+      interventionRepo.lookupIntervention(eori, notificationId).map(log("notification retrieved"))
     }
 
   def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     timeFuture("Service acknowledgeIntervention", "acknowledgeIntervention.total") {
-      interventionRepo.acknowledgeIntervention(eori, notificationId)
+      interventionRepo.acknowledgeIntervention(eori, notificationId).map(log("notification acknowledged"))
     }
 
   def listInterventions(eori: String): Future[List[InterventionIds]] =
     timeFuture("Service listInterventions", "listInterventions.total") {
       interventionRepo.listInterventions(eori)
     }
+
+  private def log(event: String)(intervention: Option[InterventionModel]): Option[InterventionModel] = {
+    intervention.foreach { model =>
+      import model._
+      logger.info(LoggerMetadata(eori, correlationId, submissionId, notificationId).toLog(event))
+    }
+    intervention
+  }
 }
