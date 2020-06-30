@@ -22,9 +22,8 @@ import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
 import uk.gov.hmrc.entrydeclarationintervention.services.InterventionSubmissionService
-import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, SaveError}
+import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import uk.gov.hmrc.entrydeclarationintervention.validators.JsonSchemaValidator
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,8 +32,7 @@ class InterventionSubmissionController @Inject()(
   appConfig: AppConfig,
   cc: ControllerComponents,
   service: InterventionSubmissionService)(implicit ec: ExecutionContext)
-    extends EisInboundAuthorisedController(cc, appConfig)
-    with EventLogger {
+    extends EisInboundAuthorisedController(cc, appConfig) {
 
   val postIntervention: Action[JsValue] = authorisedAction.async(parse.json) { implicit request =>
     val model: JsResult[InterventionReceived] = request.body.validate[InterventionReceived]
@@ -49,9 +47,7 @@ class InterventionSubmissionController @Inject()(
             case _                         => InternalServerError
           }
       }
-    } else {
-      Future.successful(BadRequest)
-    }
+    } else { Future.successful(BadRequest) }
   }
 
   private def getValidationErrors(interventionReceived: InterventionReceived, json: JsValue): Option[JsValue] =

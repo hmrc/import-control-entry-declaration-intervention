@@ -21,7 +21,7 @@ import java.net.URL
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.github.fge.jsonschema.core.report.ProcessingReport
 import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
-import play.Logger
+import play.api.Logger
 import play.api.libs.json.JsValue
 
 object JsonSchemaValidator {

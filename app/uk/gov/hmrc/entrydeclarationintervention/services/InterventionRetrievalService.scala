@@ -18,7 +18,8 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import com.kenshoo.play.metrics.Metrics
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel, LoggerMetadata}
+import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
+import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel}
 import uk.gov.hmrc.entrydeclarationintervention.repositories.InterventionRepo
 import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, Timer}
 
@@ -45,10 +46,10 @@ class InterventionRetrievalService @Inject()(interventionRepo: InterventionRepo,
     }
 
   private def log(event: String)(intervention: Option[InterventionModel]): Option[InterventionModel] = {
-    intervention.foreach { model =>
+    intervention.map { model =>
       import model._
-      logger.info(LoggerMetadata(eori, correlationId, submissionId, notificationId).toLog(event))
+      ContextLogger.info(event)(LoggingContext(eori, correlationId, submissionId, notificationId))
+      model
     }
-    intervention
   }
 }

@@ -20,13 +20,14 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.Cursor.FailOnError
-import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.api.indexes.Index
 import reactivemongo.api.indexes.IndexType.Ascending
+import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.bson.BSONObjectID
 import reactivemongo.core.errors.DatabaseException
 import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
+import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
 import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel, NotificationId}
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import uk.gov.hmrc.mongo.ReactiveRepository
@@ -35,7 +36,7 @@ import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import scala.concurrent.{ExecutionContext, Future}
 
 trait InterventionRepo {
-  def save(intervention: InterventionModel): Future[Option[SaveError]]
+  def save(intervention: InterventionModel)(implicit lc: LoggingContext): Future[Option[SaveError]]
 
   def lookupNotificationIds(submissionId: String): Future[Seq[String]]
 
@@ -81,26 +82,18 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
 
   val mongoErrorCodeForDuplicate: Int = 11000
 
-  def save(intervention: InterventionModel): Future[Option[SaveError]] = {
+  def save(intervention: InterventionModel)(implicit lc: LoggingContext): Future[Option[SaveError]] = {
     val interventionPersisted = InterventionPersisted.from(intervention)
 
     insert(interventionPersisted)
       .map(_ => None)
       .recover {
         case e: DatabaseException =>
-          import intervention._
-
           if (e.code.contains(mongoErrorCodeForDuplicate)) {
-            logger.error(
-              s"Duplicate entry declaration intervention with eori=$eori, correlationId=$correlationId, submissionId=$submissionId",
-              e
-            )
+            ContextLogger.error("Duplicate entry declaration intervention", e)
             Some(SaveError.Duplicate)
           } else {
-            logger.error(
-              s"Unable to save entry declaration intervention with eori=$eori, correlationId=$correlationId, submissionId=$submissionId",
-              e
-            )
+            ContextLogger.error("Unable to save entry declaration intervention", e)
             Some(SaveError.ServerError)
           }
       }
@@ -129,7 +122,8 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
       fetchNewObject = true
     ).map(result => result.result[InterventionPersisted].map(_.toIntervention)).recover {
       case e: DatabaseException =>
-        logger.error(s"Unable to acknowledge intervention with eori=$eori and notificationId=$notificationId", e)
+        ContextLogger.error(s"Unable to acknowledge intervention", e)(
+          LoggingContext(eori = Some(eori), notificationId = Some(notificationId)))
         None
     }
 
