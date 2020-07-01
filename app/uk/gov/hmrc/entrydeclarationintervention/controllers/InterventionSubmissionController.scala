@@ -17,7 +17,8 @@
 package uk.gov.hmrc.entrydeclarationintervention.controllers
 
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{JsResult, JsString, JsValue}
+import play.api.Logger
+import play.api.libs.json.{JsError, JsString, JsSuccess, JsValue}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
@@ -36,20 +37,22 @@ class InterventionSubmissionController @Inject()(
     extends EisInboundAuthorisedController(cc, appConfig) {
 
   val postIntervention: Action[JsValue] = authorisedAction.async(parse.json) { implicit request =>
-    val model: JsResult[InterventionReceived] = request.body.validate[InterventionReceived]
-
-    if (model.isSuccess) {
-      implicit val loggingContext: LoggingContext = LoggingContext(model.get)
-      getValidationErrors(request.body) match {
-        case Some(errorMsg) => Future.successful(BadRequest(errorMsg))
-        case None =>
-          service.processIntervention(model.get).map {
-            case None                      => Created
-            case Some(SaveError.Duplicate) => Conflict
-            case _                         => InternalServerError
-          }
-      }
-    } else { Future.successful(BadRequest) }
+    request.body.validate[InterventionReceived] match {
+      case JsSuccess(intervention, _) =>
+        implicit val loggingContext: LoggingContext = LoggingContext(intervention)
+        getValidationErrors(request.body) match {
+          case Some(errorMsg) => Future.successful(BadRequest(errorMsg))
+          case None =>
+            service.processIntervention(intervention).map {
+              case None                      => Created
+              case Some(SaveError.Duplicate) => Conflict
+              case _                         => InternalServerError
+            }
+        }
+      case JsError(errs) =>
+        Logger.error(s"Unable to parse intervention payload: $errs")
+        Future.successful(BadRequest)
+    }
   }
 
   private def getValidationErrors(json: JsValue)(implicit lc: LoggingContext): Option[JsValue] =
