@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.logging
 
+import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
+
 case class LoggingContext(
   eori: Option[String]           = None,
   correlationId: Option[String]  = None,
@@ -32,4 +34,7 @@ case class LoggingContext(
 object LoggingContext {
   def apply(eori: String, correlationId: String, submissionId: String, notificationId: String): LoggingContext =
     LoggingContext(Some(eori), Some(correlationId), Some(submissionId), Some(notificationId))
+
+  def apply(model: InterventionModel): LoggingContext =
+    LoggingContext(model.eori, model.correlationId, model.submissionId, model.notificationId)
 }
