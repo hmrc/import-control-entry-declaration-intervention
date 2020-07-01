@@ -47,10 +47,7 @@ class InterventionSubmissionService @Inject()(
       validateSchema(rawXml)
       val notificationId = idGenerator.generateNotificationId
 
-      implicit val loggingContext: LoggingContext = {
-        import intervention._
-        LoggingContext(metadata.senderEORI, metadata.correlationId, submissionId, notificationId)
-      }
+      implicit val loggingContext: LoggingContext = LoggingContext(intervention, notificationId)
       ContextLogger.info("notification received")
 
       val wrappedXml = xmlWrapper.wrapXml(notificationId, rawXml)

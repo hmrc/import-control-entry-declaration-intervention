@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsResult, JsString, JsValue}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
+import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
 import uk.gov.hmrc.entrydeclarationintervention.services.InterventionSubmissionService
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
@@ -38,7 +39,8 @@ class InterventionSubmissionController @Inject()(
     val model: JsResult[InterventionReceived] = request.body.validate[InterventionReceived]
 
     if (model.isSuccess) {
-      getValidationErrors(model.get, request.body) match {
+      implicit val loggingContext: LoggingContext = LoggingContext(model.get)
+      getValidationErrors(request.body) match {
         case Some(errorMsg) => Future.successful(BadRequest(errorMsg))
         case None =>
           service.processIntervention(model.get).map {
@@ -50,7 +52,7 @@ class InterventionSubmissionController @Inject()(
     } else { Future.successful(BadRequest) }
   }
 
-  private def getValidationErrors(interventionReceived: InterventionReceived, json: JsValue): Option[JsValue] =
+  private def getValidationErrors(json: JsValue)(implicit lc: LoggingContext): Option[JsValue] =
     if (appConfig.validateIncomingJson && !JsonSchemaValidator.validateJSONAgainstSchema(json)) {
       Some(JsString("Failed to validate JSON against schema"))
     } else { None }

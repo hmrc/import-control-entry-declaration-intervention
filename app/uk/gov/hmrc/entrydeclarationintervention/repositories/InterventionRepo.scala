@@ -120,12 +120,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
       query          = Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
       update         = Json.obj("$set" -> Json.obj("acknowledged" -> true)),
       fetchNewObject = true
-    ).map(result => result.result[InterventionPersisted].map(_.toIntervention)).recover {
-      case e: DatabaseException =>
-        ContextLogger.error(s"Unable to acknowledge intervention", e)(
-          LoggingContext(eori = Some(eori), notificationId = Some(notificationId)))
-        None
-    }
+    ).map(result => result.result[InterventionPersisted].map(_.toIntervention))
 
   def listInterventions(eori: String): Future[List[InterventionIds]] =
     collection
