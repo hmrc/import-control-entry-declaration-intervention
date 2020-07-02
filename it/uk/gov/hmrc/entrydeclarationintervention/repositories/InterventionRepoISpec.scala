@@ -23,6 +23,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, Injecting}
 import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models._
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import uk.gov.hmrc.play.test.UnitSpec
@@ -59,6 +60,8 @@ class InterventionRepoISpec
   val acknowledgedEori           = "acknowledgedEori"
   val interventionXml            = "somexml"
   val receivedDateTime: Instant  = Instant.parse("2020-12-31T23:59:00Z")
+
+  implicit val lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId")
 
   def intervention(
     notificationId: String    = notificationId1,

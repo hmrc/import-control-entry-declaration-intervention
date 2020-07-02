@@ -19,7 +19,8 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 import com.kenshoo.play.metrics.Metrics
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
-import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionModel, NotificationId}
+import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
+import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
 import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
 import uk.gov.hmrc.entrydeclarationintervention.repositories.InterventionRepo
 import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, IdGenerator, SaveError, Timer}
@@ -45,24 +46,34 @@ class InterventionSubmissionService @Inject()(
       val rawXml = buildXML(intervention)
       validateSchema(rawXml)
       val notificationId = idGenerator.generateNotificationId
+
+      implicit val loggingContext: LoggingContext = LoggingContext(intervention, notificationId)
+      ContextLogger.info("notification received")
+
       val wrappedXml = xmlWrapper.wrapXml(notificationId, rawXml)
       saveIntervention(notificationId, intervention, wrappedXml)
     }
 
-  private def saveIntervention(notificationId: String, intervention: InterventionReceived, interventionXml: Node): Future[Option[SaveError]] =
+  private def saveIntervention(notificationId: String, intervention: InterventionReceived, interventionXml: Node)(
+    implicit lc: LoggingContext): Future[Option[SaveError]] =
     timeFuture("Service saveIntervention", "saveIntervention.total") {
       import intervention._
       val xmlString = Utility.trim(interventionXml).toString
 
-      interventionRepo.save(
-        InterventionModel(
-          eori             = metadata.senderEORI,
-          correlationId    = metadata.correlationId,
-          notificationId   = notificationId,
-          receivedDateTime = metadata.receivedDateTime,
-          submissionId     = submissionId,
-          interventionXml  = xmlString
-        ))
+      interventionRepo
+        .save(
+          InterventionModel(
+            eori             = metadata.senderEORI,
+            correlationId    = metadata.correlationId,
+            notificationId   = notificationId,
+            receivedDateTime = metadata.receivedDateTime,
+            submissionId     = submissionId,
+            interventionXml  = xmlString
+          ))
+        .map { error =>
+          if (error.isEmpty) ContextLogger.info("notification available")
+          error
+        }
     }
 
   private def buildXML(intervention: InterventionReceived) =
@@ -78,5 +89,4 @@ class InterventionSubmissionService @Inject()(
           s"\n$xml\n is not valid against CC351A schema:\n ${result.allErrors.map(_.getMessage).mkString("\n")}")
       }
     }
-
 }

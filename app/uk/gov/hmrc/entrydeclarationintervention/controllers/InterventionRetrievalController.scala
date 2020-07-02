@@ -19,7 +19,8 @@ package uk.gov.hmrc.entrydeclarationintervention.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.mvc.Http.MimeTypes
-import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, NotificationId, StandardError}
+import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
+import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, StandardError}
 import uk.gov.hmrc.entrydeclarationintervention.services.{AuthService, InterventionRetrievalService}
 
 import scala.concurrent.ExecutionContext
@@ -32,6 +33,7 @@ class InterventionRetrievalController @Inject()(
     extends AuthorisedController(cc) {
 
   def listInterventions(): Action[AnyContent] = authorisedAction().async { userRequest =>
+    ContextLogger.info("Listing interventions")(LoggingContext(eori = Some(userRequest.eori)))
     service.listInterventions(userRequest.eori).map {
       case Nil                  => NoContent
       case interventionMetadata => Ok(listXml(interventionMetadata)).as(MimeTypes.XML)
@@ -40,16 +42,26 @@ class InterventionRetrievalController @Inject()(
 
   def getIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async { implicit userRequest =>
     service.retrieveIntervention(userRequest.eori, notificationId) map {
-      case None               => NotFound(StandardError.notFound)
-      case Some(intervention) => Ok(intervention.interventionXml).as(MimeTypes.XML)
+      case None =>
+        ContextLogger.info("Intervention not found")(
+          LoggingContext(eori = Some(userRequest.eori), notificationId = Some(notificationId)))
+        NotFound(StandardError.notFound)
+      case Some(intervention) =>
+        ContextLogger.info("Intervention fetched")(LoggingContext(intervention))
+        Ok(intervention.interventionXml).as(MimeTypes.XML)
     }
   }
 
   def acknowledgeIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async {
     implicit userRequest =>
       service.acknowledgeIntervention(userRequest.eori, notificationId) map {
-        case None    => NotFound(StandardError.notFound)
-        case Some(_) => Ok
+        case None =>
+          ContextLogger.info("Intervention not found")(
+            LoggingContext(eori = Some(userRequest.eori), notificationId = Some(notificationId)))
+          NotFound(StandardError.notFound)
+        case Some(intervention) =>
+          ContextLogger.info("Intervention acknowledged")(LoggingContext(intervention))
+          Ok
       }
   }
 

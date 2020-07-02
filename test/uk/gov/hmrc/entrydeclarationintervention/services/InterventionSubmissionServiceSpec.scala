@@ -23,7 +23,8 @@ import com.kenshoo.play.metrics.Metrics
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
-import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionModel, NotificationId}
+import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
+import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
 import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
 import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRepo
 import uk.gov.hmrc.entrydeclarationintervention.utils.{MockIdGenerator, ResourceUtils, SaveError}
@@ -60,22 +61,24 @@ class InterventionSubmissionServiceSpec
     mockIdGenerator,
     mockedMetrics)
 
-  val correlationId = "12345678901234"
-
+  val submissionId   = "c75f40a6-a3df-4429-a697-471eeec46435"
+  val eori           = "ABCDEFGHIJKLMN"
+  val correlationId  = "12345678901234"
   val notificationId = "notificationId"
 
   val rawXml: Elem     = <rawXml/>
   val wrappedXml: Elem = <wrapped/>
 
   val interventionModel: InterventionModel = InterventionModel(
-    "ABCDEFGHIJKLMN",
+    eori,
     notificationId,
     correlationId,
     acknowledged = false,
     Instant.parse("2020-12-23T14:46:01.000Z"),
-    "c75f40a6-a3df-4429-a697-471eeec46435",
+    submissionId,
     wrappedXml.toString
   )
+  implicit val loggingContext: LoggingContext = LoggingContext(eori, correlationId, submissionId, notificationId)
 
   val interventionReceived: InterventionReceived =
     ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse).as[InterventionReceived]
@@ -88,7 +91,6 @@ class InterventionSubmissionServiceSpec
         MockIdGenerator.generateNotificationId.returns(notificationId)
         MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
         MockInterventionRepo.saveIntervention(interventionModel).returns(None)
-        println(Json.toJson(interventionModel))
 
         service.processIntervention(interventionReceived).futureValue shouldBe None
       }
