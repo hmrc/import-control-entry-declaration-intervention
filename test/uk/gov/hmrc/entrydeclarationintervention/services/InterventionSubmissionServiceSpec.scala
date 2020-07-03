@@ -25,7 +25,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
+import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
 import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRepo
 import uk.gov.hmrc.entrydeclarationintervention.utils.{MockIdGenerator, ResourceUtils, SaveError}
 import uk.gov.hmrc.entrydeclarationintervention.validators.{MockSchemaValidator, ValidationResult}
@@ -80,8 +80,8 @@ class InterventionSubmissionServiceSpec
   )
   implicit val loggingContext: LoggingContext = LoggingContext(eori, correlationId, submissionId, notificationId)
 
-  val interventionReceived: InterventionReceived =
-    ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse).as[InterventionReceived]
+  val interventionReceived: InterventionResponse =
+    ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse).as[InterventionResponse]
 
   "InterventionSubmissionService processIntervention" should {
     "return None" when {

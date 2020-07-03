@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.services
+package uk.gov.hmrc.entrydeclarationintervention.models.received
 
-import org.scalamock.handlers.CallHandler
-import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
+import play.api.libs.json.{Format, Json}
 
-import scala.xml.Elem
+case class InterventionResponse(
+  submissionId: String,
+  metadata: Metadata,
+  parties: Parties,
+  goods: Goods,
+  declaration: Declaration,
+  itinerary: Itinerary,
+  customsIntervention: CustomsIntervention)
 
-trait MockXMLBuilder extends MockFactory {
-  val mockXMLBuilder: XMLBuilder = mock[XMLBuilder]
-
-  object MockXMLBuilder {
-    def buildXML(interventionReceived: InterventionResponse): CallHandler[Elem] =
-      mockXMLBuilder.buildXML _ expects interventionReceived
-  }
-
+object InterventionResponse {
+  implicit val jsonFormat: Format[InterventionResponse] = Json.format[InterventionResponse]
 }

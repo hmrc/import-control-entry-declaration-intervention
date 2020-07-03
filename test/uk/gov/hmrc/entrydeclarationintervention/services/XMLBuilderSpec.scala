@@ -20,7 +20,7 @@ import java.time.Instant
 
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.libs.json.Json
-import uk.gov.hmrc.entrydeclarationintervention.models.received.{ArbitraryIntervention, InterventionReceived}
+import uk.gov.hmrc.entrydeclarationintervention.models.received.{ArbitraryIntervention, InterventionResponse}
 import uk.gov.hmrc.entrydeclarationintervention.services.XMLBuilder._
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
 import uk.gov.hmrc.entrydeclarationintervention.validators.SchemaValidator
@@ -55,7 +55,7 @@ class XMLBuilderSpec extends UnitSpec with ScalaCheckDrivenPropertyChecks with A
     "return XML formatted correctly" when {
       "an intervention is supplied" in {
         val interventionJson = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
-        val intervention     = interventionJson.as[InterventionReceived]
+        val intervention     = interventionJson.as[InterventionResponse]
         val expected         = ResourceUtils.withInputStreamFor("xmls/Intervention.xml")(XML.load)
 
         val xml = xmlBuilder.buildXML(intervention)
@@ -66,7 +66,7 @@ class XMLBuilderSpec extends UnitSpec with ScalaCheckDrivenPropertyChecks with A
 
       "an intervention is supplied with all optional fields" in {
         val interventionJson = ResourceUtils.withInputStreamFor("jsons/InterventionAllOptional.json")(Json.parse)
-        val intervention     = interventionJson.as[InterventionReceived]
+        val intervention     = interventionJson.as[InterventionResponse]
         val expected         = ResourceUtils.withInputStreamFor("xmls/InterventionAllOptional.xml")(XML.load)
 
         val xml = xmlBuilder.buildXML(intervention)
@@ -78,7 +78,7 @@ class XMLBuilderSpec extends UnitSpec with ScalaCheckDrivenPropertyChecks with A
       "generate schema valid XML for all inputs" in {
         val schemaValidator = new SchemaValidator
 
-        forAll { intervention: InterventionReceived =>
+        forAll { intervention: InterventionResponse =>
           val xml = xmlBuilder.buildXML(intervention)
 
           schemaValidator.validateSchema(xml).allErrors.filterNot { ex =>

@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.services
+package uk.gov.hmrc.entrydeclarationintervention.reporting
 
-import org.scalamock.handlers.CallHandler
-import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
+import uk.gov.hmrc.entrydeclarationintervention.models.received.MessageType
 
-import scala.xml.Elem
-
-trait MockXMLBuilder extends MockFactory {
-  val mockXMLBuilder: XMLBuilder = mock[XMLBuilder]
-
-  object MockXMLBuilder {
-    def buildXML(interventionReceived: InterventionResponse): CallHandler[Elem] =
-      mockXMLBuilder.buildXML _ expects interventionReceived
-  }
-
+trait Report {
+  def eori: String
+  def correlationId: String
+  def submissionId: String
+  def messageType: MessageType
 }

@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.services
+package uk.gov.hmrc.entrydeclarationintervention.reporting.audit
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.xml.Elem
+import scala.concurrent.Future
 
-trait MockXMLBuilder extends MockFactory {
-  val mockXMLBuilder: XMLBuilder = mock[XMLBuilder]
+trait MockAuditHandler extends MockFactory {
+  val mockAuditHandler: AuditHandler = mock[AuditHandler]
 
-  object MockXMLBuilder {
-    def buildXML(interventionReceived: InterventionResponse): CallHandler[Elem] =
-      mockXMLBuilder.buildXML _ expects interventionReceived
+  object MockAuditHandler {
+    def audit(auditEvent: AuditEvent): CallHandler[Future[Unit]] =
+      (mockAuditHandler.audit(_: AuditEvent)(_: HeaderCarrier)) expects (auditEvent, *)
   }
-
 }
