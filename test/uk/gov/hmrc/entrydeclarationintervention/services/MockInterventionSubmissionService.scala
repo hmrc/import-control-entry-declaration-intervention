@@ -18,7 +18,7 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
+import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 
 import scala.concurrent.Future
@@ -27,7 +27,7 @@ trait MockInterventionSubmissionService extends MockFactory {
   val mockInterventionSubmissionService: InterventionSubmissionService = mock[InterventionSubmissionService]
 
   object MockInterventionSubmissionService {
-    def processIntervention(interventionReceived: InterventionReceived): CallHandler[Future[Option[SaveError]]] =
+    def processIntervention(interventionReceived: InterventionResponse): CallHandler[Future[Option[SaveError]]] =
       mockInterventionSubmissionService.processIntervention _ expects interventionReceived
   }
 }

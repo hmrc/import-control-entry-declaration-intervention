@@ -23,6 +23,8 @@ trait MockAppConfig extends MockFactory {
   val mockAppConfig: AppConfig = mock[AppConfig]
 
   object MockAppConfig {
+    def appName: CallHandler[String] = mockAppConfig.appName _ expects ()
+
     def apiSubscriptionFieldsHost: CallHandler[String] = mockAppConfig.apiSubscriptionFieldsHost _ expects ()
 
     def apiGatewayContext: CallHandler[String] = mockAppConfig.apiGatewayContext _ expects ()

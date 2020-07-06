@@ -25,7 +25,7 @@ trait ArbitraryIntervention {
   implicit val arbZonedDateTime: Arbitrary[Instant] =
     Arbitrary(Gen.choose(0, Long.MaxValue).map(ts => Instant.ofEpochMilli(ts)))
 
-  implicit val arbitraryInterventionReceived: Arbitrary[InterventionReceived] = Arbitrary(
+  implicit val arbitraryInterventionReceived: Arbitrary[InterventionResponse] = Arbitrary(
     for {
       submissionId        <- arbitrary[String]
       metadata            <- arbitrary[Metadata]
@@ -34,7 +34,7 @@ trait ArbitraryIntervention {
       declaration         <- arbitrary[Declaration]
       itinerary           <- arbitrary[Itinerary]
       customsIntervention <- arbitrary[CustomsIntervention]
-    } yield InterventionReceived(submissionId, metadata, parties, goods, declaration, itinerary, customsIntervention)
+    } yield InterventionResponse(submissionId, metadata, parties, goods, declaration, itinerary, customsIntervention)
   )
 
   implicit val arbitraryMetadata: Arbitrary[Metadata] = Arbitrary(

@@ -45,7 +45,7 @@ class XMLBuilder {
 
   import XMLBuilder._
 
-  def buildXML(intervention: InterventionReceived): Elem = {
+  def buildXML(intervention: InterventionResponse): Elem = {
     import intervention._
     //@formatter:off
     <cc3:CC351A xmlns:cc3="http://ics.dgtaxud.ec/CC351A">
@@ -69,7 +69,7 @@ class XMLBuilder {
     //@formatter:on
   }
 
-  private def getHEAHEA(intervention: InterventionReceived): Elem = {
+  private def getHEAHEA(intervention: InterventionResponse): Elem = {
     import intervention._
     //@formatter:off
     <HEAHEA>

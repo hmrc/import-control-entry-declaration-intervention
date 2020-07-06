@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.models.received
+package uk.gov.hmrc.entrydeclarationintervention.reporting.audit
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.JsObject
 
-case class InterventionReceived(
-  submissionId: String,
-  metadata: Metadata,
-  parties: Parties,
-  goods: Goods,
-  declaration: Declaration,
-  itinerary: Itinerary,
-  customsIntervention: CustomsIntervention)
-
-object InterventionReceived {
-  implicit val jsonFormat: Format[InterventionReceived] = Json.format[InterventionReceived]
-}
+case class AuditEvent(
+  auditType: String,
+  transactionName: String,
+  detail: JsObject
+)

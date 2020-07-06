@@ -23,7 +23,8 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
+import uk.gov.hmrc.entrydeclarationintervention.models.received.{InterventionResponse, MessageType}
+import uk.gov.hmrc.entrydeclarationintervention.reporting.{InterventionReceived, MockReportSender}
 import uk.gov.hmrc.entrydeclarationintervention.services.MockInterventionSubmissionService
 import uk.gov.hmrc.entrydeclarationintervention.utils.{ResourceUtils, SaveError}
 
@@ -35,18 +36,27 @@ class InterventionSubmissionControllerSpec
     with Matchers
     with GuiceOneAppPerSuite
     with MockInterventionSubmissionService
-    with MockAppConfig {
+    with MockAppConfig
+    with MockReportSender {
 
   val validIntervention: JsValue = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
   val bearerToken: String        = "bearerToken"
   val request: FakeRequest[JsValue] =
     FakeRequest().withBody(validIntervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
 
+  val interventionReceivedReport: InterventionReceived = InterventionReceived(
+    "ABCDEFGHIJKLMN",
+    "12345678901234",
+    "c75f40a6-a3df-4429-a697-471eeec46435",
+    MessageType.IE351,
+    validIntervention) //Could parse the values from the validIntervention
+
   private val controller =
     new InterventionSubmissionController(
       mockAppConfig,
       Helpers.stubControllerComponents(),
-      mockInterventionSubmissionService)
+      mockInterventionSubmissionService,
+      mockReportSender)
 
   private val submissionId = "submissionId"
 
@@ -55,8 +65,9 @@ class InterventionSubmissionControllerSpec
       MockAppConfig.eisInboundBearerToken.returns(bearerToken)
       MockAppConfig.validateIncomingJson.returns(false)
       MockInterventionSubmissionService
-        .processIntervention(validIntervention.as[InterventionReceived])
+        .processIntervention(validIntervention.as[InterventionResponse])
         .returns(Future.successful(None))
+      MockReportSender.sendReport(interventionReceivedReport)
 
       val result = controller.postIntervention(request)
 
@@ -71,8 +82,9 @@ class InterventionSubmissionControllerSpec
           MockAppConfig.eisInboundBearerToken.returns(bearerToken)
           MockAppConfig.validateIncomingJson.returns(false)
           MockInterventionSubmissionService
-            .processIntervention(validIntervention.as[InterventionReceived])
+            .processIntervention(validIntervention.as[InterventionResponse])
             .returns(Future.successful(Some(saveError)))
+          MockReportSender.sendReport(interventionReceivedReport)
 
           val result = controller.postIntervention(request)
 
@@ -92,8 +104,9 @@ class InterventionSubmissionControllerSpec
       MockAppConfig.eisInboundBearerToken.returns(bearerToken)
       MockAppConfig.validateIncomingJson.returns(true)
       MockInterventionSubmissionService
-        .processIntervention(validIntervention.as[InterventionReceived])
+        .processIntervention(validIntervention.as[InterventionResponse])
         .returns(Future.successful(None))
+      MockReportSender.sendReport(interventionReceivedReport)
 
       val result = controller.postIntervention(request)
 
@@ -148,7 +161,8 @@ class InterventionSubmissionControllerSpec
                                        |""".stripMargin)
 
       MockAppConfig.validateIncomingJson.returns(true)
-      val request = FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
+      val request =
+        FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
       MockAppConfig.eisInboundBearerToken.returns(bearerToken)
       val result = controller.postIntervention(request)
 
@@ -172,7 +186,8 @@ class InterventionSubmissionControllerSpec
                                        |}
                                        |""".stripMargin)
 
-      val request = FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
+      val request =
+        FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
       MockAppConfig.eisInboundBearerToken.returns(bearerToken)
       val result = controller.postIntervention(request)
 

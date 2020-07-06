@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.services
+package uk.gov.hmrc.entrydeclarationintervention.reporting
 
-import org.scalamock.handlers.CallHandler
-import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
+import uk.gov.hmrc.entrydeclarationintervention.reporting.audit.AuditEvent
 
-import scala.xml.Elem
-
-trait MockXMLBuilder extends MockFactory {
-  val mockXMLBuilder: XMLBuilder = mock[XMLBuilder]
-
-  object MockXMLBuilder {
-    def buildXML(interventionReceived: InterventionResponse): CallHandler[Elem] =
-      mockXMLBuilder.buildXML _ expects interventionReceived
-  }
-
+/**
+  * Type class that knows how to convert a report for auditing.
+  *
+  * @tparam R the report type
+  */
+trait EventSources[R] {
+  def auditEventFor(report: R): Option[AuditEvent]
 }

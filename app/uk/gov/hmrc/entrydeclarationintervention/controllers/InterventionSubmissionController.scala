@@ -22,7 +22,8 @@ import play.api.libs.json.{JsError, JsString, JsSuccess, JsValue}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
+import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
+import uk.gov.hmrc.entrydeclarationintervention.reporting.{InterventionReceived, ReportSender}
 import uk.gov.hmrc.entrydeclarationintervention.services.InterventionSubmissionService
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import uk.gov.hmrc.entrydeclarationintervention.validators.JsonSchemaValidator
@@ -33,20 +34,32 @@ import scala.concurrent.{ExecutionContext, Future}
 class InterventionSubmissionController @Inject()(
   appConfig: AppConfig,
   cc: ControllerComponents,
-  service: InterventionSubmissionService)(implicit ec: ExecutionContext)
+  service: InterventionSubmissionService,
+  reportSender: ReportSender)(implicit ec: ExecutionContext)
     extends EisInboundAuthorisedController(cc, appConfig) {
 
   val postIntervention: Action[JsValue] = authorisedAction.async(parse.json) { implicit request =>
-    request.body.validate[InterventionReceived] match {
+    request.body.validate[InterventionResponse] match {
       case JsSuccess(intervention, _) =>
         implicit val loggingContext: LoggingContext = LoggingContext(intervention)
         getValidationErrors(request.body) match {
           case Some(errorMsg) => Future.successful(BadRequest(errorMsg))
           case None =>
-            service.processIntervention(intervention).map {
-              case None                      => Created
-              case Some(SaveError.Duplicate) => Conflict
-              case _                         => InternalServerError
+            service.processIntervention(intervention).map { response =>
+              reportSender.sendReport(
+                InterventionReceived(
+                  eori          = intervention.metadata.senderEORI,
+                  correlationId = intervention.metadata.correlationId,
+                  submissionId  = intervention.submissionId,
+                  intervention.metadata.messageType,
+                  request.body
+                ))
+
+              response match {
+                case None                      => Created
+                case Some(SaveError.Duplicate) => Conflict
+                case _                         => InternalServerError
+              }
             }
         }
       case JsError(errs) =>

@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
 import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionReceived
+import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
 import uk.gov.hmrc.entrydeclarationintervention.repositories.InterventionRepo
 import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, IdGenerator, SaveError, Timer}
 import uk.gov.hmrc.entrydeclarationintervention.validators.SchemaValidator
@@ -41,7 +41,7 @@ class InterventionSubmissionService @Inject()(
     extends Timer
     with EventLogger {
 
-  def processIntervention(intervention: InterventionReceived): Future[Option[SaveError]] =
+  def processIntervention(intervention: InterventionResponse): Future[Option[SaveError]] =
     timeFuture("Service processIntervention", "processIntervention.total") {
       val rawXml = buildXML(intervention)
       validateSchema(rawXml)
@@ -54,7 +54,7 @@ class InterventionSubmissionService @Inject()(
       saveIntervention(notificationId, intervention, wrappedXml)
     }
 
-  private def saveIntervention(notificationId: String, intervention: InterventionReceived, interventionXml: Node)(
+  private def saveIntervention(notificationId: String, intervention: InterventionResponse, interventionXml: Node)(
     implicit lc: LoggingContext): Future[Option[SaveError]] =
     timeFuture("Service saveIntervention", "saveIntervention.total") {
       import intervention._
@@ -76,7 +76,7 @@ class InterventionSubmissionService @Inject()(
         }
     }
 
-  private def buildXML(intervention: InterventionReceived) =
+  private def buildXML(intervention: InterventionResponse) =
     time("Build XML", s"buildInterventionXML") {
       xmlBuilder.buildXML(intervention)
     }
