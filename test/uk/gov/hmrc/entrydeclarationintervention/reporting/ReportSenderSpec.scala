@@ -49,6 +49,11 @@ class ReportSenderSpec extends UnitSpec with MockAuditHandler with ScalaFutures 
 
       reportSender.sendReport(Report).futureValue shouldBe ((): Unit)
     }
+    "return success even if the audit fails" in {
+      MockAuditHandler.audit(auditEvent) returns Future.failed(new RuntimeException)
+
+      reportSender.sendReport(Report).futureValue shouldBe ((): Unit)
+    }
   }
 
 }
