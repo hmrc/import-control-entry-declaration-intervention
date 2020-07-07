@@ -19,6 +19,5 @@ package uk.gov.hmrc.entrydeclarationintervention.utils
 sealed trait SaveError
 
 object SaveError{
-  case object Duplicate extends SaveError
   case object ServerError extends SaveError
 }

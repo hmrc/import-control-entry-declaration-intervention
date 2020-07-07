@@ -57,7 +57,6 @@ class InterventionSubmissionController @Inject()(
 
               response match {
                 case None                      => Created
-                case Some(SaveError.Duplicate) => Conflict
                 case _                         => InternalServerError
               }
             }

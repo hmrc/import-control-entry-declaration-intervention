@@ -114,14 +114,14 @@ class InterventionRepoISpec
       "unique submissionId + notificationId constraint would be violated" must {
         "return duplicate" in {
           val duplicate = intervention().copy(eori = "otherEori")
-          await(repository.save(duplicate)) shouldBe Some(SaveError.Duplicate)
+          await(repository.save(duplicate)) shouldBe Some(SaveError.ServerError)
         }
       }
 
       "unique eori + notificationId constraint would be violated" must {
         "return duplicate error" in {
           val duplicate = intervention().copy(submissionId = "other")
-          await(repository.save(duplicate)) shouldBe Some(SaveError.Duplicate)
+          await(repository.save(duplicate)) shouldBe Some(SaveError.ServerError)
         }
       }
     }
