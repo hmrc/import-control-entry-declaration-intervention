@@ -108,7 +108,7 @@ class InterventionSubmissionServiceSpec
     }
 
     "return SaveError" when {
-      val someSaveError = SaveError.Duplicate
+      val someSaveError = SaveError.ServerError
 
       "the intervention cannot be saved" in {
         MockAppConfig.validateJsonToXMLTransformation returns false

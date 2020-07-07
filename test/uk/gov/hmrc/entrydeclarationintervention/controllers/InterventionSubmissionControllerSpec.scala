@@ -92,7 +92,6 @@ class InterventionSubmissionControllerSpec
         }
 
       val input = Seq(
-        (SaveError.Duplicate, CONFLICT),
         (SaveError.ServerError, INTERNAL_SERVER_ERROR)
       )
       input.foreach(args => (run _).tupled(args))

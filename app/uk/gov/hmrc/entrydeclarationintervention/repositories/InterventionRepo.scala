@@ -43,8 +43,8 @@ trait InterventionRepo {
   def lookupIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]]
 
   /**
-    * @return the acknowledged intervention
-    */
+   * @return the acknowledged intervention
+   */
   def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]]
 
   def listInterventions(eori: String): Future[List[InterventionIds]]
@@ -52,17 +52,17 @@ trait InterventionRepo {
 
 @Singleton
 class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: ReactiveMongoComponent, ec: ExecutionContext)
-    extends ReactiveRepository[InterventionPersisted, BSONObjectID](
-      "intervention",
-      mongo.mongoConnector.db,
-      InterventionPersisted.format,
-      ReactiveMongoFormats.objectIdFormats)
+  extends ReactiveRepository[InterventionPersisted, BSONObjectID](
+    "intervention",
+    mongo.mongoConnector.db,
+    InterventionPersisted.format,
+    ReactiveMongoFormats.objectIdFormats)
     with InterventionRepo {
 
   override def indexes: Seq[Index] = Seq(
     Index(
       Seq(("submissionId", Ascending), ("notificationId", Ascending)),
-      name   = Some("lookupNotificationIdIndex"),
+      name = Some("lookupNotificationIdIndex"),
       unique = true),
     // Covering index for list...
     Index(
@@ -76,7 +76,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
     ),
     Index(
       Seq(("eori", Ascending), ("notificationId", Ascending)),
-      name   = Some("eoriPlusNotificationIdIndex"),
+      name = Some("eoriPlusNotificationIdIndex"),
       unique = true)
   )
 
@@ -89,13 +89,8 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
       .map(_ => None)
       .recover {
         case e: DatabaseException =>
-          if (e.code.contains(mongoErrorCodeForDuplicate)) {
-            ContextLogger.error("Duplicate entry declaration intervention", e)
-            Some(SaveError.Duplicate)
-          } else {
-            ContextLogger.error("Unable to save entry declaration intervention", e)
-            Some(SaveError.ServerError)
-          }
+          ContextLogger.error("Unable to save entry declaration intervention", e)
+          Some(SaveError.ServerError)
       }
   }
 
@@ -117,8 +112,8 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
 
   def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     findAndUpdate(
-      query          = Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
-      update         = Json.obj("$set" -> Json.obj("acknowledged" -> true)),
+      query = Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
+      update = Json.obj("$set" -> Json.obj("acknowledged" -> true)),
       fetchNewObject = true
     ).map(result => result.result[InterventionPersisted].map(_.toIntervention))
 
