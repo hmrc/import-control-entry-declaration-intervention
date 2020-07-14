@@ -32,7 +32,7 @@ class InterventionReceivedSpec extends UnitSpec {
     "have the correct associated JSON audit event" in {
       val event = implicitly[EventSources[InterventionReceived]].auditEventFor(report).get
 
-      event.auditType       shouldBe "interventionReceived"
+      event.auditType       shouldBe "InterventionReceived"
       event.transactionName shouldBe "ENS intervention received from EIS"
 
       Json.toJson(event.detail) shouldBe
