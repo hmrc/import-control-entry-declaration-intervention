@@ -22,6 +22,13 @@ The Import Control Entry Declaration Intervention responsibilities:
 |```/:correlationId```                      |        POST      | External | Endpoint for users to acknowledge an unacknowledged intervention for an ENS submission. |
 |```/import-control/advanced-intervention```|        POST      | Internal | Endpoint for C&IT to return an intervention for an ENS submission. |
 
+## API Reference / Documentation 
+For more information on external API endpoints see the RAML at [Developer Hub]("https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/import-control-entry-declaration-intervention/1.0") or using the endpoint below
+
+| Path                         | Supported Methods | Description |
+| -----------------------------| ----------------- | ----------- |
+|```/api/conf/:version/*file```|        GET        | /api/conf/1.0/application.raml |
+
 ## License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
