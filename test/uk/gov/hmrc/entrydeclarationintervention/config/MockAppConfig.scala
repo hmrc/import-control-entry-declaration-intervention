@@ -19,6 +19,8 @@ package uk.gov.hmrc.entrydeclarationintervention.config
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 
+import scala.concurrent.duration.FiniteDuration
+
 trait MockAppConfig extends MockFactory {
   val mockAppConfig: AppConfig = mock[AppConfig]
 
@@ -33,9 +35,11 @@ trait MockAppConfig extends MockFactory {
 
     def listInterventionsLimit: CallHandler[Int] = mockAppConfig.listInterventionsLimit _ expects ()
 
-    def validateIncomingJson: CallHandler[Boolean] = (mockAppConfig.validateIncomingJson _).expects()
+    def validateIncomingJson: CallHandler[Boolean] = mockAppConfig.validateIncomingJson _ expects ()
 
     def validateJsonToXMLTransformation: CallHandler[Boolean] =
-      (mockAppConfig.validateJsonToXMLTransformation _).expects()
+      mockAppConfig.validateJsonToXMLTransformation _ expects ()
+
+    def defaultTtl: CallHandler[FiniteDuration] = mockAppConfig.defaultTtl _ expects ()
   }
 }

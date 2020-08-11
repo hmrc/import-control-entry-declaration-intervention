@@ -26,6 +26,7 @@ case class InterventionModel(
   correlationId: String,
   acknowledged: Boolean = false,
   receivedDateTime: Instant,
+  housekeepingAt: Instant,
   submissionId: String,
   interventionXml: String)
 

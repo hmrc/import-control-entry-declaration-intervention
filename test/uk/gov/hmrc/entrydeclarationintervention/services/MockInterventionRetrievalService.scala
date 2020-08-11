@@ -29,6 +29,9 @@ trait MockInterventionRetrievalService extends MockFactory {
     def retrieveIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
       mockInterventionRetrievalService.retrieveIntervention _ expects (eori, notificationId)
 
+    def retrieveFullIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
+      mockInterventionRetrievalService.retrieveFullIntervention _ expects (eori, notificationId)
+
     def acknowledgeIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
       mockInterventionRetrievalService.acknowledgeIntervention _ expects (eori, notificationId)
 

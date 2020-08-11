@@ -32,6 +32,7 @@ import uk.gov.hmrc.entrydeclarationintervention.validators.{MockSchemaValidator,
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 import scala.xml.{Elem, SAXParseException}
 
 class InterventionSubmissionServiceSpec
@@ -69,12 +70,17 @@ class InterventionSubmissionServiceSpec
   val rawXml: Elem     = <rawXml/>
   val wrappedXml: Elem = <wrapped/>
 
+  val defaultTtl: FiniteDuration = 3.seconds
+  val receivedDateTime: Instant  = Instant.parse("2020-12-23T14:46:01.000Z")
+  val housekeepingAt: Instant    = receivedDateTime.plusSeconds(defaultTtl.toSeconds)
+
   val interventionModel: InterventionModel = InterventionModel(
     eori,
     notificationId,
     correlationId,
     acknowledged = false,
-    Instant.parse("2020-12-23T14:46:01.000Z"),
+    receivedDateTime,
+    housekeepingAt,
     submissionId,
     wrappedXml.toString
   )
@@ -87,21 +93,23 @@ class InterventionSubmissionServiceSpec
     "return None" when {
       "an intervention is supplied and successfully saved" in {
         MockAppConfig.validateJsonToXMLTransformation returns false
-        MockXMLBuilder.buildXML(interventionReceived).returns(rawXml)
-        MockIdGenerator.generateNotificationId.returns(notificationId)
+        MockXMLBuilder.buildXML(interventionReceived) returns rawXml
+        MockIdGenerator.generateNotificationId returns notificationId
         MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
-        MockInterventionRepo.saveIntervention(interventionModel).returns(None)
+        MockAppConfig.defaultTtl returns defaultTtl
+        MockInterventionRepo.saveIntervention(interventionModel) returns None
 
         service.processIntervention(interventionReceived).futureValue shouldBe None
       }
 
       "an intervention successfully processed despite schema validation failing" in {
         MockAppConfig.validateJsonToXMLTransformation returns true
-        MockXMLBuilder.buildXML(interventionReceived).returns(rawXml)
+        MockXMLBuilder.buildXML(interventionReceived) returns rawXml
         MockSchemaValidator.validateSchema(rawXml) returns failedValidationResult
-        MockIdGenerator.generateNotificationId.returns(notificationId)
+        MockIdGenerator.generateNotificationId returns notificationId
         MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
-        MockInterventionRepo.saveIntervention(interventionModel).returns(None)
+        MockAppConfig.defaultTtl returns defaultTtl
+        MockInterventionRepo.saveIntervention(interventionModel) returns None
 
         service.processIntervention(interventionReceived).futureValue shouldBe None
       }
@@ -112,10 +120,11 @@ class InterventionSubmissionServiceSpec
 
       "the intervention cannot be saved" in {
         MockAppConfig.validateJsonToXMLTransformation returns false
-        MockXMLBuilder.buildXML(interventionReceived).returns(rawXml)
-        MockIdGenerator.generateNotificationId.returns(notificationId)
+        MockXMLBuilder.buildXML(interventionReceived) returns rawXml
+        MockIdGenerator.generateNotificationId returns notificationId
         MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
-        MockInterventionRepo.saveIntervention(interventionModel).returns(Some(someSaveError))
+        MockAppConfig.defaultTtl returns defaultTtl
+        MockInterventionRepo.saveIntervention(interventionModel) returns Some(someSaveError)
 
         service.processIntervention(interventionReceived).futureValue shouldBe Some(someSaveError)
       }

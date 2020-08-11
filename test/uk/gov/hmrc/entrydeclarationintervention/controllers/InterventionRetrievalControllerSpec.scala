@@ -21,7 +21,7 @@ import java.time.Instant
 import play.api.test.Helpers.{contentAsString, contentType, _}
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.MimeTypes
-import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel, NotificationId}
+import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel}
 import uk.gov.hmrc.entrydeclarationintervention.services.{MockAuthService, MockInterventionRetrievalService}
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -48,6 +48,7 @@ class InterventionRetrievalControllerSpec extends UnitSpec with MockIntervention
     notificationId,
     correlationId,
     acknowledged = false,
+    Instant.parse("2020-12-31T23:59:00Z"),
     Instant.parse("2020-12-31T23:59:00Z"),
     submissionId,
     payloadXml
