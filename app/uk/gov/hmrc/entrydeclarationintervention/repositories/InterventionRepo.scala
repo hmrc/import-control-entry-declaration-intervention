@@ -51,7 +51,6 @@ trait InterventionRepo {
 
   def listInterventions(eori: String): Future[List[InterventionIds]]
 
-  def getExpireAfterSeconds: Future[Option[Long]]
 }
 
 @Singleton
@@ -141,7 +140,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
       .cursor[InterventionIds]()
       .collect[List](maxDocs = appConfig.listInterventionsLimit, err = Cursor.FailOnError[List[InterventionIds]]())
 
-  def getExpireAfterSeconds: Future[Option[Long]] =
+  private[repositories] def getExpireAfterSeconds: Future[Option[Long]] =
     collection.indexesManager.list().map { indexes =>
       for {
         idx <- indexes.find(_.key.map(_._1).contains("housekeepingAt"))

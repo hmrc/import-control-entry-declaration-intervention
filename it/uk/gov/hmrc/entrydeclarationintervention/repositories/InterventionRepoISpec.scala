@@ -60,7 +60,7 @@ class InterventionRepoISpec
   val acknowledgedEori           = "acknowledgedEori"
   val interventionXml            = "somexml"
   val receivedDateTime: Instant  = Instant.parse("2020-12-31T23:59:00Z")
-  val housekeepingAt: Instant    = Instant.parse("2020-12-31T23:59:00Z")
+  val housekeepingAt: Instant    = Instant.parse("2021-12-31T23:59:00Z")
 
   implicit val lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId")
 
