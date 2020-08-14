@@ -60,6 +60,7 @@ class InterventionRepoISpec
   val acknowledgedEori           = "acknowledgedEori"
   val interventionXml            = "somexml"
   val receivedDateTime: Instant  = Instant.parse("2020-12-31T23:59:00Z")
+  val housekeepingAt: Instant    = Instant.parse("2021-12-31T23:59:00Z")
 
   implicit val lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId")
 
@@ -71,16 +72,18 @@ class InterventionRepoISpec
     correlationId,
     acknowledged = false,
     receivedDateTime,
+    housekeepingAt,
     submissionId,
     interventionXml
   )
 
   val acknowledgedIntervention: InterventionModel = InterventionModel(
-    eori,
+    acknowledgedEori,
     acknowledgedNotificationId,
     acknowledgedCorrelationId,
     acknowledged = true,
     receivedDateTime,
+    housekeepingAt,
     acknowledgedSubmissionId,
     interventionXml
   )
@@ -126,7 +129,7 @@ class InterventionRepoISpec
       }
     }
 
-    "looking up by eori and correlation id" when {
+    "looking up by eori and notification id" when {
       "it exists in the database" must {
         "return it" in {
           await(repository.lookupIntervention(eori, notificationId1)) shouldBe Some(intervention())
@@ -149,6 +152,28 @@ class InterventionRepoISpec
       "it does not exist in the database for the eori" must {
         "return None" in {
           await(repository.lookupIntervention("otherEori", notificationId1)) shouldBe None
+        }
+      }
+    }
+
+    "looking up full intervention by eori and notification id" when {
+      "it exists in the database" must {
+        "return it" in {
+          await(repository.lookupFullIntervention(eori, notificationId1)) shouldBe Some(intervention())
+        }
+      }
+
+      "it exists in the database and has been acknowledged" must {
+        "return it" in {
+          await(repository.save(acknowledgedIntervention))
+          await(repository.lookupFullIntervention(acknowledgedEori, acknowledgedNotificationId)) shouldBe
+            Some(acknowledgedIntervention)
+        }
+      }
+
+      "it does not exist in the database" must {
+        "return None" in {
+          await(repository.lookupFullIntervention("unknownEori", "unknownId")) shouldBe None
         }
       }
     }
@@ -194,6 +219,7 @@ class InterventionRepoISpec
           correlationId(1),
           acknowledged = false,
           receivedDateTime,
+          housekeepingAt,
           "subId1",
           interventionXml)
 
@@ -304,6 +330,11 @@ class InterventionRepoISpec
       "return an empty list" in {
         await(repository.lookupNotificationIds("unknownSubmissionId")) shouldBe Nil
       }
+    }
+  }
+  "expireAfterSeconds" must {
+    "initially be zero" in {
+      await(repository.getExpireAfterSeconds).get shouldBe 0
     }
   }
 }

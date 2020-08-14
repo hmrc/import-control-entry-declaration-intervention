@@ -34,6 +34,11 @@ class InterventionRetrievalService @Inject()(interventionRepo: InterventionRepo,
       interventionRepo.lookupIntervention(eori, notificationId)
     }
 
+  def retrieveFullIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
+    timeFuture("Service retrieveIntervention", "retrieveFullIntervention.total") {
+      interventionRepo.lookupFullIntervention(eori, notificationId)
+    }
+
   def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     timeFuture("Service acknowledgeIntervention", "acknowledgeIntervention.total") {
       interventionRepo.acknowledgeIntervention(eori, notificationId)

@@ -67,6 +67,7 @@ class InterventionSubmissionService @Inject()(
             correlationId    = metadata.correlationId,
             notificationId   = notificationId,
             receivedDateTime = metadata.receivedDateTime,
+            housekeepingAt   = metadata.receivedDateTime.plusMillis(appConfig.defaultTtl.toMillis),
             submissionId     = submissionId,
             interventionXml  = xmlString
           ))

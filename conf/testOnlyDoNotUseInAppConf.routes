@@ -10,6 +10,7 @@
 # Failing to follow this rule may result in test routes deployed in production.
 
 GET        /import-control/test-only/notification-ids/:submissionId        uk.gov.hmrc.entrydeclarationintervention.controllers.test.NotificationIdController.getNotificationIds(submissionId)
+GET        /import-control/test-only/fullintervention/:eori/:notificationId  uk.gov.hmrc.entrydeclarationintervention.controllers.test.TestInterventionRetrievalController.getFullIntervention(eori, notificationId)
 
 # Add all the application routes to the prod.routes file
 ->         /                          prod.Routes

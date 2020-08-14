@@ -17,13 +17,13 @@
 package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsPath, Json}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.Cursor.FailOnError
 import reactivemongo.api.indexes.Index
 import reactivemongo.api.indexes.IndexType.Ascending
 import reactivemongo.api.{Cursor, ReadPreference}
-import reactivemongo.bson.BSONObjectID
+import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.core.errors.DatabaseException
 import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
@@ -42,28 +42,36 @@ trait InterventionRepo {
 
   def lookupIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]]
 
+  def lookupFullIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]]
+
   /**
-   * @return the acknowledged intervention
-   */
+    * @return the acknowledged intervention
+    */
   def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]]
 
   def listInterventions(eori: String): Future[List[InterventionIds]]
+
 }
 
 @Singleton
 class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: ReactiveMongoComponent, ec: ExecutionContext)
-  extends ReactiveRepository[InterventionPersisted, BSONObjectID](
-    "intervention",
-    mongo.mongoConnector.db,
-    InterventionPersisted.format,
-    ReactiveMongoFormats.objectIdFormats)
+    extends ReactiveRepository[InterventionPersisted, BSONObjectID](
+      "intervention",
+      mongo.mongoConnector.db,
+      InterventionPersisted.format,
+      ReactiveMongoFormats.objectIdFormats)
     with InterventionRepo {
 
   override def indexes: Seq[Index] = Seq(
     Index(
       Seq(("submissionId", Ascending), ("notificationId", Ascending)),
-      name = Some("lookupNotificationIdIndex"),
+      name   = Some("lookupNotificationIdIndex"),
       unique = true),
+    //TTL index
+    Index(
+      Seq("housekeepingAt" -> Ascending),
+      name    = Some("housekeepingIndex"),
+      options = BSONDocument("expireAfterSeconds" -> 0)),
     // Covering index for list...
     Index(
       Seq(
@@ -76,7 +84,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
     ),
     Index(
       Seq(("eori", Ascending), ("notificationId", Ascending)),
-      name = Some("eoriPlusNotificationIdIndex"),
+      name   = Some("eoriPlusNotificationIdIndex"),
       unique = true)
   )
 
@@ -110,10 +118,16 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
       .one[InterventionPersisted]
       .map(_.map(_.toIntervention))
 
+  def lookupFullIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
+    collection
+      .find(Json.obj("eori" -> eori, "notificationId" -> notificationId), Option.empty[JsObject])
+      .one[InterventionPersisted]
+      .map(_.map(_.toIntervention))
+
   def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     findAndUpdate(
-      query = Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
-      update = Json.obj("$set" -> Json.obj("acknowledged" -> true)),
+      query          = Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
+      update         = Json.obj("$set" -> Json.obj("acknowledged" -> true)),
       fetchNewObject = true
     ).map(result => result.result[InterventionPersisted].map(_.toIntervention))
 
@@ -125,4 +139,14 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
       .sort(Json.obj("receivedDateTime" -> 1))
       .cursor[InterventionIds]()
       .collect[List](maxDocs = appConfig.listInterventionsLimit, err = Cursor.FailOnError[List[InterventionIds]]())
+
+  private[repositories] def getExpireAfterSeconds: Future[Option[Long]] =
+    collection.indexesManager.list().map { indexes =>
+      for {
+        idx <- indexes.find(_.key.map(_._1).contains("housekeepingAt"))
+        // Read the expiry from JSON (rather than BSON) so that we can control widening to Long
+        // (from the more strongly typed BSON values which can be either Int32 or Int64)
+        value <- Json.toJson(idx.options).as((JsPath \ "expireAfterSeconds").readNullable[Long])
+      } yield value
+    }
 }

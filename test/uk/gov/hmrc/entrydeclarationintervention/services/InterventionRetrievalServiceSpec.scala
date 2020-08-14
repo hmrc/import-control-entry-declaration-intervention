@@ -52,6 +52,7 @@ class InterventionRetrievalServiceSpec extends UnitSpec with MockInterventionRep
     correlationId,
     acknowledged = false,
     Instant.parse("2020-12-31T23:59:00Z"),
+    Instant.parse("2020-12-31T23:59:00Z"),
     submissionId,
     xml
   )
@@ -68,6 +69,20 @@ class InterventionRetrievalServiceSpec extends UnitSpec with MockInterventionRep
         MockInterventionRepo.lookupIntervention(eori, notificationId) returns Future.successful(None)
 
         service.retrieveIntervention(eori, notificationId).futureValue shouldBe None
+      }
+    }
+
+    "retrieving full intervention by eori and notificationId" must {
+      "return the intervention if an intervention exists in the database" in {
+        MockInterventionRepo.lookupFullIntervention(eori, notificationId) returns Future.successful(Some(intervention))
+
+        service.retrieveFullIntervention(eori, notificationId).futureValue shouldBe Some(intervention)
+      }
+
+      "return None if no intervention exists in the database" in {
+        MockInterventionRepo.lookupFullIntervention(eori, notificationId) returns Future.successful(None)
+
+        service.retrieveFullIntervention(eori, notificationId).futureValue shouldBe None
       }
     }
 
