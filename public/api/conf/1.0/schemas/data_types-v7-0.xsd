@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dt="http://www.govtalk.gov.uk/enforcement/ICS/datatypes/7" targetNamespace="http://www.govtalk.gov.uk/enforcement/ICS/datatypes/7" version="7.0" id="data_types" elementFormDefault="qualified" attributeFormDefault="unqualified">
   <xs:simpleType name="AlphaNumType">
     <xs:annotation>
