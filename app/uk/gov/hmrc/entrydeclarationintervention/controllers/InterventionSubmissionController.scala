@@ -25,7 +25,6 @@ import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
 import uk.gov.hmrc.entrydeclarationintervention.reporting.{InterventionReceived, ReportSender}
 import uk.gov.hmrc.entrydeclarationintervention.services.InterventionSubmissionService
-import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import uk.gov.hmrc.entrydeclarationintervention.validators.JsonSchemaValidator
 
 import scala.concurrent.{ExecutionContext, Future}
