@@ -17,7 +17,6 @@
 package uk.gov.hmrc.entrydeclarationintervention.services
 
 import javax.inject.Singleton
-import uk.gov.hmrc.entrydeclarationintervention.models.NotificationId
 
 import scala.xml.Elem
 

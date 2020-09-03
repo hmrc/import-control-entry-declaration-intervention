@@ -18,7 +18,6 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.entrydeclarationintervention.models.NotificationId
 
 import scala.xml.Elem
 

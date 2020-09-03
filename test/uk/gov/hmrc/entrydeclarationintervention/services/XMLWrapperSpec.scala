@@ -17,7 +17,6 @@
 package uk.gov.hmrc.entrydeclarationintervention.services
 
 import org.apache.commons.lang3.StringUtils
-import uk.gov.hmrc.entrydeclarationintervention.models.NotificationId
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
 import uk.gov.hmrc.play.test.UnitSpec
 
