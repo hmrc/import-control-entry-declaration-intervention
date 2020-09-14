@@ -192,13 +192,13 @@ class InterventionSubmissionControllerSpec
 
       status(result) shouldBe Status.BAD_REQUEST
     }
-    "return 401" when {
+    "return 403" when {
       "no authentication fails" in {
         MockAppConfig.eisInboundBearerToken returns "XXXX"
 
         val result = controller.postIntervention(request)
 
-        status(result) shouldBe UNAUTHORIZED
+        status(result) shouldBe FORBIDDEN
       }
     }
   }
