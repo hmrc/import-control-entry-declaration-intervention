@@ -49,6 +49,8 @@ trait AppConfig {
   def validateJsonToXMLTransformation: Boolean
 
   def defaultTtl: FiniteDuration
+
+  def newSSEnrolmentEnabled: Boolean
 }
 
 @Singleton
@@ -84,4 +86,6 @@ class AppConfigImpl @Inject()(config: Configuration, servicesConfig: ServicesCon
     config.getOptional[Boolean]("validateJsonToXMLTransformation").getOrElse(false)
 
   lazy val defaultTtl: FiniteDuration = getFiniteDuration(config.get[Configuration](s"mongodb"), "defaultTtl")
+
+  lazy val newSSEnrolmentEnabled: Boolean = config.get[Boolean]("feature-switch.new-ss-enrolment")
 }
