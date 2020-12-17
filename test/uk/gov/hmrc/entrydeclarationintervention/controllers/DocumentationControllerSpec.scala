@@ -45,7 +45,7 @@ class DocumentationControllerSpec extends UnitSpec with MockAppConfig with Injec
     def checkDefinition(apiStatus: String, enabled: Boolean): Assertion = {
       MockAppConfig.apiStatus returns apiStatus
       MockAppConfig.apiEndpointsEnabled returns enabled
-      MockAppConfig.apiGatewayContext returns "customs/imports/outcomes"
+      MockAppConfig.apiGatewayContext returns "customs/imports/notifications"
 
       MockAppConfig.allowListEnabled returns false
 
@@ -82,7 +82,7 @@ class DocumentationControllerSpec extends UnitSpec with MockAppConfig with Injec
         val applicationIds = Seq("app1", "app2")
         MockAppConfig.apiStatus returns apiStatus
         MockAppConfig.apiEndpointsEnabled returns enabled
-        MockAppConfig.apiGatewayContext returns "customs/imports/outcomes"
+        MockAppConfig.apiGatewayContext returns "customs/imports/notifications"
 
         MockAppConfig.allowListEnabled returns true
         MockAppConfig.allowListApplicationIds returns applicationIds
