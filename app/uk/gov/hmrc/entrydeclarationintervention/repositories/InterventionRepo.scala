@@ -149,10 +149,4 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
         value <- Json.toJson(idx.options).as((JsPath \ "expireAfterSeconds").readNullable[Long])
       } yield value
     }
-
-  override def ensureIndexes(implicit ec: ExecutionContext): Future[Seq[Boolean]] =
-    collection.indexesManager
-      .dropAll()
-      .recover { case _ => 1 }
-      .flatMap(_ => super.ensureIndexes)
 }
