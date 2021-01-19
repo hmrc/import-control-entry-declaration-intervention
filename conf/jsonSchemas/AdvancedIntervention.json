@@ -322,21 +322,70 @@
     },
     "trader": {
       "type": "object",
-      "minProperties": 1,
-      "name": {
-        "description": "The name of the trader.",
-        "$ref": "#/definitions/name"
+      "oneOf": [
+        {
+          "$ref": "#/definitions/traderContactDetails"
+        },
+        {
+          "properties": {
+            "eori": {
+              "$ref": "#/definitions/eori"
+            }
+          },
+          "required": [
+            "eori"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/definitions/traderContactDetailsAndEORI"
+        }
+      ]
+    },
+    "traderContactDetails": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the trader.",
+          "$ref": "#/definitions/name"
+        },
+        "address": {
+          "description": "address of the trader",
+          "$ref": "#/definitions/address"
+        },
+        "language": {
+          "$ref": "#/definitions/languageCode"
+        }
       },
-      "address": {
-        "description": "address of the trader",
-        "$ref": "#/definitions/address"
+      "required": [
+        "name",
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "traderContactDetailsAndEORI": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the trader.",
+          "$ref": "#/definitions/name"
+        },
+        "address": {
+          "description": "address of the trader",
+          "$ref": "#/definitions/address"
+        },
+        "language": {
+          "$ref": "#/definitions/languageCode"
+        },
+        "eori": {
+          "$ref": "#/definitions/eori"
+        }
       },
-      "language": {
-        "$ref": "#/definitions/languageCode"
-      },
-      "eori": {
-        "$ref": "#/definitions/eori"
-      },
+      "required": [
+        "name",
+        "address",
+        "eori"
+      ],
       "additionalProperties": false
     },
     "eori": {
@@ -353,8 +402,7 @@
     "address": {
       "description": "address format",
       "type": "object",
-      "minProperties": 1,
-      "properties":{
+      "properties": {
         "streetAndNumber": {
           "type": "string",
           "maxLength": 35
@@ -371,6 +419,12 @@
           "$ref": "#/definitions/countryCode"
         }
       },
+      "required": [
+        "streetAndNumber",
+        "city",
+        "postalCode",
+        "countryCode"
+      ],
       "additionalProperties": false
     },
     "customsIntervention": {
