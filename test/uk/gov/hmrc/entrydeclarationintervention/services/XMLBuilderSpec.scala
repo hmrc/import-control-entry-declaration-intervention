@@ -17,8 +17,8 @@
 package uk.gov.hmrc.entrydeclarationintervention.services
 
 import java.time.Instant
-
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.models.received.{ArbitraryIntervention, InterventionResponse}
 import uk.gov.hmrc.entrydeclarationintervention.services.XMLBuilder._
@@ -55,24 +55,24 @@ class XMLBuilderSpec extends UnitSpec with ScalaCheckDrivenPropertyChecks with A
     "return XML formatted correctly" when {
       "an intervention is supplied" in {
         val interventionJson = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
-        val intervention     = interventionJson.as[InterventionResponse]
-        val expected         = ResourceUtils.withInputStreamFor("xmls/Intervention.xml")(XML.load)
+        val intervention = interventionJson.as[InterventionResponse]
+        val expected = ResourceUtils.withInputStreamFor("xmls/Intervention.xml")(XML.load)
 
         val xml = xmlBuilder.buildXML(intervention)
         Utility.trim(xml).text shouldBe Utility.trim(expected).text
-        xml.namespace          shouldBe "http://ics.dgtaxud.ec/CC351A"
-        xml.prefix             shouldBe "cc3"
+        xml.namespace shouldBe "http://ics.dgtaxud.ec/CC351A"
+        xml.prefix shouldBe "cc3"
       }
 
       "an intervention is supplied with all optional fields" in {
         val interventionJson = ResourceUtils.withInputStreamFor("jsons/InterventionAllOptional.json")(Json.parse)
-        val intervention     = interventionJson.as[InterventionResponse]
-        val expected         = ResourceUtils.withInputStreamFor("xmls/InterventionAllOptional.xml")(XML.load)
+        val intervention = interventionJson.as[InterventionResponse]
+        val expected = ResourceUtils.withInputStreamFor("xmls/InterventionAllOptional.xml")(XML.load)
 
         val xml = xmlBuilder.buildXML(intervention)
         Utility.trim(xml).text shouldBe Utility.trim(expected).text
-        xml.namespace          shouldBe "http://ics.dgtaxud.ec/CC351A"
-        xml.prefix             shouldBe "cc3"
+        xml.namespace shouldBe "http://ics.dgtaxud.ec/CC351A"
+        xml.prefix shouldBe "cc3"
       }
 
       "generate schema valid XML for all inputs" in {
@@ -87,6 +87,28 @@ class XMLBuilderSpec extends UnitSpec with ScalaCheckDrivenPropertyChecks with A
             msg.contains("cvc-pattern-valid") || msg.contains("cvc-type.3.1.3") || msg.contains("cvc-enumeration-valid")
           } shouldBe Nil
         }
+      }
+
+      "an advanced intervention is supplied with empty address fields (only streetAndNumber)" in {
+        val interventionJson = ResourceUtils.withInputStreamFor("jsons/InterventionAddress1.json")(Json.parse)
+        val intervention = interventionJson.as[InterventionResponse]
+        val expected = ResourceUtils.withInputStreamFor("xmls/InterventionAddress1.xml")(XML.load)
+
+        val xml = xmlBuilder.buildXML(intervention)
+        Utility.trim(xml).text shouldBe Utility.trim(expected).text
+        xml.namespace shouldBe "http://ics.dgtaxud.ec/CC351A"
+        xml.prefix shouldBe "cc3"
+      }
+
+      "an advanced intervention is supplied with empty address fields (all but streetAndNumber)" in {
+        val interventionJson = ResourceUtils.withInputStreamFor("jsons/InterventionAddress2.json")(Json.parse)
+        val intervention = interventionJson.as[InterventionResponse]
+        val expected = ResourceUtils.withInputStreamFor("xmls/InterventionAddress2.xml")(XML.load)
+
+        val xml = xmlBuilder.buildXML(intervention)
+        Utility.trim(xml).text shouldBe Utility.trim(expected).text
+        xml.namespace shouldBe "http://ics.dgtaxud.ec/CC351A"
+        xml.prefix shouldBe "cc3"
       }
     }
   }
