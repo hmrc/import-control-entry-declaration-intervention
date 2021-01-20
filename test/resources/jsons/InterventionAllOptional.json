@@ -10,7 +10,17 @@
     "correlationId": "12345678901234"
   },
   "parties": {
-    "declarant": {"eori": "GB00123456789"},
+    "declarant": {
+      "name": "M. MARCHAND",
+      "address": {
+        "streetAndNumber": "13 MARCHAND BL",
+        "city": "MARCHANDVILLE",
+        "postalCode": "FR198754",
+        "countryCode": "FR"
+      },
+      "language": "FR",
+      "eori": "GB00123456789"
+    },
     "representative": {
       "name": "M. MARCHAND",
       "address": {
@@ -23,6 +33,14 @@
       "eori": "FR00123456789"
     },
     "carrier": {
+      "name": "M. MARCHAND",
+      "address": {
+        "streetAndNumber": "13 MARCHAND BL",
+        "city": "MARCHANDVILLE",
+        "postalCode": "FR198754",
+        "countryCode": "FR"
+      },
+      "language": "FR",
       "eori": "GB00123456789"
     }
   },

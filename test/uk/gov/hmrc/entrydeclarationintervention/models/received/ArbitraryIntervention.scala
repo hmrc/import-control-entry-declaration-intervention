@@ -83,10 +83,10 @@ trait ArbitraryIntervention {
 
   implicit val arbitraryAddress: Arbitrary[Address] = Arbitrary(
     for {
-      streetAndNumber <- arbitrary[String]
-      city            <- arbitrary[String]
-      postalCode      <- arbitrary[String]
-      countryCode     <- arbitrary[String]
+      streetAndNumber <- arbitrary[Option[String]]
+      city            <- arbitrary[Option[String]]
+      postalCode      <- arbitrary[Option[String]]
+      countryCode     <- arbitrary[Option[String]]
     } yield Address(streetAndNumber, city, postalCode, countryCode)
   )
 

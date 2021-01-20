@@ -18,7 +18,11 @@ package uk.gov.hmrc.entrydeclarationintervention.models.received
 
 import play.api.libs.json.{Format, Json}
 
-case class Address(streetAndNumber: String, city: String, postalCode: String, countryCode: String)
+case class Address(
+  streetAndNumber: Option[String],
+  city: Option[String],
+  postalCode: Option[String],
+  countryCode: Option[String])
 
 object Address {
   implicit val jsonFormat: Format[Address] = Json.format[Address]

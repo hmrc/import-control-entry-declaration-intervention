@@ -158,30 +158,26 @@ class XMLBuilder {
   private def getTRAREP(representative: Trader): Elem =
     //@formatter:off
     <TRAREP>
-      { for (value <- representative.name.toSeq) yield <NamTRE1>{ value } </NamTRE1>}
-      { for ( address <- representative.address.toSeq) yield {
-      <StrAndNumTRE1>{address.streetAndNumber}</StrAndNumTRE1>
-        <PosCodTRE1>{address.postalCode}</PosCodTRE1>
-        <CitTRE1>{address.city}</CitTRE1>
-        <CouCodTRE1>{address.countryCode}</CouCodTRE1>
-      }}
-      { for (value <- representative.language.toSeq)  yield <TRAREPLNG>{ value }</TRAREPLNG> }
-      { for (value <- representative.eori.toSeq) yield <TINTRE1>{ value }</TINTRE1> }
+      { for (value <- representative.name.toSeq)                     yield <NamTRE1>{ value } </NamTRE1> }
+      { for (value <- streetAndNumber(representative.address).toSeq) yield <StrAndNumTRE1>{ value }</StrAndNumTRE1> }
+      { for (value <- postalCode(representative.address).toSeq)      yield <PosCodTRE1>{ value }</PosCodTRE1> }
+      { for (value <- city(representative.address).toSeq)            yield <CitTRE1>{ value }</CitTRE1> }
+      { for (value <- countryCode(representative.address).toSeq)     yield <CouCodTRE1>{ value }</CouCodTRE1> }
+      { for (value <- representative.language.toSeq)                 yield <TRAREPLNG>{ value }</TRAREPLNG> }
+      { for (value <- representative.eori.toSeq)                     yield <TINTRE1>{ value }</TINTRE1> }
     </TRAREP>
   //@formatter:on
 
   private def getPERLODSUMDEC(declarant: Trader): Elem =
     //@formatter:off
     <PERLODSUMDEC>
-      { for (value <- declarant.name.toSeq) yield <NamPLD1>{value}</NamPLD1> }
-      { for (address <- declarant.address.toSeq) yield {
-        <StrAndNumPLD1>{address.streetAndNumber}</StrAndNumPLD1>
-        <PosCodPLD1>{address.postalCode}</PosCodPLD1>
-        <CitPLD1>{address.city}</CitPLD1>
-        <CouCodPLD1>{address.countryCode}</CouCodPLD1>
-      }}
-      { for (value <- declarant.language.toSeq) yield <PERLODSUMDECLNG>{value}</PERLODSUMDECLNG> }
-      { for (value <- declarant.eori.toSeq) yield <TINPLD1>{value}</TINPLD1> }
+      { for (value <- declarant.name.toSeq)                     yield <NamPLD1>{ value }</NamPLD1> }
+      { for (value <- streetAndNumber(declarant.address).toSeq) yield <StrAndNumPLD1>{ value }</StrAndNumPLD1> }
+      { for (value <- postalCode(declarant.address).toSeq)      yield <PosCodPLD1>{ value }</PosCodPLD1> }
+      { for (value <- city(declarant.address).toSeq)            yield <CitPLD1>{ value }</CitPLD1> }
+      { for (value <- countryCode(declarant.address).toSeq)     yield <CouCodPLD1>{ value }</CouCodPLD1> }
+      { for (value <- declarant.language.toSeq)                 yield <PERLODSUMDECLNG>{ value }</PERLODSUMDECLNG> }
+      { for (value <- declarant.eori.toSeq)                     yield <TINPLD1>{ value }</TINPLD1> }
     </PERLODSUMDEC>
   //@formatter:on
 
@@ -196,15 +192,13 @@ class XMLBuilder {
   private def getTRACARENT601(carrier: Trader): Elem =
     //@formatter:off
     <TRACARENT601>
-      { for (value <- carrier.name.toSeq) yield <NamTRACARENT604>{ value } </NamTRACARENT604>}
-      { for ( address <- carrier.address.toSeq) yield {
-      <StrNumTRACARENT607>{address.streetAndNumber}</StrNumTRACARENT607>
-        <PstCodTRACARENT606>{address.postalCode}</PstCodTRACARENT606>
-        <CtyTRACARENT603>{address.city}</CtyTRACARENT603>
-        <CouCodTRACARENT605>{address.countryCode}</CouCodTRACARENT605>
-      }}
-      { for (value <- carrier.language.toSeq)  yield <TRACARENT601LNG>{ value }</TRACARENT601LNG> }
-      { for (value <- carrier.eori.toSeq) yield <TINTRACARENT602>{ value }</TINTRACARENT602> }
+      { for (value <- carrier.name.toSeq)                     yield <NamTRACARENT604>{ value } </NamTRACARENT604> }
+      { for (value <- streetAndNumber(carrier.address).toSeq) yield <StrNumTRACARENT607>{ value }</StrNumTRACARENT607> }
+      { for (value <- postalCode(carrier.address).toSeq)      yield <PstCodTRACARENT606>{ value }</PstCodTRACARENT606> }
+      { for (value <- city(carrier.address).toSeq)            yield <CtyTRACARENT603>{ value }</CtyTRACARENT603> }
+      { for (value <- countryCode(carrier.address).toSeq)     yield <CouCodTRACARENT605>{ value }</CouCodTRACARENT605> }
+      { for (value <- carrier.language.toSeq)                 yield <TRACARENT601LNG>{ value }</TRACARENT601LNG> }
+      { for (value <- carrier.eori.toSeq)                     yield <TINTRACARENT602>{ value }</TINTRACARENT602> }
     </TRACARENT601>
   //@formatter:on
 
@@ -221,5 +215,29 @@ class XMLBuilder {
       </CUSINT632>
       //@formatter:on
     }
+
+  private def streetAndNumber(optAddress: Option[Address]): Option[String] =
+    for {
+      address <- optAddress
+      value   <- address.streetAndNumber
+    } yield value
+
+  private def postalCode(optAddress: Option[Address]): Option[String] =
+    for {
+      address <- optAddress
+      value   <- address.postalCode
+    } yield value
+
+  private def city(optAddress: Option[Address]): Option[String] =
+    for {
+      address <- optAddress
+      value   <- address.city
+    } yield value
+
+  private def countryCode(optAddress: Option[Address]): Option[String] =
+    for {
+      address <- optAddress
+      value   <- address.countryCode
+    } yield value
 
 }
