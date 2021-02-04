@@ -49,7 +49,5 @@ trait MockAppConfig extends MockFactory {
       mockAppConfig.validateJsonToXMLTransformation _ expects ()
 
     def defaultTtl: CallHandler[FiniteDuration] = mockAppConfig.defaultTtl _ expects ()
-
-    def newSSEnrolmentEnabled: CallHandler[Boolean] = mockAppConfig.newSSEnrolmentEnabled _ stubs () returns true
   }
 }
