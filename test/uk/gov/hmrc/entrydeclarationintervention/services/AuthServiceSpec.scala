@@ -35,7 +35,6 @@ class AuthServiceSpec
     extends UnitSpec
     with MockAuthConnector
     with MockApiSubscriptionFieldsConnector
-    with MockAppConfig
     with ScalaFutures
     with Inside {
 
@@ -43,7 +42,7 @@ class AuthServiceSpec
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  val service  = new AuthService(mockAuthConnector, mockApiSubscriptionFieldsConnector, mockAppConfig)
+  val service  = new AuthService(mockAuthConnector, mockApiSubscriptionFieldsConnector)
   val eori     = "GB123"
   val clientId = "someClientId"
 
@@ -93,7 +92,6 @@ class AuthServiceSpec
 
       "CSP authentication fails" should {
         authenticateBasedOnSSEnrolment { () =>
-          MockAppConfig.newSSEnrolmentEnabled
           stubCSPAuth returns Future.failed(authException)
         }
       }
@@ -102,7 +100,6 @@ class AuthServiceSpec
     "no X-Client-Id header present" should {
       implicit val hc: HeaderCarrier = HeaderCarrier()
       authenticateBasedOnSSEnrolment { () =>
-        MockAppConfig.newSSEnrolmentEnabled
       }
     }
 
