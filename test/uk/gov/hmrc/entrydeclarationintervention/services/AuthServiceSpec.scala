@@ -23,7 +23,6 @@ import org.scalatest.time.{Millis, Span}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.entrydeclarationintervention.connectors.{MockApiSubscriptionFieldsConnector, MockAuthConnector}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
@@ -100,7 +99,7 @@ class AuthServiceSpec
     "no X-Client-Id header present" should {
       implicit val hc: HeaderCarrier = HeaderCarrier()
       authenticateBasedOnSSEnrolment { () =>
-      }
+        }
     }
 
     "X-Client-Id header present with different case" must {

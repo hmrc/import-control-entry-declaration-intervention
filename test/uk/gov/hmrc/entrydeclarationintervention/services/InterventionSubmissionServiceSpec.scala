@@ -84,7 +84,7 @@ class InterventionSubmissionServiceSpec
     submissionId,
     wrappedXml.toString
   )
-  implicit val loggingContext: LoggingContext = LoggingContext(eori, correlationId, submissionId, notificationId)
+  implicit val loggingContext: LoggingContext = LoggingContext(eori, correlationId, submissionId, notificationId, "mrn")
 
   val interventionReceived: InterventionResponse =
     ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse).as[InterventionResponse]
