@@ -35,10 +35,6 @@ trait MockAppConfig extends MockFactory {
 
     def apiEndpointsEnabled: CallHandler[Boolean] = mockAppConfig.apiEndpointsEnabled _ expects ()
 
-    def allowListEnabled: CallHandler[Boolean] = mockAppConfig.allowListEnabled _ expects ()
-
-    def allowListApplicationIds: CallHandler[Seq[String]] = mockAppConfig.allowListApplicationIds _ expects ()
-
     def eisInboundBearerToken: CallHandler[String] = mockAppConfig.eisInboundBearerToken _ expects ()
 
     def listInterventionsLimit: CallHandler[Int] = mockAppConfig.listInterventionsLimit _ expects ()
