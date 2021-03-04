@@ -17,7 +17,7 @@ import play.core.PlayVersion.current
 import sbt._
 
 object AppDependencies {
-  val bootstrapVersion = "3.0.0"
+  val bootstrapVersion = "3.4.0"
 
   val compile = Seq(
     "uk.gov.hmrc"    %% "simple-reactivemongo"      % "7.30.0-play-26",
@@ -36,7 +36,7 @@ object AppDependencies {
     "org.scalamock"          %% "scalamock"                 % "5.0.0"          % "test, it",
     "org.scalacheck"         %% "scalacheck"                % "1.14.1"         % "test, it",
     "com.github.tomakehurst" % "wiremock"                   % "2.27.2"         % "test, it",
-    "uk.gov.hmrc"            %% "hmrctest"                  % "3.9.0-play-26"  % "test, it"
+    "uk.gov.hmrc"            %% "hmrctest"                  % "3.10.0-play-26" % "test, it"
   )
   // Fixes a transitive dependency clash between wiremock and scalatestplus-play
   val overrides: Seq[ModuleID] = {
