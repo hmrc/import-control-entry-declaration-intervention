@@ -32,6 +32,7 @@ import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, Interve
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.play.http.logging.Mdc
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -93,7 +94,8 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
   def save(intervention: InterventionModel)(implicit lc: LoggingContext): Future[Option[SaveError]] = {
     val interventionPersisted = InterventionPersisted.from(intervention)
 
-    insert(interventionPersisted)
+    Mdc
+      .preservingMdc(insert(interventionPersisted))
       .map(_ => None)
       .recover {
         case e: DatabaseException =>
@@ -103,50 +105,63 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: React
   }
 
   def lookupNotificationIds(submissionId: String): Future[Seq[String]] =
-    collection
-      .find(Json.obj("submissionId" -> submissionId), Some(Json.obj("notificationId" -> 1)))
-      .sort(Json.obj("receivedDateTime" -> 1))
-      .cursor[NotificationId](ReadPreference.primaryPreferred)
-      .collect(maxDocs = -1, FailOnError[Seq[NotificationId]]())
+    Mdc
+      .preservingMdc(
+        collection
+          .find(Json.obj("submissionId" -> submissionId), Some(Json.obj("notificationId" -> 1)))
+          .sort(Json.obj("receivedDateTime" -> 1))
+          .cursor[NotificationId](ReadPreference.primaryPreferred)
+          .collect(maxDocs = -1, FailOnError[Seq[NotificationId]]()))
       .map(_.map(_.value))
 
   def lookupIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
-    collection
-      .find(
-        Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
-        Option.empty[JsObject])
-      .one[InterventionPersisted]
+    Mdc
+      .preservingMdc(
+        collection
+          .find(
+            Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
+            Option.empty[JsObject])
+          .one[InterventionPersisted])
       .map(_.map(_.toIntervention))
 
   def lookupFullIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
-    collection
-      .find(Json.obj("eori" -> eori, "notificationId" -> notificationId), Option.empty[JsObject])
-      .one[InterventionPersisted]
+    Mdc
+      .preservingMdc(
+        collection
+          .find(Json.obj("eori" -> eori, "notificationId" -> notificationId), Option.empty[JsObject])
+          .one[InterventionPersisted])
       .map(_.map(_.toIntervention))
 
   def acknowledgeIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
-    findAndUpdate(
-      query          = Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
-      update         = Json.obj("$set" -> Json.obj("acknowledged" -> true)),
-      fetchNewObject = true
-    ).map(result => result.result[InterventionPersisted].map(_.toIntervention))
+    Mdc
+      .preservingMdc(
+        findAndUpdate(
+          query          = Json.obj("eori" -> eori, "notificationId" -> notificationId, "acknowledged" -> false),
+          update         = Json.obj("$set" -> Json.obj("acknowledged" -> true)),
+          fetchNewObject = true
+        ))
+      .map(result => result.result[InterventionPersisted].map(_.toIntervention))
 
   def listInterventions(eori: String): Future[List[InterventionIds]] =
-    collection
-      .find(
-        Json.obj("eori" -> eori, "acknowledged" -> false),
-        Some(Json.obj("correlationId" -> 1, "notificationId" -> 1)))
-      .sort(Json.obj("receivedDateTime" -> 1))
-      .cursor[InterventionIds]()
-      .collect[List](maxDocs = appConfig.listInterventionsLimit, err = Cursor.FailOnError[List[InterventionIds]]())
+    Mdc
+      .preservingMdc(
+        collection
+          .find(
+            Json.obj("eori" -> eori, "acknowledged" -> false),
+            Some(Json.obj("correlationId" -> 1, "notificationId" -> 1)))
+          .sort(Json.obj("receivedDateTime" -> 1))
+          .cursor[InterventionIds]()
+          .collect[List](maxDocs = appConfig.listInterventionsLimit, err = Cursor.FailOnError[List[InterventionIds]]()))
 
   private[repositories] def getExpireAfterSeconds: Future[Option[Long]] =
-    collection.indexesManager.list().map { indexes =>
-      for {
-        idx <- indexes.find(_.key.map(_._1).contains("housekeepingAt"))
-        // Read the expiry from JSON (rather than BSON) so that we can control widening to Long
-        // (from the more strongly typed BSON values which can be either Int32 or Int64)
-        value <- Json.toJson(idx.options).as((JsPath \ "expireAfterSeconds").readNullable[Long])
-      } yield value
-    }
+    Mdc
+      .preservingMdc(collection.indexesManager.list())
+      .map { indexes =>
+        for {
+          idx <- indexes.find(_.key.map(_._1).contains("housekeepingAt"))
+          // Read the expiry from JSON (rather than BSON) so that we can control widening to Long
+          // (from the more strongly typed BSON values which can be either Int32 or Int64)
+          value <- Json.toJson(idx.options).as((JsPath \ "expireAfterSeconds").readNullable[Long])
+        } yield value
+      }
 }
