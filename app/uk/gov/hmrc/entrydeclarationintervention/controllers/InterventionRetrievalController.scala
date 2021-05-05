@@ -66,7 +66,10 @@ class InterventionRetrievalController @Inject()(
   }
 
   private def listXml(interventionIdList: List[InterventionIds]): String = {
-    val prettyPrinter = new scala.xml.PrettyPrinter(100, 4)
+    val width: Int = 100
+    val step: Int = 4
+
+    val prettyPrinter = new scala.xml.PrettyPrinter(width, step)
 
     val xml = <advancedNotifications>{interventionIdList.map { interventionIds =>
     <response>
