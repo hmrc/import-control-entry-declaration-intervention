@@ -20,11 +20,11 @@ object AppDependencies {
   val bootstrapVersion = "3.4.0"
 
   val compile = Seq(
-    "uk.gov.hmrc"    %% "simple-reactivemongo"      % "7.30.0-play-26",
+    "uk.gov.hmrc"    %% "simple-reactivemongo"      % "7.31.0-play-26",
     "uk.gov.hmrc"    %% "bootstrap-backend-play-26" % bootstrapVersion,
     "com.github.fge" % "json-schema-validator"      % "2.2.6",
-    "org.typelevel"  %% "cats-core"                 % "2.2.0",
-    "com.chuusai"    %% "shapeless"                 % "2.3.3"
+    "org.typelevel"  %% "cats-core"                 % "2.6.0",
+    "com.chuusai"    %% "shapeless"                 % "2.3.4"
   )
 
   val test = Seq(
