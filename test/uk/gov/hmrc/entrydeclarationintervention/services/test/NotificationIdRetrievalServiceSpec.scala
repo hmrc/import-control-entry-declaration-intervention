@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.services.test
 
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRepo
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
-class NotificationIdRetrievalServiceSpec extends UnitSpec with MockInterventionRepo with ScalaFutures {
+class NotificationIdRetrievalServiceSpec extends WordSpecLike with Matchers with OptionValues with MockInterventionRepo with ScalaFutures {
   val notificationIdRetrievalService = new NotificationIdRetrievalService(interventionRepo)
 
   val submissionId: String = "submissionId"

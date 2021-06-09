@@ -15,7 +15,7 @@
  */
 
 package uk.gov.hmrc.entrydeclarationintervention.utils
-
+//TODO remove/refactor
 import play.api.{Logger, LoggerLike}
 
 trait EventLogger {

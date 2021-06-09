@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.controllers
 
+import org.scalamock.matchers.Matchers
+import org.scalatest.Matchers.convertToAnyShouldWrapper
+import org.scalatest.{OptionValues, WordSpecLike}
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.Json
@@ -24,12 +27,13 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, ResultExtractors}
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
 class EisInboundAuthorisedControllerSpec
-    extends UnitSpec
+    extends WordSpecLike
+    with Matchers
+    with OptionValues
     with Status
     with HeaderNames
     with ResultExtractors
@@ -61,7 +65,7 @@ class EisInboundAuthorisedControllerSpec
           FakeRequest().withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
         private val result: Future[Result] = controller.action()(fakeGetRequest)
 
-        status(await(result)) shouldBe OK
+        status(result) shouldBe OK
       }
     }
 
@@ -74,12 +78,12 @@ class EisInboundAuthorisedControllerSpec
           FakeRequest().withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $badBearerToken")
         private val result: Future[Result] = controller.action()(fakeGetRequest)
 
-        status(await(result)) shouldBe FORBIDDEN
+        status(result) shouldBe FORBIDDEN
       }
       "no bearer token is supplied" in new Test {
         private val result: Future[Result] = controller.action()(FakeRequest())
 
-        status(await(result)) shouldBe FORBIDDEN
+        status(result) shouldBe FORBIDDEN
       }
     }
   }

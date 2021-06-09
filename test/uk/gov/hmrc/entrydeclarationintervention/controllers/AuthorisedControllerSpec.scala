@@ -17,7 +17,10 @@
 package uk.gov.hmrc.entrydeclarationintervention.controllers
 
 import org.scalamock.matchers.ArgCapture.CaptureOne
+import org.scalamock.matchers.Matchers
+import org.scalatest.Matchers.convertToAnyShouldWrapper
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{OptionValues, WordSpec}
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -25,15 +28,15 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, ResultExtractors}
 import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.entrydeclarationintervention.services.{AuthService, MockAuthService}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 
 import scala.concurrent.Future
 import scala.xml.Node
 
 class AuthorisedControllerSpec
-    extends UnitSpec
+    extends WordSpec
+    with Matchers
+    with OptionValues
     with Status
     with HeaderNames
     with ResultExtractors
@@ -70,29 +73,29 @@ class AuthorisedControllerSpec
       <message>Permission denied</message>
     </error>
 
-  "calling an action" when {
-
-    "the user is authorised" should {
+  "calling an action" must {
+    "the user is authorised" when   {
       "return a 200" in new Test {
         MockAuthService.authenticate() returns Future.successful(Some(eori))
 
         private val result: Future[Result] = controller.action()(fakeGetRequest)
-        status(await(result)) shouldBe OK
+        status(result) shouldBe OK
       }
     }
 
-    "user is not authorised" should {
+    "the user is no authorised" when {
       "return a 401" in new Test {
         MockAuthService.authenticate() returns Future.successful(None)
 
         private val result: Future[Result] = controller.action()(fakeGetRequest)
-        status(await(result))                       shouldBe UNAUTHORIZED
+        status(result) shouldBe UNAUTHORIZED
         xml.XML.loadString(contentAsString(result)) shouldBe unauthorisedXml
-        contentType(result)                         shouldBe Some(MimeTypes.XML)
+        contentType(result) shouldBe Some(MimeTypes.XML)
       }
     }
   }
-  "AuthController" should {
+
+  "AuthController" must {
     "use the authorization header to send to auth" in new Test {
       val hcCapture: CaptureOne[HeaderCarrier] = CaptureOne[HeaderCarrier]()
       MockAuthService.authenticateCapture()(hcCapture) returns Future.successful(Some(eori))

@@ -25,8 +25,9 @@ trait MockApiSubscriptionFieldsConnector extends MockFactory {
   val mockApiSubscriptionFieldsConnector: ApiSubscriptionFieldsConnector = mock[ApiSubscriptionFieldsConnector]
 
   object MockApiSubscriptionFieldsConnector {
-    def getAuthenticatedEoriField(clientId: String): CallHandler[Future[Option[String]]] =
+    def getAuthenticatedEoriField(clientId: String): CallHandler[Future[Option[String]]] = {
       mockApiSubscriptionFieldsConnector.getAuthenticatedEoriField _ expects clientId
+    }
 
   }
 }
