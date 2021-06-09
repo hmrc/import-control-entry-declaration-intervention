@@ -18,8 +18,10 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import cats.data.EitherT
 import cats.implicits._
+
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
+import play.api.mvc.Headers
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
@@ -44,7 +46,7 @@ class AuthService @Inject()(
   case object NoEori extends AuthError
   case object AuthFail extends AuthError
 
-  def authenticate()(implicit hc: HeaderCarrier): Future[Option[EoriType]] =
+  def authenticate()(implicit hc: HeaderCarrier, headers: Headers): Future[Option[EoriType]] =
     authCSP
       .recoverWith {
         case AuthFail | NoClientId => authNonCSP
@@ -52,11 +54,11 @@ class AuthService @Inject()(
       .toOption
       .value
 
-  private def authCSP(implicit hc: HeaderCarrier): EitherT[Future, AuthError, EoriType] = {
+  private def authCSP(implicit hc: HeaderCarrier, headers: Headers): EitherT[Future, AuthError, EoriType] = {
     def auth: Future[Option[Unit]] =
       authorised(AuthProviders(AuthProvider.PrivilegedApplication))
-        .retrieve(EmptyRetrieval) { _ =>
-          Logger.debug(s"Successfully authorised CSP PrivilegedApplication")
+      .retrieve(EmptyRetrieval) { _ =>
+        Logger.debug(s"Successfully authorised CSP PrivilegedApplication")
           Future.successful(Some(()))
         }
         .recover {
@@ -66,17 +68,19 @@ class AuthService @Inject()(
         }
 
     for {
-      clientId <- EitherT.fromOption[Future](hc.headers.find(_._1.equalsIgnoreCase(X_CLIENT_ID)).map(_._2), NoClientId)
+      clientId <- EitherT.fromOption[Future](headers.get(X_CLIENT_ID), NoClientId)
       _        <- EitherT.fromOptionF(auth, AuthFail)
       eori     <- EitherT.fromOptionF(apiSubscriptionFieldsConnector.getAuthenticatedEoriField(clientId), NoEori: AuthError)
     } yield eori
   }
 
-  private def authNonCSP(implicit hc: HeaderCarrier): EitherT[Future, AuthError, EoriType] =
+//  clientId <- EitherT.fromOption[Future](hc.headers(Seq(X_CLIENT_ID)).find(_._1.equalsIgnoreCase(X_CLIENT_ID)).map(_._2), NoClientId)
+
+  private def authNonCSP(implicit hc: HeaderCarrier, headers: Headers): EitherT[Future, AuthError, EoriType] =
     EitherT(authorised(AuthProviders(AuthProvider.GovernmentGateway))
       .retrieve(allEnrolments) { usersEnrolments =>
         val ssEnrolments =
-          usersEnrolments.enrolments.filter(enrolment => enrolment.isActivated && enrolment.key == "HMRC-SS-ORG")
+        usersEnrolments.enrolments.filter(enrolment => enrolment.isActivated && enrolment.key == "HMRC-SS-ORG")
 
         val eoris = for {
           enrolment <- ssEnrolments

@@ -17,11 +17,15 @@
 package uk.gov.hmrc.entrydeclarationintervention.utils
 
 import com.kenshoo.play.metrics.Metrics
-import uk.gov.hmrc.play.test.UnitSpec
+import org.scalatest.{Matchers, OptionValues, WordSpecLike, durations}
+import play.api.test.Helpers.await
+import akka.util.Timeout
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.duration.{FiniteDuration, MILLISECONDS, NANOSECONDS}
 
-class TimerSpec extends UnitSpec with Timer with EventLogger {
+class TimerSpec extends WordSpecLike with Matchers with OptionValues with Timer with EventLogger {
   val metrics: Metrics = new MockMetrics
 
   var timeMs: Long = _
@@ -31,11 +35,13 @@ class TimerSpec extends UnitSpec with Timer with EventLogger {
 
   "Timer" should {
     val sleepMs = 300
+    val x : Timeout = FiniteDuration(400, MILLISECONDS)
 
     "Time a future correctly" in {
       await(timeFuture("test timer", "test.sleep") {
         Thread.sleep(sleepMs)
-      })
+        Future.successful()
+      })(timeout = x)
       val beWithinTolerance = be >= sleepMs.toLong and be <= (sleepMs + 100).toLong
       timeMs should beWithinTolerance
     }
@@ -43,7 +49,8 @@ class TimerSpec extends UnitSpec with Timer with EventLogger {
     "Time a block correctly" in {
       await(time("test timer", "test.sleep") {
         Thread.sleep(sleepMs)
-      })
+        Future.successful()
+      })(timeout = x)
       val beWithinTolerance = be >= sleepMs.toLong and be <= (sleepMs + 100).toLong
       timeMs should beWithinTolerance
     }

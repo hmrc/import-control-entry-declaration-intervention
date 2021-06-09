@@ -64,7 +64,7 @@ class SchemaValidator {
   }
 
   def validateSchema(xml: Node): ValidationResult = {
-    val factory = SAXParserFactory.newInstance()
+    val factory = SAXParserFactory.newInstance() //Parser for XML to check if valid XML
 
     factory.setNamespaceAware(true)
     factory.setSchema(schema)

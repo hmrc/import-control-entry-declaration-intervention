@@ -22,12 +22,16 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.entrydeclarationintervention.services.test.MockNotificationIdRetrievalService
-import uk.gov.hmrc.play.test.UnitSpec
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NotificationIdControllerSpec extends UnitSpec with MockNotificationIdRetrievalService {
+class NotificationIdControllerSpec
+  extends WordSpecLike
+    with Matchers
+    with OptionValues
+    with MockNotificationIdRetrievalService {
 
   val controller = new NotificationIdController(Helpers.stubControllerComponents(), mockNotificationIdRetrievalService)
 
