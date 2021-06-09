@@ -17,35 +17,33 @@ import play.core.PlayVersion.current
 import sbt._
 
 object AppDependencies {
-  val bootstrapVersion = "3.4.0"
+  val bootstrapVersion = "5.4.0"
 
   val compile = Seq(
-    "uk.gov.hmrc"    %% "simple-reactivemongo"      % "7.31.0-play-26",
-    "uk.gov.hmrc"    %% "bootstrap-backend-play-26" % bootstrapVersion,
+    "uk.gov.hmrc"    %% "simple-reactivemongo"      % "8.0.0-play-27",
+    "uk.gov.hmrc"    %% "bootstrap-backend-play-27" % bootstrapVersion,
     "com.github.fge" % "json-schema-validator"      % "2.2.6",
-    "org.typelevel"  %% "cats-core"                 % "2.6.0",
-    "com.chuusai"    %% "shapeless"                 % "2.3.4"
+    "org.typelevel"  %% "cats-core"                 % "2.6.1",
+    "com.chuusai"    %% "shapeless"                 % "2.3.7"
   )
 
   val test = Seq(
     "uk.gov.hmrc"            %% "bootstrap-backend-play-26" % bootstrapVersion % "test, it",
-    "org.scalatest"          %% "scalatest"                 % "3.0.9"          % "test, it",
     "com.typesafe.play"      %% "play-test"                 % current          % "test",
-    "org.pegdown"            % "pegdown"                    % "1.6.0"          % "test, it",
-    "org.scalatestplus.play" %% "scalatestplus-play"        % "3.1.3"          % "test, it",
-    "org.scalamock"          %% "scalamock"                 % "5.0.0"          % "test, it",
+    "org.pegdown"            %  "pegdown"                    % "1.6.0"          % "test, it",
+    "org.scalatestplus.play" %% "scalatestplus-play"        % "4.0.3"          % "test, it",
+    "org.scalamock"          %% "scalamock"                 % "5.1.0"          % "test, it",
     "org.scalacheck"         %% "scalacheck"                % "1.14.1"         % "test, it",
-    "com.github.tomakehurst" % "wiremock"                   % "2.27.2"         % "test, it",
-    "uk.gov.hmrc"            %% "hmrctest"                  % "3.10.0-play-26" % "test, it"
+    "com.github.tomakehurst" %  "wiremock"                   % "2.27.2"         % "test, it",
   )
   // Fixes a transitive dependency clash between wiremock and scalatestplus-play
   val overrides: Seq[ModuleID] = {
     val jettyFromWiremockVersion = "9.2.24.v20180105"
     Seq(
-      "com.typesafe.akka"           %% "akka-actor"        % "2.5.23",
-      "com.typesafe.akka"           %% "akka-stream"       % "2.5.23",
-      "com.typesafe.akka"           %% "akka-protobuf"     % "2.5.23",
-      "com.typesafe.akka"           %% "akka-slf4j"        % "2.5.23",
+      "com.typesafe.akka"           %% "akka-actor"        % "2.6.15",
+      "com.typesafe.akka"           %% "akka-stream"       % "2.6.15",
+      "com.typesafe.akka"           %% "akka-protobuf"     % "2.6.15",
+      "com.typesafe.akka"           %% "akka-slf4j"        % "2.6.15",
       "org.eclipse.jetty"           % "jetty-client"       % jettyFromWiremockVersion,
       "org.eclipse.jetty"           % "jetty-continuation" % jettyFromWiremockVersion,
       "org.eclipse.jetty"           % "jetty-http"         % jettyFromWiremockVersion,

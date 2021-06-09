@@ -16,19 +16,18 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.services
 
-import java.time.Instant
-
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.models.received.{ArbitraryIntervention, InterventionResponse}
 import uk.gov.hmrc.entrydeclarationintervention.services.XMLBuilder._
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
 import uk.gov.hmrc.entrydeclarationintervention.validators.SchemaValidator
-import uk.gov.hmrc.play.test.UnitSpec
 
+import java.time.Instant
 import scala.xml.{Utility, XML}
 
-class XMLBuilderSpec extends UnitSpec with ScalaCheckDrivenPropertyChecks with ArbitraryIntervention {
+class XMLBuilderSpec extends WordSpecLike with Matchers with OptionValues with ScalaCheckDrivenPropertyChecks with ArbitraryIntervention {
   "XMLBuilder" when {
     "formatting with getDateFromDateTime" must {
       "use the correct format" in {
@@ -76,6 +75,7 @@ class XMLBuilderSpec extends UnitSpec with ScalaCheckDrivenPropertyChecks with A
       }
 
       "generate schema valid XML for all inputs" in {
+//        pending
         val schemaValidator = new SchemaValidator
 
         forAll { intervention: InterventionResponse =>

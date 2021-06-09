@@ -17,7 +17,7 @@
 package uk.gov.hmrc.entrydeclarationintervention.controllers
 
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.{JsError, JsString, JsSuccess, JsValue}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
@@ -35,7 +35,7 @@ class InterventionSubmissionController @Inject()(
   cc: ControllerComponents,
   service: InterventionSubmissionService,
   reportSender: ReportSender)(implicit ec: ExecutionContext)
-    extends EisInboundAuthorisedController(cc, appConfig) {
+    extends EisInboundAuthorisedController(cc, appConfig) with Logging {
 
   val postIntervention: Action[JsValue] = authorisedAction.async(parse.json) { implicit request =>
     request.body.validate[InterventionResponse] match {
@@ -61,7 +61,7 @@ class InterventionSubmissionController @Inject()(
             }
         }
       case JsError(errs) =>
-        Logger.error(s"Unable to parse intervention payload: $errs")
+        logger.error(s"Unable to parse intervention payload: $errs")
         Future.successful(BadRequest)
     }
   }

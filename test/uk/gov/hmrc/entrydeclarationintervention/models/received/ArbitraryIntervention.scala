@@ -17,7 +17,6 @@
 package uk.gov.hmrc.entrydeclarationintervention.models.received
 
 import java.time.Instant
-
 import org.scalacheck.Arbitrary.{arbitrary, _}
 import org.scalacheck.{Arbitrary, Gen}
 
@@ -41,9 +40,9 @@ trait ArbitraryIntervention {
     for {
       senderEORI            <- arbitrary[String]
       senderBranch          <- arbitrary[String]
-      preparationDateTime   <- arbitrary[Instant]
+      preparationDateTime   <- arbitrary[Instant](arbZonedDateTime)
       messageIdentification <- arbitrary[String]
-      receivedDateTime      <- arbitrary[Instant]
+      receivedDateTime      <- arbitrary[Instant](arbZonedDateTime)
       correlationId         <- arbitrary[String]
     } yield
       Metadata(
@@ -58,7 +57,7 @@ trait ArbitraryIntervention {
 
   implicit val arbitraryCustomsIntervention: Arbitrary[CustomsIntervention] = Arbitrary(
     for {
-      notificationDateTime <- arbitrary[Instant]
+      notificationDateTime <- arbitrary[Instant](arbZonedDateTime)
       // Non-empty list...
       interventions <- arbitrary[(Intervention, Seq[Intervention])].map { case (i, is) => i +: is }
     } yield CustomsIntervention(notificationDateTime, interventions)
@@ -142,8 +141,8 @@ trait ArbitraryIntervention {
     for {
       localReferenceNumber    <- arbitrary[String]
       movementReferenceNumber <- arbitrary[String]
-      registeredDateTime      <- arbitrary[Instant]
-      submittedDateTime       <- arbitrary[Instant]
+      registeredDateTime      <- arbitrary[Instant](arbZonedDateTime)
+      submittedDateTime       <- arbitrary[Instant](arbZonedDateTime)
       officeOfLodgement       <- arbitrary[Option[String]]
     } yield
       Declaration(
@@ -157,7 +156,7 @@ trait ArbitraryIntervention {
   implicit val arbitraryOfficeOfFirstEntry: Arbitrary[OfficeOfFirstEntry] = Arbitrary(
     for {
       reference                 <- arbitrary[String]
-      expectedDateTimeOfArrival <- arbitrary[Instant]
+      expectedDateTimeOfArrival <- arbitrary[Instant](arbZonedDateTime)
     } yield OfficeOfFirstEntry(reference, expectedDateTimeOfArrival)
   )
 
