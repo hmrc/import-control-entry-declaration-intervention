@@ -18,21 +18,22 @@ package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import java.time.Instant
 import java.util.UUID
-
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.{BeforeAndAfterAll, Matchers, OptionValues, WordSpecLike}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers.await
 import play.api.test.{DefaultAwaitTimeout, Injecting}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models._
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class InterventionRepoISpec
-    extends UnitSpec
+    extends WordSpecLike
+    with Matchers
+    with OptionValues
     with DefaultAwaitTimeout
     with GuiceOneAppPerSuite
     with BeforeAndAfterAll

@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.validators
 
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.xml.XML
 
-class SchemaValidatorSpec extends UnitSpec {
+class SchemaValidatorSpec extends WordSpecLike with Matchers with OptionValues {
   val schemaValidator = new SchemaValidator
 
   "SchemaValidator" when {

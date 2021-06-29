@@ -16,20 +16,20 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.controllers
 
-import java.time.Instant
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 
+import java.time.Instant
 import play.api.test.Helpers.{contentAsString, contentType, _}
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel}
 import uk.gov.hmrc.entrydeclarationintervention.services.{MockAuthService, MockInterventionRetrievalService}
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.xml.Node
 
-class InterventionRetrievalControllerSpec extends UnitSpec with MockInterventionRetrievalService with MockAuthService {
+class InterventionRetrievalControllerSpec extends WordSpecLike with Matchers with OptionValues with MockInterventionRetrievalService with MockAuthService {
 
   val controller =
     new InterventionRetrievalController(

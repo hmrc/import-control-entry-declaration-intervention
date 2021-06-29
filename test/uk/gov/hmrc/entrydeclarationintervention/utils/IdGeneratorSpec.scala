@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.utils
 
-import uk.gov.hmrc.play.test.UnitSpec
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 
-class IdGeneratorSpec extends UnitSpec {
+class IdGeneratorSpec extends WordSpecLike with Matchers with OptionValues {
 
   val idGenerator = new IdGenerator
 

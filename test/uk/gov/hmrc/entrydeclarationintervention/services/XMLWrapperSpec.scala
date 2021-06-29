@@ -17,12 +17,12 @@
 package uk.gov.hmrc.entrydeclarationintervention.services
 
 import org.apache.commons.lang3.StringUtils
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.xml.{Utility, XML}
 
-class XMLWrapperSpec extends UnitSpec {
+class XMLWrapperSpec extends WordSpecLike with Matchers with OptionValues{
 
   val xmlWrapper = new XMLWrapper
 

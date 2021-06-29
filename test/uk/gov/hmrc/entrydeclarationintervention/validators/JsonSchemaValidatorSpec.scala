@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.validators
 
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
-import uk.gov.hmrc.play.test.UnitSpec
 
-class JsonSchemaValidatorSpec extends UnitSpec {
+class JsonSchemaValidatorSpec extends WordSpecLike with Matchers with OptionValues {
   implicit val lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId", "mrn")
 
   "JsonSchemaValidator" should {

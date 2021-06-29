@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.services
 
-import java.time.Instant
-
 import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
+import org.scalamock.matchers.Matchers
+import org.scalatest.Matchers.convertToAnyShouldWrapper
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{OptionValues, WordSpecLike}
 import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
@@ -29,14 +30,17 @@ import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResp
 import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRepo
 import uk.gov.hmrc.entrydeclarationintervention.utils.{MockIdGenerator, ResourceUtils, SaveError}
 import uk.gov.hmrc.entrydeclarationintervention.validators.{MockSchemaValidator, ValidationResult}
-import uk.gov.hmrc.play.test.UnitSpec
 
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.xml.{Elem, SAXParseException}
 
 class InterventionSubmissionServiceSpec
-    extends UnitSpec
+    extends WordSpecLike
+    with Matchers
+    with OptionValues
     with MockAppConfig
     with MockXMLBuilder
     with MockXMLWrapper
@@ -89,7 +93,7 @@ class InterventionSubmissionServiceSpec
   val interventionReceived: InterventionResponse =
     ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse).as[InterventionResponse]
 
-  "InterventionSubmissionService processIntervention" should {
+  "InterventionSubmissionService processIntervention" must {
     "return None" when {
       "an intervention is supplied and successfully saved" in {
         MockAppConfig.validateJsonToXMLTransformation returns false
@@ -97,7 +101,7 @@ class InterventionSubmissionServiceSpec
         MockIdGenerator.generateNotificationId returns notificationId
         MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
         MockAppConfig.defaultTtl returns defaultTtl
-        MockInterventionRepo.saveIntervention(interventionModel) returns None
+        MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(None)
 
         service.processIntervention(interventionReceived).futureValue shouldBe None
       }
@@ -109,7 +113,7 @@ class InterventionSubmissionServiceSpec
         MockIdGenerator.generateNotificationId returns notificationId
         MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
         MockAppConfig.defaultTtl returns defaultTtl
-        MockInterventionRepo.saveIntervention(interventionModel) returns None
+        MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(None)
 
         service.processIntervention(interventionReceived).futureValue shouldBe None
       }
@@ -124,7 +128,7 @@ class InterventionSubmissionServiceSpec
         MockIdGenerator.generateNotificationId returns notificationId
         MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
         MockAppConfig.defaultTtl returns defaultTtl
-        MockInterventionRepo.saveIntervention(interventionModel) returns Some(someSaveError)
+        MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(Some(SaveError.ServerError))
 
         service.processIntervention(interventionReceived).futureValue shouldBe Some(someSaveError)
       }
