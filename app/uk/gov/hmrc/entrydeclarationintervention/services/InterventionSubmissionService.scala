@@ -17,15 +17,16 @@
 package uk.gov.hmrc.entrydeclarationintervention.services
 
 import com.kenshoo.play.metrics.Metrics
-import javax.inject.{Inject, Singleton}
+import play.api.Logging
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
 import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
 import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
 import uk.gov.hmrc.entrydeclarationintervention.repositories.InterventionRepo
-import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, IdGenerator, SaveError, Timer}
+import uk.gov.hmrc.entrydeclarationintervention.utils.{IdGenerator, SaveError, Timer}
 import uk.gov.hmrc.entrydeclarationintervention.validators.SchemaValidator
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.{Node, Utility}
 
@@ -39,7 +40,7 @@ class InterventionSubmissionService @Inject()(
   idGenerator: IdGenerator,
   override val metrics: Metrics)(implicit ec: ExecutionContext)
     extends Timer
-    with EventLogger {
+    with Logging {
 
   def processIntervention(intervention: InterventionResponse): Future[Option[SaveError]] =
     timeFuture("Service processIntervention", "processIntervention.total") {

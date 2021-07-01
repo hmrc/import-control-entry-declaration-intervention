@@ -17,10 +17,12 @@
 package uk.gov.hmrc.entrydeclarationintervention.services
 
 import com.kenshoo.play.metrics.Metrics
+import play.api.Logging
+
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel}
 import uk.gov.hmrc.entrydeclarationintervention.repositories.InterventionRepo
-import uk.gov.hmrc.entrydeclarationintervention.utils.{EventLogger, Timer}
+import uk.gov.hmrc.entrydeclarationintervention.utils.Timer
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class InterventionRetrievalService @Inject()(interventionRepo: InterventionRepo, override val metrics: Metrics)(
   implicit ec: ExecutionContext)
     extends Timer
-    with EventLogger {
+    with Logging {
   def retrieveIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     timeFuture("Service retrieveIntervention", "retrieveIntervention.total") {
       interventionRepo.lookupIntervention(eori, notificationId)
