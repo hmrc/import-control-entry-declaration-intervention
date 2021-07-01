@@ -19,13 +19,14 @@ package uk.gov.hmrc.entrydeclarationintervention.utils
 import akka.util.Timeout
 import com.kenshoo.play.metrics.Metrics
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import play.api.Logging
 import play.api.test.Helpers.await
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
-class TimerSpec extends WordSpecLike with Matchers with OptionValues with Timer with EventLogger {
+class TimerSpec extends WordSpecLike with Matchers with OptionValues with Timer with Logging {
   val metrics: Metrics = new MockMetrics
 
   var timeMs: Long = _
