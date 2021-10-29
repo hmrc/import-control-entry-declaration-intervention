@@ -16,19 +16,21 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.controllers.test
 
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.http.MimeTypes
 import play.api.libs.json.{JsArray, Json}
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.entrydeclarationintervention.services.test.MockNotificationIdRetrievalService
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class NotificationIdControllerSpec
-  extends WordSpecLike
+  extends AnyWordSpecLike
     with Matchers
     with OptionValues
     with MockNotificationIdRetrievalService {

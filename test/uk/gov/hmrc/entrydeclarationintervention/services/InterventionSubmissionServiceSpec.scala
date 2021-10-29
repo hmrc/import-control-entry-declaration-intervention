@@ -16,12 +16,15 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.services
 
+import java.time.Instant
+
 import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
 import org.scalamock.matchers.Matchers
-import org.scalatest.Matchers.convertToAnyShouldWrapper
+import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{OptionValues, WordSpecLike}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
@@ -31,14 +34,13 @@ import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRep
 import uk.gov.hmrc.entrydeclarationintervention.utils.{MockIdGenerator, ResourceUtils, SaveError}
 import uk.gov.hmrc.entrydeclarationintervention.validators.{MockSchemaValidator, ValidationResult}
 
-import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.xml.{Elem, SAXParseException}
 
 class InterventionSubmissionServiceSpec
-    extends WordSpecLike
+    extends AnyWordSpecLike
     with Matchers
     with OptionValues
     with MockAppConfig

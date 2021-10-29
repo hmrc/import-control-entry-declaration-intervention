@@ -18,7 +18,9 @@ package uk.gov.hmrc.entrydeclarationintervention.utils
 
 import akka.util.Timeout
 import com.kenshoo.play.metrics.Metrics
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.Logging
 import play.api.test.Helpers.await
 
@@ -26,7 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
-class TimerSpec extends WordSpecLike with Matchers with OptionValues with Timer with Logging {
+class TimerSpec extends AnyWordSpecLike with Matchers with OptionValues with Timer with Logging {
   val metrics: Metrics = new MockMetrics
 
   var timeMs: Long = _
@@ -41,7 +43,7 @@ class TimerSpec extends WordSpecLike with Matchers with OptionValues with Timer 
     "Time a future correctly" in {
       await(timeFuture("test timer", "test.sleep") {
         Thread.sleep(sleepMs)
-        Future.successful()
+        Future.successful((): Unit)
       })(timeout)
       val beWithinTolerance = be >= sleepMs.toLong and be <= (sleepMs + 100).toLong
       timeMs should beWithinTolerance
@@ -50,7 +52,7 @@ class TimerSpec extends WordSpecLike with Matchers with OptionValues with Timer 
     "Time a block correctly" in {
       await(time("test timer", "test.sleep") {
         Thread.sleep(sleepMs)
-        Future.successful()
+        Future.successful((): Unit)
       })(timeout)
       val beWithinTolerance = be >= sleepMs.toLong and be <= (sleepMs + 100).toLong
       timeMs should beWithinTolerance

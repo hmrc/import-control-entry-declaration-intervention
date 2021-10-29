@@ -18,10 +18,11 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.matchers.Matchers
-import org.scalatest.Matchers.convertToAnyShouldWrapper
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.{Inside, OptionValues, WordSpecLike}
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{Inside, OptionValues}
 import play.api.mvc.Headers
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
@@ -33,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NoStackTrace
 
 class AuthServiceSpec
-  extends WordSpecLike
+  extends AnyWordSpecLike
     with Matchers
     with OptionValues
     with MockAuthConnector
@@ -86,7 +87,7 @@ class AuthServiceSpec
 
         "no authenticated EORI present in subscription fields" when {
           "return None (without non-CSP auth)" in {
-            stubCSPAuth returns Future.successful((Enrolments(Set(validICSEnrolment(eori)))))
+            stubCSPAuth returns Future.successful(Enrolments(Set(validICSEnrolment(eori))))
             MockApiSubscriptionFieldsConnector.getAuthenticatedEoriField(clientId) returns Future.successful(None)
 
             service.authenticate().futureValue shouldBe None

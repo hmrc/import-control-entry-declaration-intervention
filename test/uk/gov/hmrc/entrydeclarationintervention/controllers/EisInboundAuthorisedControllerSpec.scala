@@ -17,9 +17,10 @@
 package uk.gov.hmrc.entrydeclarationintervention.controllers
 
 import org.scalamock.matchers.Matchers
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-import org.scalatest.{OptionValues, WordSpecLike}
+import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -31,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 
 class EisInboundAuthorisedControllerSpec
-    extends WordSpecLike
+    extends AnyWordSpecLike
     with Matchers
     with OptionValues
     with Status

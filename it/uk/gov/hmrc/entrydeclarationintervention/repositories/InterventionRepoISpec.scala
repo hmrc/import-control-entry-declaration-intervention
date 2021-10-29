@@ -18,7 +18,10 @@ package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import java.time.Instant
 import java.util.UUID
-import org.scalatest.{BeforeAndAfterAll, Matchers, OptionValues, WordSpecLike}
+
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{BeforeAndAfterAll, OptionValues}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.await
@@ -31,7 +34,7 @@ import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class InterventionRepoISpec
-    extends WordSpecLike
+    extends AnyWordSpecLike
     with Matchers
     with OptionValues
     with DefaultAwaitTimeout
