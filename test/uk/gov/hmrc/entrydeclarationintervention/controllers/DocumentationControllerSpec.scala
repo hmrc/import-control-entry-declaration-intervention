@@ -17,19 +17,20 @@
 package uk.gov.hmrc.entrydeclarationintervention.controllers
 
 import controllers.Assets
-import org.scalatest.{Assertion, OptionValues, WordSpecLike}
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.inject.guice.GuiceApplicationBuilder
 import org.scalamock.matchers.Matchers
-import org.scalatest.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{Assertion, OptionValues}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.MimeTypes
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 
-class DocumentationControllerSpec extends WordSpecLike with Matchers with OptionValues with MockAppConfig with Injecting with GuiceOneAppPerSuite {
+class DocumentationControllerSpec extends AnyWordSpecLike with Matchers with OptionValues with MockAppConfig with Injecting with GuiceOneAppPerSuite {
   override lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
     .configure("metrics.enabled" -> "false")

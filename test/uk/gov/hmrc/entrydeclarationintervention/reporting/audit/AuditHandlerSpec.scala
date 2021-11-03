@@ -18,7 +18,9 @@ package uk.gov.hmrc.entrydeclarationintervention.reporting.audit
 
 import org.scalamock.matchers.ArgCapture.CaptureOne
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{Inside, Matchers, OptionValues, WordSpecLike}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{Inside, OptionValues}
 import play.api.libs.json.{JsObject, JsString}
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.http.HeaderCarrier
@@ -28,7 +30,7 @@ import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuditHandlerSpec extends WordSpecLike with Matchers with OptionValues with MockFactory with MockAppConfig with Inside {
+class AuditHandlerSpec extends AnyWordSpecLike with Matchers with OptionValues with MockFactory with MockAppConfig with Inside {
 
   val appName         = "appname"
   val auditType       = "type"

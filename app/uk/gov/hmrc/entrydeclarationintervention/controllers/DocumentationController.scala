@@ -38,7 +38,7 @@ class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets
                      |    {
                      |      "key": "write:import-control-system",
                      |      "name": "Access Import Control System",
-                     |      "description": "Allow access to entry summary declaration notifications"
+                     |      "description": "Allow access to entry summary declaration outcomes"
                      |    }
                      |  ],
                      |  "api": {

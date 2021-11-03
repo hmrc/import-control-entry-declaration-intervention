@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.reporting
 
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.{JsObject, JsString, Json}
 import uk.gov.hmrc.entrydeclarationintervention.models.received.MessageType
 
-class InterventionReceivedSpec extends WordSpecLike with Matchers with OptionValues {
+class InterventionReceivedSpec extends AnyWordSpecLike with Matchers with OptionValues {
   val report: InterventionReceived = InterventionReceived(
     eori          = "eori",
     correlationId = "correlationId",

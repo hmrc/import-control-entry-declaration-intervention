@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.controllers
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsValue, Json}
@@ -32,7 +33,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class InterventionSubmissionControllerSpec
-    extends WordSpec
+    extends AnyWordSpec
     with Matchers
     with GuiceOneAppPerSuite
     with MockInterventionSubmissionService

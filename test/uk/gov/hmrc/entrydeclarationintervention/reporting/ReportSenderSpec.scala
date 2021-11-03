@@ -18,9 +18,10 @@ package uk.gov.hmrc.entrydeclarationintervention.reporting
 
 import com.kenshoo.play.metrics.Metrics
 import org.scalamock.matchers.Matchers
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-import org.scalatest.{OptionValues, WordSpecLike}
+import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.JsObject
 import uk.gov.hmrc.entrydeclarationintervention.reporting.audit.{AuditEvent, MockAuditHandler}
 import uk.gov.hmrc.entrydeclarationintervention.utils.MockMetrics
@@ -29,7 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ReportSenderSpec extends WordSpecLike with Matchers with OptionValues with MockAuditHandler with ScalaFutures {
+class ReportSenderSpec extends AnyWordSpecLike with Matchers with OptionValues with MockAuditHandler with ScalaFutures {
 
   val auditEvent: AuditEvent = AuditEvent("type", "trans", JsObject.empty)
 

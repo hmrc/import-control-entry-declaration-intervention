@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.controllers.test
 
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
-
 import java.time.Instant
+
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -29,7 +31,7 @@ import uk.gov.hmrc.entrydeclarationintervention.services.MockInterventionRetriev
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TestInterventionRetrievalControllerSpec extends WordSpecLike with Matchers with OptionValues with MockInterventionRetrievalService {
+class TestInterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers with OptionValues with MockInterventionRetrievalService {
 
   val controller =
     new TestInterventionRetrievalController(Helpers.stubControllerComponents(), mockInterventionRetrievalService)

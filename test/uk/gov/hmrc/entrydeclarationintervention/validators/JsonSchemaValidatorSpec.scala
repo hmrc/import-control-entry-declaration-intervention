@@ -16,12 +16,14 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.validators
 
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
 
-class JsonSchemaValidatorSpec extends WordSpecLike with Matchers with OptionValues {
+class JsonSchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionValues {
   implicit val lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId", "mrn")
 
   "JsonSchemaValidator" should {
