@@ -17,24 +17,25 @@ import play.core.PlayVersion.current
 import sbt._
 
 object AppDependencies {
-  val bootstrapVersion = "5.16.0"
+  val bootstrapVersion = "5.19.0"
 
   val compile = Seq(
     "uk.gov.hmrc"    %% "simple-reactivemongo"      % "8.0.0-play-28",
     "uk.gov.hmrc"    %% "bootstrap-backend-play-28" % bootstrapVersion,
-    "com.github.fge" % "json-schema-validator"      % "2.2.14",
-    "org.typelevel"  %% "cats-core"                 % "2.6.1",
+    "com.github.fge" %  "json-schema-validator"     % "2.2.14",
+    "org.typelevel"  %% "cats-core"                 % "2.7.0",
     "com.chuusai"    %% "shapeless"                 % "2.3.7"
   )
 
   val test = Seq(
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28" % bootstrapVersion % "test, it",
-    "com.typesafe.play"      %% "play-test"              % current          % "test",
-    "org.pegdown"            %  "pegdown"                % "1.6.0"          % "test, it",
-    "org.scalatestplus.play" %% "scalatestplus-play"     % "5.1.0"          % "test, it",
-    "org.scalamock"          %% "scalamock"              % "5.1.0"          % "test, it",
-    "org.scalatestplus"      %% "scalacheck-1-15"        % "3.2.10.0"       % "test, it",
-    "com.github.tomakehurst" %  "wiremock"               % "2.27.2"         % "test, it"
+    "uk.gov.hmrc"                  %% "bootstrap-test-play-28" % bootstrapVersion % "test, it",
+    "com.typesafe.play"            %% "play-test"              % current          % "test",
+    "org.pegdown"                  %  "pegdown"                % "1.6.0"          % "test, it",
+    "org.scalatestplus.play"       %% "scalatestplus-play"     % "5.1.0"          % "test, it",
+    "org.scalamock"                %% "scalamock"              % "5.2.0"          % "test, it",
+    "org.scalatestplus"            %% "scalacheck-1-15"        % "3.2.10.0"       % "test, it",
+    "com.github.tomakehurst"       %  "wiremock"               % "2.32.0"         % "test, it",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.13.1"         % "test, it"
   )
   // Fixes a transitive dependency clash between wiremock and scalatestplus-play
   val overrides: Seq[ModuleID] = {
