@@ -19,31 +19,19 @@ package uk.gov.hmrc.entrydeclarationintervention.repositories
 import com.mongodb.client.model.Indexes.ascending
 import org.mongodb.scala.model.Filters.{and, equal}
 import org.mongodb.scala.model.Projections.{excludeId, fields, include}
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
-
+import org.mongodb.scala.model.{IndexModel, IndexOptions}
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.{JsObject, JsPath, Json}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.Cursor.FailOnError
-import reactivemongo.api.indexes.Index
-import reactivemongo.api.indexes.IndexType.Ascending
-import reactivemongo.api.{Cursor, ReadPreference}
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import org.mongodb.scala._
 import org.mongodb.scala.bson.{BsonNumber, BsonValue}
 import org.mongodb.scala.model._
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Updates._
-import org.mongodb.scala.model.UpdateOptions
 import play.api.Logging
-import reactivemongo.core.errors.DatabaseException
-import reactivemongo.play.json.ImplicitBSONHandlers._
+import uk.gov.hmrc.mongo._
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
 import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel, NotificationId}
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
-import uk.gov.hmrc.mongo.{MongoComponent, ReactiveRepository}
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.play.http.logging.Mdc
 
@@ -109,7 +97,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
       .preservingMdc(collection.insertOne(interventionPersisted).toFuture())
       .map(_ => None)
       .recover {
-        case e: DatabaseException =>
+        case e: Exception =>
           ContextLogger.error("Unable to save entry declaration intervention", e)
           Some(SaveError.ServerError)
       }
