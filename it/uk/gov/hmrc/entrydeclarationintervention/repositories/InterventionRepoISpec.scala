@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.repositories
 
+import org.mongodb.scala.model.Filters
+
 import java.time.Instant
 import java.util.UUID
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
@@ -94,7 +95,11 @@ class InterventionRepoISpec
   )
 
   def lookupIntervention(notificationId: String): Option[InterventionModel] =
-    await(repository.find("notificationId" -> notificationId).map(_.map(_.toIntervention))).headOption
+    await(repository
+      .collection
+      .find(Filters.equal("notificationId", notificationId))
+      .toFuture
+      .map(_.map(_.toIntervention))).headOption
 
   "InterventionRepo" when {
     "saving an intervention" when {
@@ -287,14 +292,14 @@ class InterventionRepoISpec
 
           await(repository.removeAll())
           await(
-            repository.save(listedIntervention
-              .copy(notificationId = notificationId(1), correlationId = correlationId(1), receivedDateTime = time2)))
+              repository.save(listedIntervention
+                .copy(notificationId = notificationId(1), correlationId = correlationId(1), receivedDateTime = time2)))
           await(
-            repository.save(listedIntervention
-              .copy(notificationId = notificationId(2), correlationId = correlationId(2), receivedDateTime = time3)))
+              repository.save(listedIntervention
+                .copy(notificationId = notificationId(2), correlationId = correlationId(2), receivedDateTime = time3)))
           await(
-            repository.save(listedIntervention
-              .copy(notificationId = notificationId(3), correlationId = correlationId(3), receivedDateTime = time1)))
+              repository.save(listedIntervention
+                .copy(notificationId = notificationId(3), correlationId = correlationId(3), receivedDateTime = time1)))
           await(repository.listInterventions("testEori")) shouldBe List(
             InterventionIds(correlationId(3), notificationId(3)),
             InterventionIds(correlationId(1), notificationId(1)))
