@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.repositories
 
-import com.mongodb.client.model.IndexModel
 import com.mongodb.client.model.Indexes.ascending
 import org.mongodb.scala.model.Filters.{and, equal}
 import org.mongodb.scala.model.Projections.{excludeId, fields, include}
@@ -31,10 +30,12 @@ import reactivemongo.api.indexes.IndexType.Ascending
 import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import org.mongodb.scala._
+import org.mongodb.scala.bson.{BsonNumber, BsonValue}
 import org.mongodb.scala.model._
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Updates._
 import org.mongodb.scala.model.UpdateOptions
+import play.api.Logging
 import reactivemongo.core.errors.DatabaseException
 import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
@@ -43,7 +44,7 @@ import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, Interve
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import uk.gov.hmrc.mongo.{MongoComponent, ReactiveRepository}
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.play.http.logging.Mdc
 
 import java.util.concurrent.TimeUnit
@@ -91,9 +92,15 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
           IndexOptions().name("eoriPlusNotificationIdIndex").unique(true)
         )
       ))
-    with InterventionRepo {
+    with InterventionRepo with Logging {
 
   val mongoErrorCodeForDuplicate: Int = 11000
+
+  def removeAll(): Future[Unit] =
+    collection
+      .deleteMany(exists("_id"))
+      .toFutureOption
+      .map(_ => ())
 
   def save(intervention: InterventionModel)(implicit lc: LoggingContext): Future[Option[SaveError]] = {
     val interventionPersisted = InterventionPersisted.from(intervention)
@@ -112,12 +119,15 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
     Mdc
       .preservingMdc(
         collection
-          .find(equal("submissionId", submissionId))
+          .find[BsonValue](equal("submissionId", submissionId))
           .projection(fields(include("notificationId"), excludeId()))
-          .sort(ascending("receivedDateTime"))
-          .toFuture()
+          .collect
+          .toFutureOption
+          .map{
+            case None => Nil
+            case Some(l) => l.map(Codecs.fromBson[NotificationId](_).value).toList
+          }
       )
-      .map(_.map(_.notificationId))
 
   def lookupIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =
     Mdc
@@ -148,20 +158,24 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
         ).toFutureOption()
       ).map(_.map(_.toIntervention))
 
-  def listInterventions(eori: String)(implicit lc: LoggingContext): Future[List[InterventionIds]] =
+  def listInterventions(eori: String): Future[List[InterventionIds]] =
     Mdc
       .preservingMdc(
         collection
-          .find(and(equal("eori", eori), equal("acknowledged", false)))
+          .find[BsonValue](and(equal("eori", eori), equal("acknowledged", false)))
           .projection(fields(include("correlationId", "notificationId")))
           .sort(ascending("receivedDateTime"))
-          .batchSize(appConfig.listInterventionsLimit)
+          .limit(appConfig.listInterventionsLimit)
           .collect()
           .toFutureOption()
           .map {
-            case Some(list) => list.map(intervention => InterventionIds(intervention.correlationId, intervention.notificationId))
+            case Some(list) => list.map { bsonValue =>
+              val intervention = Codecs.fromBson[InterventionIds](bsonValue)
+
+              InterventionIds(intervention.correlationId, intervention.notificationId)
+            }
             case None =>
-              ContextLogger.error("No results for listInterventions")
+              logger.error("No results for listInterventions")
               Seq.empty[InterventionIds]
           }
           .map(_.toList)
@@ -169,13 +183,20 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
 
   private[repositories] def getExpireAfterSeconds: Future[Option[Long]] =
     Mdc
-      .preservingMdc(collection.indexesManager.list())
-      .map { indexes =>
-        for {
-          idx <- indexes.find(_.key.map(_._1).contains("housekeepingAt"))
-          // Read the expiry from JSON (rather than BSON) so that we can control widening to Long
-          // (from the more strongly typed BSON values which can be either Int32 or Int64)
-          value <- Json.toJson(idx.options).as((JsPath \ "expireAfterSeconds").readNullable[Long])
-        } yield value
+      .preservingMdc(
+        collection
+          .listIndexes()
+          .collect
+          .toFutureOption
+      )
+      .map {
+        case None => None
+        case Some(indexes) =>
+          indexes.find(_.containsKey("expireAfterSeconds")).map{idx =>
+            idx.get("expireAfterSeconds") match {
+              case Some(value: BsonNumber) => value.longValue()
+              case _ => 0L
+            }
+          }
       }
 }
