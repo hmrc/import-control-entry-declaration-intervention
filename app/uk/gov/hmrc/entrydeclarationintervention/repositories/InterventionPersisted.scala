@@ -18,14 +18,16 @@ package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import play.api.libs.json._
 import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
+import java.time.Instant
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits.jatInstantFormat
 
 private[repositories] case class InterventionPersisted(
   eori: String,
   notificationId: String,
   correlationId: String,
   acknowledged: Boolean = false,
-  receivedDateTime: PersistableDateTime,
-  housekeepingAt: PersistableDateTime,
+  receivedDateTime: Instant,
+  housekeepingAt: Instant,
   submissionId: String,
   interventionXml: String) {
   def toIntervention: InterventionModel =
@@ -34,8 +36,8 @@ private[repositories] case class InterventionPersisted(
       notificationId   = notificationId,
       correlationId    = correlationId,
       acknowledged     = acknowledged,
-      receivedDateTime = receivedDateTime.toInstant,
-      housekeepingAt   = housekeepingAt.toInstant,
+      receivedDateTime = receivedDateTime,
+      housekeepingAt   = housekeepingAt,
       submissionId     = submissionId,
       interventionXml  = interventionXml
     )
@@ -50,8 +52,8 @@ private[repositories] object InterventionPersisted {
       notificationId   = notificationId,
       correlationId    = correlationId,
       acknowledged     = acknowledged,
-      receivedDateTime = PersistableDateTime(receivedDateTime),
-      housekeepingAt   = PersistableDateTime(housekeepingAt),
+      receivedDateTime = receivedDateTime,
+      housekeepingAt   = housekeepingAt,
       submissionId     = submissionId,
       interventionXml  = interventionXml
     )

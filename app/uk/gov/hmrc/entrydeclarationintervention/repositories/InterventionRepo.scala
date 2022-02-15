@@ -109,6 +109,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
         collection
           .find[BsonValue](equal("submissionId", submissionId))
           .projection(fields(include("notificationId"), excludeId()))
+          .sort(ascending("receivedDateTime"))
           .collect
           .toFutureOption
           .map{
