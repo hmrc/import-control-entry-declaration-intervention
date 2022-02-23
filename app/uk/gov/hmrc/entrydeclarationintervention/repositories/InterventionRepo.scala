@@ -62,6 +62,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
       collectionName = "intervention",
       mongoComponent = mongo,
       domainFormat = InterventionPersisted.format,
+      extraCodecs = Seq(Codecs.playFormatCodec(InterventionIds.formats)),
       indexes = Seq(
         IndexModel(
           ascending("submissionId", "notificationId"),
@@ -107,6 +108,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
     Mdc
       .preservingMdc(
         collection
+          .withReadPreference(ReadPreference.primaryPreferred())
           .find[BsonValue](equal("submissionId", submissionId))
           .projection(fields(include("notificationId"), excludeId()))
           .sort(ascending("receivedDateTime"))
@@ -151,18 +153,14 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
     Mdc
       .preservingMdc(
         collection
-          .find[BsonValue](and(equal("eori", eori), equal("acknowledged", false)))
-          .projection(fields(include("correlationId", "notificationId")))
+          .find[InterventionIds](and(equal("eori", eori), equal("acknowledged", false)))
+          .projection(fields(include("correlationId", "notificationId"), excludeId()))
           .sort(ascending("receivedDateTime"))
           .limit(appConfig.listInterventionsLimit)
           .collect()
           .toFutureOption()
           .map {
-            case Some(list) => list.map { bsonValue =>
-              val intervention = Codecs.fromBson[InterventionIds](bsonValue)
-
-              InterventionIds(intervention.correlationId, intervention.notificationId)
-            }
+            case Some(list) => list
             case None =>
               logger.error("No results for listInterventions")
               Seq.empty[InterventionIds]

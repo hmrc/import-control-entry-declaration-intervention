@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.models
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Format, Json, Reads}
 
 case class InterventionIds(correlationId: String, notificationId: String)
 
 object InterventionIds {
   implicit val reads: Reads[InterventionIds] = Json.reads[InterventionIds]
+  implicit val formats: Format[InterventionIds] = Json.format[InterventionIds]
 }
