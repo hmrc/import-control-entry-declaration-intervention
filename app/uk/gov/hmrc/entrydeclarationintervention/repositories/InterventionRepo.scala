@@ -80,7 +80,8 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
           ascending("eori", "notificationId"),
           IndexOptions().name("eoriPlusNotificationIdIndex").unique(true)
         )
-      ))
+      )
+    )
     with InterventionRepo with Logging {
 
   val mongoErrorCodeForDuplicate: Int = 11000
@@ -160,12 +161,11 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
           .collect()
           .toFutureOption()
           .map {
-            case Some(list) => list
+            case Some(seq) => seq.toList
             case None =>
               logger.error("No results for listInterventions")
-              Seq.empty[InterventionIds]
+              Nil
           }
-          .map(_.toList)
       )
 
   private[repositories] def getExpireAfterSeconds: Future[Option[Long]] =
