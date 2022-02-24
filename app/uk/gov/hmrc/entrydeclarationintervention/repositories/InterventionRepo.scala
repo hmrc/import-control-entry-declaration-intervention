@@ -160,12 +160,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
           .limit(appConfig.listInterventionsLimit)
           .collect()
           .toFutureOption()
-          .map {
-            case Some(seq) => seq.toList
-            case None =>
-              logger.error("No results for listInterventions")
-              Nil
-          }
+          .map( _.map(_.toList).getOrElse(Nil))
       )
 
   private[repositories] def getExpireAfterSeconds: Future[Option[Long]] =
