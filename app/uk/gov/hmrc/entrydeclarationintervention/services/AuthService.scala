@@ -46,13 +46,20 @@ class AuthService @Inject()(
   case object NoEori extends AuthError
   case object AuthFail extends AuthError
 
-  def authenticate()(implicit hc: HeaderCarrier, headers: Headers): Future[Option[EoriType]] =
-    authCSP
-      .recoverWith {
-        case AuthFail | NoClientId => authNonCSP
-      }
-      .toOption
-      .value
+  def authenticate(csp: Boolean)(implicit hc: HeaderCarrier, headers: Headers): Future[Option[EoriType]] = {
+    if (csp) {
+      authCSP
+        .recoverWith {
+          case AuthFail | NoClientId => authNonCSP
+        }
+        .toOption
+        .value
+    } else {
+      authNonCSP
+        .toOption
+        .value
+    }
+  }
 
   private def authCSP(implicit hc: HeaderCarrier, headers: Headers): EitherT[Future, AuthError, EoriType] = {
     def auth: Future[Option[Unit]] =

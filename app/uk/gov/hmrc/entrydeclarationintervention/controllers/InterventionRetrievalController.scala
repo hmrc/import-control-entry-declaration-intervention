@@ -32,7 +32,16 @@ class InterventionRetrievalController @Inject()(
   service: InterventionRetrievalService)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc) {
 
-  def listInterventions(): Action[AnyContent] = authorisedAction().async { userRequest =>
+  val list: Action[AnyContent] = listInterventions(false)
+  val listExternal: Action[AnyContent] = listInterventions(true)
+
+  def get(id: String): Action[AnyContent] = getIntervention(id, false)
+  def getExternal(id: String): Action[AnyContent] = getIntervention(id, true)
+
+  def acknowledge(id: String): Action[AnyContent] = acknowledgeIntervention(id, false)
+  def acknowledgeExternal(id: String): Action[AnyContent] = acknowledgeIntervention(id, true)
+
+  def listInterventions(csp: Boolean): Action[AnyContent] = authorisedAction(csp).async { userRequest =>
     ContextLogger.info("Listing interventions")(LoggingContext(eori = Some(userRequest.eori)))
     service.listInterventions(userRequest.eori).map {
       case Nil                  => NoContent
@@ -40,7 +49,7 @@ class InterventionRetrievalController @Inject()(
     }
   }
 
-  def getIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async { implicit userRequest =>
+  def getIntervention(notificationId: String, csp: Boolean): Action[AnyContent] = authorisedAction(csp).async { implicit userRequest =>
     service.retrieveIntervention(userRequest.eori, notificationId) map {
       case None =>
         ContextLogger.info("Intervention not found")(
@@ -52,7 +61,7 @@ class InterventionRetrievalController @Inject()(
     }
   }
 
-  def acknowledgeIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async {
+  def acknowledgeIntervention(notificationId: String, csp: Boolean): Action[AnyContent] = authorisedAction(csp).async {
     implicit userRequest =>
       service.acknowledgeIntervention(userRequest.eori, notificationId) map {
         case None =>

@@ -18,12 +18,15 @@ The Import Control Entry Declaration Intervention responsibilities:
 
 ## API
 
-| Path | Supported Methods | Type | Description |
-| ----------------------------------------- | ---------------- | -------- |----------- |
-|```/```                                    |        GET       | External | Endpoint for users to list unacknowledged interventions for ENS submissions. |
-|```/:correlationId```                      |        DELETE    | External | Endpoint for users to fetch an unacknowledged intervention for an ENS submission. |
-|```/:correlationId```                      |        POST      | External | Endpoint for users to acknowledge an unacknowledged intervention for an ENS submission. |
-|```/import-control/advanced-intervention```|        POST      | Internal | Endpoint for C&IT to return an intervention for an ENS submission. |
+| Path                                                          | Supported Methods | Type     | Description                                                                                      |
+| ------------------------------------------------------------- | ----------------- | -------- |--------------------------------------------------------------------------------------------------|
+|```/```                                                        | GET               | External | Endpoint for users to list unacknowledged interventions for ENS submissions.                     |
+|```/:correlationId```                                          | POST              | External | Endpoint for users to acknowledge an unacknowledged intervention for an ENS submission.          |
+|```/:correlationId```                                          | DELETE            | External | Endpoint for users to fetch an unacknowledged intervention for an ENS submission.                |
+|```/import-control/list-interventions```                       | GET               | Internal | Endpoint for frontend users to list unacknowledged interventions for ENS submissions.            |
+|```/import-control/get-intervention/:correlationId```          | POST              | Internal | Endpoint for frontend users to acknowledge an unacknowledged intervention for an ENS submission. |
+|```/import-control/acknowledge-intervention/:correlationId```  | DELETE            | Internal | Endpoint for frontend users to fetch an unacknowledged intervention for an ENS submission.       |
+|```/import-control/advanced-intervention```                    | POST              | Internal | Endpoint for C&IT to return an intervention for an ENS submission.                               |
 
 ## API Reference / Documentation 
 For more information on external API endpoints see the RAML at [Developer Hub]("https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/import-control-entry-declaration-intervention/1.0") or using the endpoint below
