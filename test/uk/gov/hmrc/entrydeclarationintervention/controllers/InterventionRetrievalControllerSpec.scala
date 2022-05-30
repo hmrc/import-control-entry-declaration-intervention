@@ -69,7 +69,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
         MockInterventionRetrievalService.retrieveIntervention(eori, notificationId) returns Future.successful(
           Some(intervention))
 
-        val result = controller.getIntervention(notificationId)(FakeRequest())
+        val result = controller.getExternal(notificationId)(FakeRequest())
 
         status(result)          shouldBe OK
         contentAsString(result) shouldBe payloadXml
@@ -81,7 +81,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
         MockAuthService.authenticate() returns Future.successful(Some(eori))
         MockInterventionRetrievalService.retrieveIntervention(eori, notificationId) returns Future.successful(None)
 
-        val result = controller.getIntervention(notificationId)(FakeRequest())
+        val result = controller.getExternal(notificationId)(FakeRequest())
 
         status(result)                              shouldBe NOT_FOUND
         xml.XML.loadString(contentAsString(result)) shouldBe notFoundXml
@@ -92,7 +92,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
       "the user is not-authenticated" in {
         MockAuthService.authenticate() returns Future.successful(None)
 
-        val result = controller.getIntervention(notificationId)(FakeRequest())
+        val result = controller.getExternal(notificationId)(FakeRequest())
 
         status(result) shouldBe UNAUTHORIZED
       }
@@ -106,7 +106,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
         MockInterventionRetrievalService.acknowledgeIntervention(eori, notificationId) returns Future.successful(
           Some(intervention))
 
-        val result = controller.acknowledgeIntervention(notificationId)(FakeRequest())
+        val result = controller.acknowledgeExternal(notificationId)(FakeRequest())
 
         status(result) shouldBe OK
       }
@@ -116,7 +116,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
         MockAuthService.authenticate() returns Future.successful(Some(eori))
         MockInterventionRetrievalService.acknowledgeIntervention(eori, notificationId) returns Future.successful(None)
 
-        val result = controller.acknowledgeIntervention(notificationId)(FakeRequest())
+        val result = controller.acknowledgeExternal(notificationId)(FakeRequest())
 
         status(result)                              shouldBe NOT_FOUND
         xml.XML.loadString(contentAsString(result)) shouldBe notFoundXml
@@ -127,7 +127,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
       "the user is not-authenticated" in {
         MockAuthService.authenticate() returns Future.successful(None)
 
-        val result = controller.acknowledgeIntervention(notificationId)(FakeRequest())
+        val result = controller.acknowledgeExternal(notificationId)(FakeRequest())
 
         status(result) shouldBe UNAUTHORIZED
       }
@@ -159,7 +159,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
            </response>
           </advancedNotifications>
 
-        val result        = controller.listInterventions()(FakeRequest())
+        val result        = controller.listExternal(FakeRequest())
         val prettyPrinter = new scala.xml.PrettyPrinter(80, 4)
 
         status(result)                                                    shouldBe OK
@@ -173,7 +173,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
         MockInterventionRetrievalService.listInterventions(eori) returns
           Future.successful(List.empty[InterventionIds])
 
-        val result = controller.listInterventions()(FakeRequest())
+        val result = controller.listExternal(FakeRequest())
 
         status(result) shouldBe NO_CONTENT
       }
@@ -182,7 +182,7 @@ class InterventionRetrievalControllerSpec extends AnyWordSpecLike with Matchers 
       "the user is not-authenticated" in {
         MockAuthService.authenticate() returns Future.successful(None)
 
-        val result = controller.listInterventions()(FakeRequest())
+        val result = controller.listExternal(FakeRequest())
 
         status(result) shouldBe UNAUTHORIZED
       }

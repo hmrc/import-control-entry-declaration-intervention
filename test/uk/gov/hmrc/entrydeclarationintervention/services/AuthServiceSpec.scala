@@ -22,7 +22,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.wordspec.AnyWordSpecLike
-import org.scalatest.{Inside, OptionValues}
+import org.scalatest.{Inside, OptionValues, fullstacks}
 import play.api.mvc.Headers
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
@@ -81,7 +81,7 @@ class AuthServiceSpec
             stubCSPAuth returns Future.successful(())
             MockApiSubscriptionFieldsConnector.getAuthenticatedEoriField(clientId) returns Future.successful(Some(eori))
 
-            service.authenticate().futureValue shouldBe Some(eori)
+            service.authenticate(true).futureValue shouldBe Some(eori)
           }
         }
 
@@ -90,7 +90,7 @@ class AuthServiceSpec
             stubCSPAuth returns Future.successful(Enrolments(Set(validICSEnrolment(eori))))
             MockApiSubscriptionFieldsConnector.getAuthenticatedEoriField(clientId) returns Future.successful(None)
 
-            service.authenticate().futureValue shouldBe None
+            service.authenticate(true).futureValue shouldBe None
           }
         }
       }
@@ -117,7 +117,7 @@ class AuthServiceSpec
         stubCSPAuth returns Future.successful(())
 
         MockApiSubscriptionFieldsConnector.getAuthenticatedEoriField(clientId) returns  Future.successful(Some(eori))
-        service.authenticate().futureValue shouldBe Some(eori)
+        service.authenticate(true).futureValue shouldBe Some(eori)
       }
     }
 
@@ -127,7 +127,7 @@ class AuthServiceSpec
         "S&S enrolment with an eori" in {
           stubbings()
           stubAuth returns Future.successful(Enrolments(Set(validICSEnrolment(eori))))
-          service.authenticate().futureValue shouldBe Some(eori)
+          service.authenticate(true).futureValue shouldBe Some(eori)
         }
       }
 
@@ -135,7 +135,7 @@ class AuthServiceSpec
         "S&S enrolment with no identifiers" in {
           stubbings()
           stubAuth returns Future.successful(Enrolments(Set(validICSEnrolment(eori).copy(identifiers = Nil))))
-          service.authenticate().futureValue shouldBe None
+          service.authenticate(true).futureValue shouldBe None
         }
 
         "no S&S enrolment in authorization header" in {
@@ -147,25 +147,25 @@ class AuthServiceSpec
                 identifiers       = Seq(EnrolmentIdentifier(identifier, eori)),
                 state             = "Activated",
                 delegatedAuthRule = None))))
-          service.authenticate().futureValue shouldBe None
+          service.authenticate(true).futureValue shouldBe None
         }
 
         "no enrolments at all in authorization header" in {
           stubbings()
           stubAuth returns Future.successful(Enrolments(Set.empty))
-          service.authenticate().futureValue shouldBe None
+          service.authenticate(true).futureValue shouldBe None
         }
 
         "S&S enrolment not activated" in {
           stubbings()
           stubAuth returns Future.successful(Enrolments(Set(validICSEnrolment(eori).copy(state = "inactive"))))
-          service.authenticate().futureValue shouldBe None
+          service.authenticate(true).futureValue shouldBe None
         }
 
         "authorisation fails" in {
           stubbings()
           stubAuth returns Future.failed(authException)
-          service.authenticate().futureValue shouldBe None
+          service.authenticate(true).futureValue shouldBe None
         }
       }
     }
