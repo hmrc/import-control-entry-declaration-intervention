@@ -17,14 +17,14 @@ import play.core.PlayVersion.current
 import sbt._
 
 object AppDependencies {
-  val bootstrapVersion = "5.19.0"
+  val bootstrapVersion = "5.25.0"
 
   val compile = Seq(
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"      % "0.59.0",
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"      % "0.67.0",
     "uk.gov.hmrc"    %% "bootstrap-backend-play-28" % bootstrapVersion,
     "com.github.fge" %  "json-schema-validator"     % "2.2.14",
-    "org.typelevel"  %% "cats-core"                 % "2.7.0",
-    "com.chuusai"    %% "shapeless"                 % "2.3.7"
+    "org.typelevel"  %% "cats-core"                 % "2.8.0",
+    "com.chuusai"    %% "shapeless"                 % "2.3.9"
   )
 
   val test = Seq(
@@ -33,34 +33,9 @@ object AppDependencies {
     "org.pegdown"                  %  "pegdown"                % "1.6.0"          % "test, it",
     "org.scalatestplus.play"       %% "scalatestplus-play"     % "5.1.0"          % "test, it",
     "org.scalamock"                %% "scalamock"              % "5.2.0"          % "test, it",
-    "org.scalatestplus"            %% "scalacheck-1-15"        % "3.2.10.0"       % "test, it",
-    "com.github.tomakehurst"       %  "wiremock"               % "2.32.0"         % "test, it",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.13.1"         % "test, it"
+    "org.scalatestplus"            %% "scalacheck-1-15"        % "3.2.11.0"       % "test, it",
+    "com.github.tomakehurst"       %  "wiremock"               % "2.33.2"         % "test, it",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.13.3"         % "test, it"
   )
-  // Fixes a transitive dependency clash between wiremock and scalatestplus-play
-  val overrides: Seq[ModuleID] = {
-    val jettyFromWiremockVersion = "9.4.44.v20210927"
-    Seq(
-      "com.typesafe.akka"           %% "akka-actor"                 % "2.6.17",
-      "com.typesafe.akka"           %% "akka-stream"                % "2.6.17",
-      "com.typesafe.akka"           %% "akka-protobuf"              % "2.6.17",
-      "com.typesafe.akka"           %% "akka-slf4j"                 % "2.6.17",
-      "com.typesafe.akka"           %% "akka-serialization-jackson" % "2.6.17",
-      "com.typesafe.akka"           %% "akka-actor-typed"           % "2.6.17",
-      "org.eclipse.jetty"           % "jetty-client"       % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-continuation" % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-http"         % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-io"           % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-security"     % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-server"       % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-servlet"      % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-servlets"     % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-util"         % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-webapp"       % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-xml"          % jettyFromWiremockVersion,
-      "org.eclipse.jetty.websocket" % "websocket-api"      % jettyFromWiremockVersion,
-      "org.eclipse.jetty.websocket" % "websocket-client"   % jettyFromWiremockVersion,
-      "org.eclipse.jetty.websocket" % "websocket-common"   % jettyFromWiremockVersion
-    )
-  }
+
 }
