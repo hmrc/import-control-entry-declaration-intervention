@@ -1,0 +1,1138 @@
+openapi: 3.0.3
+info:
+  title: Safety and security import control entry summary declaration notifications
+  contact: {}
+  version: '1.0'
+servers:
+  - url: https://test-api.service.hmrc.gov.uk
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk
+    description: Production
+paths:
+  /customs/imports/notifications/:
+    get:
+      tags:
+      - customs
+      summary: Get a list of notifications
+      description: >
+        This endpoint allows a developer to retrieve a list of advanced notifications that are yet to be acknowledged.
+      operationId: Getalistofnotifications
+      parameters:
+        - $ref: '#/components/parameters/acceptHeader'
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/xml:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/advancedNotifications'
+                - xml:
+                    name: advancedNotifications
+                    attribute: false
+                    wrapped: false
+              examples:
+                advancedNotificationsExample:
+                  description: |
+                    The response will contain a list (schema [here](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/listInterventions.xsd)) of Notication IDs corresponding to advanced notifications for ENS submissions. Each one will be listed along with the Correlation ID that identifies the submission.
+
+                    The list will include only those notifications that have not been acknowledged.
+
+                    This is an example response:
+                  value: |
+                    <advancedNotifications>
+                      <response>
+                        <correlationId>1234567890</correlationId>
+                        <notificationId>1D45fQ563</notificationId>
+                        <link>/customs/imports/notifications/1D45fQ563</link>
+                      </response>
+                      <response>
+                        <correlationId>0987654321</correlationId>
+                        <notificationId>ABx4414f4</notificationId>
+                        <link>/customs/imports/notifications/ABx4414f4</link>
+                      </response>
+                    </advancedNotifications>
+        '204':
+          description: No Content
+          headers: {}
+      deprecated: false
+      security:
+        - User-Restricted:
+            - write:import-control-system
+  /customs/imports/notifications/{notificationId}:
+    get:
+      tags:
+      - customs
+      summary: Retrieve a notification
+      description: >
+        This endpoint allows a developer to retrieve an advanced notification for a given Notification ID.
+      operationId: Retrieveanotification
+      parameters:
+        - $ref: '#/components/parameters/notificationId'
+        - $ref: '#/components/parameters/acceptHeader'
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/xml:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/notificationResponse'
+                - xml:
+                    name: notificationResponse
+                    attribute: false
+                    wrapped: false
+              examples:
+                notificationReponseExample:
+                  description: |
+                    A notification for the Notification ID (schema [here](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/advancedNotification.xsd)).
+                    
+                    The content of response element will be determined by the type of notification.
+                    Currently the following types of notification can be returned:
+                    
+                    * Do Not Load: schema [http://ics.dgtaxud.ec/CC351A](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/CC351A-v10-0.xsd).
+                    
+                    This schema imports a number of other schemas:
+                    
+                    * [http://ics.dgtaxud.ec/doc](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/doc-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/complex_ics](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/complex_types_ics-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/simple](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/simple_types-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/simple_ics](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/simple_types_ics-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/tcl](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/tcl-v10-0.xsd)
+                    * [http://ics.dgtaxud.ec/tcl_ics](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/download/import-control-entry-declaration-intervention/1.0/schemas/tcl_ics-v10-0.xsd)
+                    
+                    This is an example response:
+                  value: |
+                    <notificationResponse xmlns:cc3="http://ics.dgtaxud.ec/CC351A">
+                        <response>
+                            <cc3:CC351A>
+                                <MesSenMES3>GBCD1234/1234567890</MesSenMES3>
+                                <MesRecMES6>GBC123</MesRecMES6>
+                                <DatOfPreMES9>030211</DatOfPreMES9>
+                                <TimOfPreMES10>0123</TimOfPreMES10>
+                                <MesIdeMES19>ABC123</MesIdeMES19>
+                                <MesTypMES20>CC313A</MesTypMES20>
+                                <CorIdeMES25>ABC123</CorIdeMES25>
+                                <HEAHEA>
+                                    <RefNumHEA4>ABCD1234</RefNumHEA4>
+                                    <DocNumHEA5>12AB3C4D5E6F7G8H90</DocNumHEA5>
+                                    <TraModAtBorHEA76>4</TraModAtBorHEA76>
+                                    <NatHEA001>GB</NatHEA001>
+                                    <IdeOfMeaOfTraCroHEA85>ABC123</IdeOfMeaOfTraCroHEA85>
+                                    <TotNumOfIteHEA305>42</TotNumOfIteHEA305>
+                                    <ComRefNumHEA>ABC123</ComRefNumHEA>
+                                    <ConRefNumHEA>ABC123</ConRefNumHEA>
+                                    <NotDatTimHEA104>200302111234</NotDatTimHEA104>
+                                    <DecRegDatTimHEA115>200302111234</DecRegDatTimHEA115>
+                                    <DecSubDatTimHEA118>200302111234</DecSubDatTimHEA118>
+                                </HEAHEA>
+                                <GOOITEGDS>
+                                    <IteNumGDS7>1</IteNumGDS7>
+                                    <ComRefNumGIM1>ABC123</ComRefNumGIM1>
+                                    <PRODOCDC2>
+                                        <DocTypDC21>AB12</DocTypDC21>
+                                        <DocRefDC23>ABC123</DocRefDC23>
+                                        <DocRefDCLNG>en</DocRefDCLNG>
+                                    </PRODOCDC2>
+                                    <CONNR2>
+                                        <ConNumNR21>ABC123</ConNumNR21>
+                                    </CONNR2>
+                                    <IDEMEATRAGI970>
+                                        <NatIDEMEATRAGI973>EN</NatIDEMEATRAGI973>
+                                        <IdeMeaTraGIMEATRA971>ABC123</IdeMeaTraGIMEATRA971>
+                                        <IdeMeaTraGIMEATRA972LNG>en</IdeMeaTraGIMEATRA972LNG>
+                                    </IDEMEATRAGI970>
+                                </GOOITEGDS>
+                                <CUSOFFLON>
+                                    <RefNumCOL1>ES000055</RefNumCOL1>
+                                </CUSOFFLON>
+                                <TRAREP>
+                                    <NamTRE1>ABC123</NamTRE1>
+                                    <StrAndNumTRE1>ABC123</StrAndNumTRE1>
+                                    <PosCodTRE1>ABC123</PosCodTRE1>
+                                    <CitTRE1>ABC123</CitTRE1>
+                                    <CouCodTRE1>EN</CouCodTRE1>
+                                    <TRAREPLNG>en</TRAREPLNG>
+                                    <TINTRE1>YZ^</TINTRE1>
+                                </TRAREP>
+                                <PERLODSUMDEC>
+                                    <NamPLD1>ABC123</NamPLD1>
+                                    <StrAndNumPLD1>ABC123</StrAndNumPLD1>
+                                    <PosCodPLD1>ABC123</PosCodPLD1>
+                                    <CitPLD1>ABC123</CitPLD1>
+                                    <CouCodPLD1>EN</CouCodPLD1>
+                                    <PERLODSUMDECLNG>en</PERLODSUMDECLNG>
+                                    <TINPLD1>YZ^</TINPLD1>
+                                </PERLODSUMDEC>
+                                <CUSOFFFENT730>
+                                    <RefNumCUSOFFFENT731>AB3C4D5E</RefNumCUSOFFFENT731>
+                                    <ExpDatOfArrFIRENT733>200302111234</ExpDatOfArrFIRENT733>
+                                </CUSOFFFENT730>
+                                <TRACARENT601>
+                                    <NamTRACARENT604>ABC123</NamTRACARENT604>
+                                    <StrNumTRACARENT607>ABC123</StrNumTRACARENT607>
+                                    <PstCodTRACARENT606>ABC123</PstCodTRACARENT606>
+                                    <CtyTRACARENT603>ABC123</CtyTRACARENT603>
+                                    <CouCodTRACARENT605>EN</CouCodTRACARENT605>
+                                    <TRACARENT601LNG>en</TRACARENT601LNG>
+                                    <TINTRACARENT602>YZ^</TINTRACARENT602>
+                                </TRACARENT601>
+                                <CUSINT632>
+                                    <IteNumConCUSINT668>1</IteNumConCUSINT668>
+                                    <CusIntCodCUSINT665>ABCD</CusIntCodCUSINT665>
+                                    <CusIntTexCUSINT666>ABC12</CusIntTexCUSINT666>
+                                    <CusIntTexCUSINT667LNG>en</CusIntTexCUSINT667LNG>
+                                </CUSINT632>
+                            </cc3:CC351A>
+                        </response>
+                        <acknowledgement method='DELETE' href='/customs/imports/notifications/0JRF7UncK0t004'/>
+                    </notificationResponse>
+        '404':
+          description: Not Found
+          headers: {}
+          content:
+            application/xml:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - xml:
+                    name: errorResponse
+                    attribute: false
+                    wrapped: false
+              examples:
+                notFoundExample:
+                  description: >
+                    No notification for the submission with the specified Notification ID 
+                    is currently available or the notification has already been acknowledged.
+                  value: |
+                    <error>
+                       <code>NOTIFICATION_NOT_FOUND</code>
+                       <message>No unacknowledged notification found</message>
+                    </error>
+      deprecated: false
+      security:
+        - User-Restricted:
+            - write:import-control-system
+    delete:
+      tags:
+      - customs
+      summary: Acknowledge a notification
+      description: >
+        This endpoint allows a developer to acknowledge the receipt of an advanced notification for a given Notification ID.
+      operationId: Acknowledgeanotification
+      parameters:
+        - $ref: '#/components/parameters/notificationId'
+        - $ref: '#/components/parameters/acceptHeader'
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+#          content:
+#            application/xml:
+#              schema:
+#                type: string
+#                xml:
+#                  name: response200
+#                  attribute: false
+#                  wrapped: false
+        '404':
+          description: Not Found
+          headers: {}
+          content:
+            application/xml:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - xml:
+                    name: errorResponse
+                    attribute: false
+                    wrapped: false
+              examples:
+                notFoundExample:
+                  description: >
+                    No notification for the submission with the specified Notification ID 
+                    is currently available or the notification has already been acknowledged.
+                  value: |
+                    <error>
+                       <code>NOTIFICATION_NOT_FOUND</code>
+                       <message>No unacknowledged notification found</message>
+                    </error>
+      deprecated: false
+      security:
+        - User-Restricted:
+            - write:import-control-system
+components:
+  parameters:
+    acceptHeader:
+      name: Accept
+      in: header
+      description: |
+        Specifies the response format and the [version](/api-documentation/docs/reference-guide#versioning) of the API to be used.
+        
+        For example: application/vnd.hmrc.1.0+xml
+      schema:
+        type: string
+        enum: [
+          "application/vnd.hmrc.1.0+xml"
+        ]
+      required: true
+    authorizationHeader:
+      name: Authorization
+      in: header
+      description: |
+        An [OAuth 2.0 Bearer Token](/api-documentation/docs/authorisation/user-restricted-endpoints) with the write:import-control-system scope.
+        
+        For example: Bearer bb7fed3fe10dd235a2ccda3d50fb
+      schema:
+        type: string
+        enum: [
+          "Bearer bb7fed3fe10dd235a2ccda3d50fb"
+        ]
+      required: true
+    notificationId:
+      name: notificationId
+      in: path
+      description: The Notification ID that uniquely identifies the notification.
+      schema:
+        type: string
+      style: simple
+      required: true
+  securitySchemes:
+    User-Restricted:
+      type: oauth2
+      description: HMRC supports OAuth 2.0 for authenticating User-restricted API requests
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
+          scopes:
+            write:import-control-system: SomeScope
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          description: The error code
+          type: string
+        message:
+          description: The error message
+          type: string
+    acknowledgement:
+      title: acknowledgement
+      required:
+      - method
+      - href
+      type: object
+      properties:
+        method:
+          type: string
+          xml:
+            name: method
+            attribute: true
+            wrapped: false
+        href:
+          type: string
+          xml:
+            name: href
+            attribute: true
+            wrapped: false
+      xml:
+        name: acknowledgement
+        namespace: ''
+        attribute: false
+        wrapped: false
+    advancedNotifications:
+      title: advancedNotifications
+      required:
+      - response
+      type: object
+      properties:
+        response:
+          type: array
+          items:
+            $ref: '#/components/schemas/response'
+          description: ''
+          xml:
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: advancedNotifications
+        namespace: ''
+        attribute: false
+        wrapped: false
+    CC351A:
+      title: CC351A
+      required:
+      - MesSenMES3
+      - MesRecMES6
+      - DatOfPreMES9
+      - TimOfPreMES10
+      - MesIdeMES19
+      - MesTypMES20
+      - CorIdeMES25
+      - HEAHEA
+      - GOOITEGDS
+      - CUSOFFLON
+      - TRAREP
+      - PERLODSUMDEC
+      - CUSOFFFENT730
+      - TRACARENT601
+      - CUSINT632
+      type: object
+      properties:
+        MesSenMES3:
+          type: string
+          xml:
+            name: MesSenMES3
+            namespace: ''
+            attribute: false
+            wrapped: false
+        MesRecMES6:
+          type: string
+          xml:
+            name: MesRecMES6
+            namespace: ''
+            attribute: false
+            wrapped: false
+        DatOfPreMES9:
+          type: string
+          xml:
+            name: DatOfPreMES9
+            namespace: ''
+            attribute: false
+            wrapped: false
+        TimOfPreMES10:
+          type: string
+          xml:
+            name: TimOfPreMES10
+            namespace: ''
+            attribute: false
+            wrapped: false
+        MesIdeMES19:
+          type: string
+          xml:
+            name: MesIdeMES19
+            namespace: ''
+            attribute: false
+            wrapped: false
+        MesTypMES20:
+          type: string
+          xml:
+            name: MesTypMES20
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CorIdeMES25:
+          type: string
+          xml:
+            name: CorIdeMES25
+            namespace: ''
+            attribute: false
+            wrapped: false
+        HEAHEA:
+          allOf:
+          - $ref: '#/components/schemas/HEAHEA'
+          - xml:
+              name: HEAHEA
+              namespace: ''
+              attribute: false
+              wrapped: false
+        GOOITEGDS:
+          allOf:
+          - $ref: '#/components/schemas/GOOITEGDS'
+          - xml:
+              name: GOOITEGDS
+              namespace: ''
+              attribute: false
+              wrapped: false
+        CUSOFFLON:
+          allOf:
+          - $ref: '#/components/schemas/CUSOFFLON'
+          - xml:
+              name: CUSOFFLON
+              namespace: ''
+              attribute: false
+              wrapped: false
+        TRAREP:
+          allOf:
+          - $ref: '#/components/schemas/TRAREP'
+          - xml:
+              name: TRAREP
+              namespace: ''
+              attribute: false
+              wrapped: false
+        PERLODSUMDEC:
+          allOf:
+          - $ref: '#/components/schemas/PERLODSUMDEC'
+          - xml:
+              name: PERLODSUMDEC
+              namespace: ''
+              attribute: false
+              wrapped: false
+        CUSOFFFENT730:
+          allOf:
+          - $ref: '#/components/schemas/CUSOFFFENT730'
+          - xml:
+              name: CUSOFFFENT730
+              namespace: ''
+              attribute: false
+              wrapped: false
+        TRACARENT601:
+          allOf:
+          - $ref: '#/components/schemas/TRACARENT601'
+          - xml:
+              name: TRACARENT601
+              namespace: ''
+              attribute: false
+              wrapped: false
+        CUSINT632:
+          allOf:
+          - $ref: '#/components/schemas/CUSINT632'
+          - xml:
+              name: CUSINT632
+              namespace: ''
+              attribute: false
+              wrapped: false
+      xml:
+        name: CC351A
+        namespace: http://ics.dgtaxud.ec/CC351A
+        prefix: cc3
+        attribute: false
+        wrapped: false
+    CONNR2:
+      title: CONNR2
+      required:
+      - ConNumNR21
+      type: object
+      properties:
+        ConNumNR21:
+          type: string
+          xml:
+            name: ConNumNR21
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: CONNR2
+        namespace: ''
+        attribute: false
+        wrapped: false
+    CUSINT632:
+      title: CUSINT632
+      required:
+      - IteNumConCUSINT668
+      - CusIntCodCUSINT665
+      - CusIntTexCUSINT666
+      - CusIntTexCUSINT667LNG
+      type: object
+      properties:
+        IteNumConCUSINT668:
+          type: integer
+          format: int32
+          xml:
+            name: IteNumConCUSINT668
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CusIntCodCUSINT665:
+          type: string
+          xml:
+            name: CusIntCodCUSINT665
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CusIntTexCUSINT666:
+          type: string
+          xml:
+            name: CusIntTexCUSINT666
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CusIntTexCUSINT667LNG:
+          type: string
+          xml:
+            name: CusIntTexCUSINT667LNG
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: CUSINT632
+        namespace: ''
+        attribute: false
+        wrapped: false
+    CUSOFFFENT730:
+      title: CUSOFFFENT730
+      required:
+      - RefNumCUSOFFFENT731
+      - ExpDatOfArrFIRENT733
+      type: object
+      properties:
+        RefNumCUSOFFFENT731:
+          type: string
+          xml:
+            name: RefNumCUSOFFFENT731
+            namespace: ''
+            attribute: false
+            wrapped: false
+        ExpDatOfArrFIRENT733:
+          type: integer
+          format: int64
+          xml:
+            name: ExpDatOfArrFIRENT733
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: CUSOFFFENT730
+        namespace: ''
+        attribute: false
+        wrapped: false
+    CUSOFFLON:
+      title: CUSOFFLON
+      required:
+      - RefNumCOL1
+      type: object
+      properties:
+        RefNumCOL1:
+          type: string
+          xml:
+            name: RefNumCOL1
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: CUSOFFLON
+        namespace: ''
+        attribute: false
+        wrapped: false
+    GOOITEGDS:
+      title: GOOITEGDS
+      required:
+      - IteNumGDS7
+      - ComRefNumGIM1
+      - PRODOCDC2
+      - CONNR2
+      - IDEMEATRAGI970
+      type: object
+      properties:
+        IteNumGDS7:
+          type: integer
+          format: int32
+          xml:
+            name: IteNumGDS7
+            namespace: ''
+            attribute: false
+            wrapped: false
+        ComRefNumGIM1:
+          type: string
+          xml:
+            name: ComRefNumGIM1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        PRODOCDC2:
+          allOf:
+          - $ref: '#/components/schemas/PRODOCDC2'
+          - xml:
+              name: PRODOCDC2
+              namespace: ''
+              attribute: false
+              wrapped: false
+        CONNR2:
+          allOf:
+          - $ref: '#/components/schemas/CONNR2'
+          - xml:
+              name: CONNR2
+              namespace: ''
+              attribute: false
+              wrapped: false
+        IDEMEATRAGI970:
+          allOf:
+          - $ref: '#/components/schemas/IDEMEATRAGI970'
+          - xml:
+              name: IDEMEATRAGI970
+              namespace: ''
+              attribute: false
+              wrapped: false
+      xml:
+        name: GOOITEGDS
+        namespace: ''
+        attribute: false
+        wrapped: false
+    HEAHEA:
+      title: HEAHEA
+      required:
+      - RefNumHEA4
+      - DocNumHEA5
+      - TraModAtBorHEA76
+      - NatHEA001
+      - IdeOfMeaOfTraCroHEA85
+      - TotNumOfIteHEA305
+      - ComRefNumHEA
+      - ConRefNumHEA
+      - NotDatTimHEA104
+      - DecRegDatTimHEA115
+      - DecSubDatTimHEA118
+      type: object
+      properties:
+        RefNumHEA4:
+          type: string
+          xml:
+            name: RefNumHEA4
+            namespace: ''
+            attribute: false
+            wrapped: false
+        DocNumHEA5:
+          type: string
+          xml:
+            name: DocNumHEA5
+            namespace: ''
+            attribute: false
+            wrapped: false
+        TraModAtBorHEA76:
+          type: integer
+          format: int32
+          xml:
+            name: TraModAtBorHEA76
+            namespace: ''
+            attribute: false
+            wrapped: false
+        NatHEA001:
+          type: string
+          xml:
+            name: NatHEA001
+            namespace: ''
+            attribute: false
+            wrapped: false
+        IdeOfMeaOfTraCroHEA85:
+          type: string
+          xml:
+            name: IdeOfMeaOfTraCroHEA85
+            namespace: ''
+            attribute: false
+            wrapped: false
+        TotNumOfIteHEA305:
+          type: integer
+          format: int32
+          xml:
+            name: TotNumOfIteHEA305
+            namespace: ''
+            attribute: false
+            wrapped: false
+        ComRefNumHEA:
+          type: string
+          xml:
+            name: ComRefNumHEA
+            namespace: ''
+            attribute: false
+            wrapped: false
+        ConRefNumHEA:
+          type: string
+          xml:
+            name: ConRefNumHEA
+            namespace: ''
+            attribute: false
+            wrapped: false
+        NotDatTimHEA104:
+          type: integer
+          format: int64
+          xml:
+            name: NotDatTimHEA104
+            namespace: ''
+            attribute: false
+            wrapped: false
+        DecRegDatTimHEA115:
+          type: integer
+          format: int64
+          xml:
+            name: DecRegDatTimHEA115
+            namespace: ''
+            attribute: false
+            wrapped: false
+        DecSubDatTimHEA118:
+          type: integer
+          format: int64
+          xml:
+            name: DecSubDatTimHEA118
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: HEAHEA
+        namespace: ''
+        attribute: false
+        wrapped: false
+    IDEMEATRAGI970:
+      title: IDEMEATRAGI970
+      required:
+      - NatIDEMEATRAGI973
+      - IdeMeaTraGIMEATRA971
+      - IdeMeaTraGIMEATRA972LNG
+      type: object
+      properties:
+        NatIDEMEATRAGI973:
+          type: string
+          xml:
+            name: NatIDEMEATRAGI973
+            namespace: ''
+            attribute: false
+            wrapped: false
+        IdeMeaTraGIMEATRA971:
+          type: string
+          xml:
+            name: IdeMeaTraGIMEATRA971
+            namespace: ''
+            attribute: false
+            wrapped: false
+        IdeMeaTraGIMEATRA972LNG:
+          type: string
+          xml:
+            name: IdeMeaTraGIMEATRA972LNG
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: IDEMEATRAGI970
+        namespace: ''
+        attribute: false
+        wrapped: false
+    notificationResponse:
+      title: notificationResponse
+      required:
+      - response
+      - acknowledgement
+      type: object
+      properties:
+        response:
+          allOf:
+          - $ref: '#/components/schemas/response1'
+          - xml:
+              name: response
+              namespace: ''
+              attribute: false
+              wrapped: false
+        acknowledgement:
+          allOf:
+          - $ref: '#/components/schemas/acknowledgement'
+          - xml:
+              name: acknowledgement
+              namespace: ''
+              attribute: false
+              wrapped: false
+      xml:
+        name: notificationResponse
+        namespace: ''
+        attribute: false
+        wrapped: false
+    PERLODSUMDEC:
+      title: PERLODSUMDEC
+      required:
+      - NamPLD1
+      - StrAndNumPLD1
+      - PosCodPLD1
+      - CitPLD1
+      - CouCodPLD1
+      - PERLODSUMDECLNG
+      - TINPLD1
+      type: object
+      properties:
+        NamPLD1:
+          type: string
+          xml:
+            name: NamPLD1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        StrAndNumPLD1:
+          type: string
+          xml:
+            name: StrAndNumPLD1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        PosCodPLD1:
+          type: string
+          xml:
+            name: PosCodPLD1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CitPLD1:
+          type: string
+          xml:
+            name: CitPLD1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CouCodPLD1:
+          type: string
+          xml:
+            name: CouCodPLD1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        PERLODSUMDECLNG:
+          type: string
+          xml:
+            name: PERLODSUMDECLNG
+            namespace: ''
+            attribute: false
+            wrapped: false
+        TINPLD1:
+          type: string
+          xml:
+            name: TINPLD1
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: PERLODSUMDEC
+        namespace: ''
+        attribute: false
+        wrapped: false
+    PRODOCDC2:
+      title: PRODOCDC2
+      required:
+      - DocTypDC21
+      - DocRefDC23
+      - DocRefDCLNG
+      type: object
+      properties:
+        DocTypDC21:
+          type: string
+          xml:
+            name: DocTypDC21
+            namespace: ''
+            attribute: false
+            wrapped: false
+        DocRefDC23:
+          type: string
+          xml:
+            name: DocRefDC23
+            namespace: ''
+            attribute: false
+            wrapped: false
+        DocRefDCLNG:
+          type: string
+          xml:
+            name: DocRefDCLNG
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: PRODOCDC2
+        namespace: ''
+        attribute: false
+        wrapped: false
+    response:
+      title: response
+      required:
+      - correlationId
+      - notificationId
+      - link
+      type: object
+      properties:
+        correlationId:
+          oneOf:
+          - type: integer
+            format: int32
+            xml:
+              name: correlationId
+              namespace: ''
+              attribute: false
+              wrapped: false
+          - type: string
+            xml:
+              name: correlationId
+              namespace: ''
+              attribute: false
+              wrapped: false
+          xml:
+            name: correlationId
+            namespace: ''
+            attribute: false
+            wrapped: false
+        notificationId:
+          type: string
+          xml:
+            name: notificationId
+            namespace: ''
+            attribute: false
+            wrapped: false
+        link:
+          type: string
+          xml:
+            name: link
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: response
+        namespace: ''
+        attribute: false
+        wrapped: false
+    response1:
+      title: response1
+      required:
+      - CC351A
+      type: object
+      properties:
+        CC351A:
+          allOf:
+          - $ref: '#/components/schemas/CC351A'
+          - xml:
+              name: CC351A
+              namespace: http://ics.dgtaxud.ec/CC351A
+              prefix: cc3
+              attribute: false
+              wrapped: false
+      xml:
+        name: response
+        namespace: ''
+        attribute: false
+        wrapped: false
+    TRACARENT601:
+      title: TRACARENT601
+      required:
+      - NamTRACARENT604
+      - StrNumTRACARENT607
+      - PstCodTRACARENT606
+      - CtyTRACARENT603
+      - CouCodTRACARENT605
+      - TRACARENT601LNG
+      - TINTRACARENT602
+      type: object
+      properties:
+        NamTRACARENT604:
+          type: string
+          xml:
+            name: NamTRACARENT604
+            namespace: ''
+            attribute: false
+            wrapped: false
+        StrNumTRACARENT607:
+          type: string
+          xml:
+            name: StrNumTRACARENT607
+            namespace: ''
+            attribute: false
+            wrapped: false
+        PstCodTRACARENT606:
+          type: string
+          xml:
+            name: PstCodTRACARENT606
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CtyTRACARENT603:
+          type: string
+          xml:
+            name: CtyTRACARENT603
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CouCodTRACARENT605:
+          type: string
+          xml:
+            name: CouCodTRACARENT605
+            namespace: ''
+            attribute: false
+            wrapped: false
+        TRACARENT601LNG:
+          type: string
+          xml:
+            name: TRACARENT601LNG
+            namespace: ''
+            attribute: false
+            wrapped: false
+        TINTRACARENT602:
+          type: string
+          xml:
+            name: TINTRACARENT602
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: TRACARENT601
+        namespace: ''
+        attribute: false
+        wrapped: false
+    TRAREP:
+      title: TRAREP
+      required:
+      - NamTRE1
+      - StrAndNumTRE1
+      - PosCodTRE1
+      - CitTRE1
+      - CouCodTRE1
+      - TRAREPLNG
+      - TINTRE1
+      type: object
+      properties:
+        NamTRE1:
+          type: string
+          xml:
+            name: NamTRE1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        StrAndNumTRE1:
+          type: string
+          xml:
+            name: StrAndNumTRE1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        PosCodTRE1:
+          type: string
+          xml:
+            name: PosCodTRE1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CitTRE1:
+          type: string
+          xml:
+            name: CitTRE1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        CouCodTRE1:
+          type: string
+          xml:
+            name: CouCodTRE1
+            namespace: ''
+            attribute: false
+            wrapped: false
+        TRAREPLNG:
+          type: string
+          xml:
+            name: TRAREPLNG
+            namespace: ''
+            attribute: false
+            wrapped: false
+        TINTRE1:
+          type: string
+          xml:
+            name: TINTRE1
+            namespace: ''
+            attribute: false
+            wrapped: false
+      xml:
+        name: TRAREP
+        namespace: ''
+        attribute: false
+        wrapped: false
+tags:
+- name: customs
+  description: ''
