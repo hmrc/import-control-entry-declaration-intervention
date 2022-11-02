@@ -55,7 +55,7 @@ paths:
                       </response>
                     </advancedNotifications>
         '204':
-          description: No Content
+          description: No Content - There are no notifications available
           headers: {}
       deprecated: false
       security:
@@ -230,16 +230,8 @@ paths:
         - $ref: '#/components/parameters/authorizationHeader'
       responses:
         '200':
-          description: OK
+          description: OK - The notification has successfully been acknowledged
           headers: {}
-#          content:
-#            application/xml:
-#              schema:
-#                type: string
-#                xml:
-#                  name: response200
-#                  attribute: false
-#                  wrapped: false
         '404':
           description: Not Found
           headers: {}
@@ -312,12 +304,13 @@ components:
           tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
           refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
           scopes:
-            write:import-control-system: SomeScope
+            write:import-control-system: Access Import Control System
   schemas:
     errorResponse:
       title: errorResponse
       required:
       - code
+      - message
       type: object
       properties:
         code:
@@ -585,8 +578,8 @@ components:
             attribute: false
             wrapped: false
         ExpDatOfArrFIRENT733:
-          type: integer
-          format: int64
+          type: string
+          format: date-time
           xml:
             name: ExpDatOfArrFIRENT733
             namespace: ''
@@ -744,24 +737,24 @@ components:
             attribute: false
             wrapped: false
         NotDatTimHEA104:
-          type: integer
-          format: int64
+          type: string
+          format: date-time
           xml:
             name: NotDatTimHEA104
             namespace: ''
             attribute: false
             wrapped: false
         DecRegDatTimHEA115:
-          type: integer
-          format: int64
+          type: string
+          format: date-time
           xml:
             name: DecRegDatTimHEA115
             namespace: ''
             attribute: false
             wrapped: false
         DecSubDatTimHEA118:
-          type: integer
-          format: int64
+          type: string
+          format: date-time
           xml:
             name: DecSubDatTimHEA118
             namespace: ''
@@ -943,20 +936,7 @@ components:
       type: object
       properties:
         correlationId:
-          oneOf:
-          - type: integer
-            format: int32
-            xml:
-              name: correlationId
-              namespace: ''
-              attribute: false
-              wrapped: false
-          - type: string
-            xml:
-              name: correlationId
-              namespace: ''
-              attribute: false
-              wrapped: false
+          type: string
           xml:
             name: correlationId
             namespace: ''
@@ -982,7 +962,7 @@ components:
         attribute: false
         wrapped: false
     response1:
-      title: response1
+      title: response
       required:
       - CC351A
       type: object
