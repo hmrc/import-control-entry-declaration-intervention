@@ -18,3 +18,7 @@ This API will allow you to:
 * get a list of notifications
 * retrieve a notification
 * acknowledge a notification
+
+## Changelog
+
+All service changes can be found within our Wiki page located [here](https://github.com/hmrc/import-control-entry-declaration-intervention/wiki/Changelog).

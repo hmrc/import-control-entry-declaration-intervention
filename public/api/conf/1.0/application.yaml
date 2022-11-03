@@ -28,11 +28,7 @@ paths:
             application/xml:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/advancedNotifications'
-                - xml:
-                    name: advancedNotifications
-                    attribute: false
-                    wrapped: false
+                - $ref: '#/components/schemas/advancedNotificationResponse'
               examples:
                 advancedNotificationsExample:
                   description: |
@@ -81,11 +77,7 @@ paths:
             application/xml:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/notificationResponse'
-                - xml:
-                    name: notificationResponse
-                    attribute: false
-                    wrapped: false
+                - $ref: '#/components/schemas/notificationResponseWrapper'
               examples:
                 notificationReponseExample:
                   description: |
@@ -198,11 +190,7 @@ paths:
             application/xml:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
-                - xml:
-                    name: errorResponse
-                    attribute: false
-                    wrapped: false
+                - $ref: '#/components/schemas/notFoundResponse'
               examples:
                 notFoundExample:
                   description: >
@@ -239,11 +227,7 @@ paths:
             application/xml:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
-                - xml:
-                    name: errorResponse
-                    attribute: false
-                    wrapped: false
+                - $ref: '#/components/schemas/notFoundResponse'
               examples:
                 notFoundExample:
                   description: >
@@ -306,8 +290,17 @@ components:
           scopes:
             write:import-control-system: Access Import Control System
   schemas:
+    notFoundResponse:
+      title: notFound
+      required:
+        - error
+      type: object
+      properties:
+        error:
+          allOf:
+            - $ref: '#/components/schemas/errorResponse'
     errorResponse:
-      title: errorResponse
+      title: error
       required:
       - code
       - message
@@ -343,6 +336,15 @@ components:
         namespace: ''
         attribute: false
         wrapped: false
+    advancedNotificationResponse:
+      title: advancedNotifications
+      required:
+        - advancedResponse
+      type: object
+      properties:
+        advancedResponse:
+          allOf:
+            - $ref: '#/components/schemas/advancedNotifications'
     advancedNotifications:
       title: advancedNotifications
       required:
@@ -799,6 +801,15 @@ components:
         namespace: ''
         attribute: false
         wrapped: false
+    notificationResponseWrapper:
+      title: notificationResponseWrapper
+      required:
+        - notificationResponse
+      type: object
+      properties:
+        notificationResponse:
+          allOf:
+            - $ref: '#/components/schemas/notificationResponse'
     notificationResponse:
       title: notificationResponse
       required:
