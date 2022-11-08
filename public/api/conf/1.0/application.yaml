@@ -339,10 +339,10 @@ components:
     advancedNotificationResponse:
       title: advancedNotifications
       required:
-        - advancedResponse
+        - advancedNotifications
       type: object
       properties:
-        advancedResponse:
+        advancedNotifications:
           allOf:
             - $ref: '#/components/schemas/advancedNotifications'
     advancedNotifications:
