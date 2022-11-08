@@ -20,22 +20,21 @@ object AppDependencies {
   val bootstrapVersion = "5.25.0"
 
   val compile = Seq(
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"      % "0.68.0",
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"      % "0.73.0",
     "uk.gov.hmrc"    %% "bootstrap-backend-play-28" % bootstrapVersion,
     "com.github.fge" %  "json-schema-validator"     % "2.2.14",
     "org.typelevel"  %% "cats-core"                 % "2.8.0",
-    "com.chuusai"    %% "shapeless"                 % "2.3.9"
+    "com.chuusai"    %% "shapeless"                 % "2.3.10"
   )
 
   val test = Seq(
     "uk.gov.hmrc"                  %% "bootstrap-test-play-28" % bootstrapVersion % "test, it",
     "com.typesafe.play"            %% "play-test"              % current          % "test",
-    "org.pegdown"                  %  "pegdown"                % "1.6.0"          % "test, it",
     "org.scalatestplus.play"       %% "scalatestplus-play"     % "5.1.0"          % "test, it",
     "org.scalamock"                %% "scalamock"              % "5.2.0"          % "test, it",
     "org.scalatestplus"            %% "scalacheck-1-15"        % "3.2.11.0"       % "test, it",
     "com.github.tomakehurst"       %  "wiremock"               % "2.33.2"         % "test, it",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.13.3"         % "test, it"
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.13.4"         % "test, it"
   )
 
 }
