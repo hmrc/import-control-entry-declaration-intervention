@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,19 +29,19 @@ trait MockInterventionRepo extends MockFactory {
 
   object MockInterventionRepo {
     def saveIntervention(intervention: InterventionModel): CallHandler[Future[Option[SaveError]]] =
-      (interventionRepo.save(_:InterventionModel)(_: LoggingContext)) expects (intervention, *)
+      (interventionRepo.save(_:InterventionModel)(_: LoggingContext)).expects(intervention, *)
 
     def lookupNotificationIds(submissionId: String): CallHandler[Future[Seq[String]]] =
       interventionRepo.lookupNotificationIds _ expects submissionId
 
     def lookupIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
-      interventionRepo.lookupIntervention _ expects (eori, notificationId)
+      (interventionRepo.lookupIntervention(_: String, _: String)).expects(eori, notificationId)
 
     def lookupFullIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
-      interventionRepo.lookupFullIntervention _ expects (eori, notificationId)
+      (interventionRepo.lookupFullIntervention(_: String, _: String)).expects(eori, notificationId)
 
     def acknowledgeIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
-      interventionRepo.acknowledgeIntervention _ expects (eori, notificationId)
+      (interventionRepo.acknowledgeIntervention(_: String, _: String)).expects(eori, notificationId)
 
     def listInterventions(eori: String): CallHandler[Future[List[InterventionIds]]] =
       interventionRepo.listInterventions _ expects eori
