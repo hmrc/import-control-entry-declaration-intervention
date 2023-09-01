@@ -98,7 +98,7 @@ class InterventionRepoISpec
     await(repository
       .collection
       .find(Filters.equal("notificationId", notificationId))
-      .toFuture
+      .toFuture()
       .map(_.map(_.toIntervention))).headOption
 
   "InterventionRepo" when {
