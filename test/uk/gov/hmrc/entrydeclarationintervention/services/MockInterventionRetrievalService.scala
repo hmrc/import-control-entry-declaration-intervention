@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ trait MockInterventionRetrievalService extends MockFactory {
 
   object MockInterventionRetrievalService {
     def retrieveIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
-      mockInterventionRetrievalService.retrieveIntervention _ expects (eori, notificationId)
+      (mockInterventionRetrievalService.retrieveIntervention(_: String, _: String)).expects(eori, notificationId)
 
     def retrieveFullIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
-      mockInterventionRetrievalService.retrieveFullIntervention _ expects (eori, notificationId)
+      (mockInterventionRetrievalService.retrieveFullIntervention(_: String, _: String)).expects(eori, notificationId)
 
     def acknowledgeIntervention(eori: String, notificationId: String): CallHandler[Future[Option[InterventionModel]]] =
-      mockInterventionRetrievalService.acknowledgeIntervention _ expects (eori, notificationId)
+      (mockInterventionRetrievalService.acknowledgeIntervention(_: String, _: String)).expects(eori, notificationId)
 
     def listInterventions(eori: String): CallHandler[Future[List[InterventionIds]]] =
       mockInterventionRetrievalService.listInterventions _ expects eori

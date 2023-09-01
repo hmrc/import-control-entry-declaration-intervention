@@ -10,7 +10,7 @@ The Import Control Entry Declaration Intervention responsibilities:
 - MongoDB instance
 - Run locally: `sbt run` which runs on port `9812` by default
 - Run with test end points: sbt 'run -Dplay.http.router=testOnlyDoNotUseInAppConf.Routes'
-- Run all associated services: `sm --start ICED_ALL -f
+- Run all associated services: `sm2 --start ICED_ALL
 
 ## Tests
 - Run Unit Tests: `sbt test`
