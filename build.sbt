@@ -44,7 +44,5 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(integrationTestSettings(): _*)
   .settings(
-    scalacOptions += "-Xlint:_,-missing-interpolator",
-    scalacOptions += "-Wconf:src=routes/.*:s",
-    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s"
+    scalacOptions ++= Seq("-Wconf:src=routes/.*:s","-Wconf:cat=unused-imports&src=html/.*:s")
   )
