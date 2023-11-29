@@ -37,4 +37,6 @@ object AppDependencies {
     "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.15.2"         % "test, it"
   )
 
+  val itDependencies: Seq[ModuleID] = Seq()
+
 }
