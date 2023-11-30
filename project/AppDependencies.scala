@@ -27,15 +27,15 @@ object AppDependencies {
     "com.chuusai"       %% "shapeless"                  % "2.3.10"
   )
 
-  val test = Seq(
-    "uk.gov.hmrc"                  %% "bootstrap-test-play-28" % bootstrapVersion % "test, it",
-    "com.typesafe.play"            %% "play-test"              % current          % "test",
-    "org.scalatestplus.play"       %% "scalatestplus-play"     % "5.1.0"          % "test, it",
-    "org.scalamock"                %% "scalamock"              % "5.2.0"          % "test, it",
-    "org.scalatestplus"            %% "scalacheck-1-17"        % "3.2.16.0"       % "test, it",
-    "com.github.tomakehurst"       %  "wiremock-jre8"          % "2.35.0"         % "test, it",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.15.2"         % "test, it"
-  )
+  val test: Seq[ModuleID] = Seq(
+    "uk.gov.hmrc"                  %% "bootstrap-test-play-28" % bootstrapVersion,
+    "com.typesafe.play"            %% "play-test"              % current,
+    "org.scalatestplus.play"       %% "scalatestplus-play"     % "5.1.0",
+    "org.scalamock"                %% "scalamock"              % "5.2.0",
+    "org.scalatestplus"            %% "scalacheck-1-17"        % "3.2.16.0",
+    "com.github.tomakehurst"       %  "wiremock-jre8"          % "2.35.0",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.15.2"
+  ).map(_ % Test)
 
   val itDependencies: Seq[ModuleID] = Seq()
 
