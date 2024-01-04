@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.validators
+package uk.gov.hmrc.entrydeclarationintervention.models.received
 
-import org.scalamock.handlers.CallHandler
-import org.scalamock.scalatest.MockFactory
+import play.api.libs.json.{Format, Json}
 
-import scala.xml.Node
+case class GoodsNew(numberOfItems: Option[Int], goodsItems: Option[Seq[GoodsItem]])
 
-trait MockSchemaValidator extends MockFactory {
-  val mockSchemaValidator: SchemaValidator = mock[SchemaValidator]
-
-  object MockSchemaValidator {
-    def validateSchema(xml: Node, useNew: Boolean): CallHandler[ValidationResult] =
-      mockSchemaValidator.validateSchema _ expects(xml, useNew)
-  }
-
+object GoodsNew {
+  implicit val jsonFormat: Format[GoodsNew] = Json.format[GoodsNew]
 }

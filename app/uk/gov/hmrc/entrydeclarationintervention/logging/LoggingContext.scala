@@ -17,7 +17,7 @@
 package uk.gov.hmrc.entrydeclarationintervention.logging
 
 import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
+import uk.gov.hmrc.entrydeclarationintervention.models.received.{InterventionResponse, InterventionResponseNew}
 
 case class LoggingContext(
   eori: Option[String]                    = None,
@@ -66,7 +66,24 @@ object LoggingContext {
       movementReferenceNumber = Some(model.declaration.movementReferenceNumber)
     )
 
+  def apply(model: InterventionResponseNew): LoggingContext =
+    LoggingContext(
+      eori                    = Some(model.metadata.senderEORI),
+      correlationId           = Some(model.metadata.correlationId),
+      submissionId            = Some(model.submissionId),
+      movementReferenceNumber = Some(model.declaration.movementReferenceNumber)
+    )
+
   def apply(model: InterventionResponse, notificationId: String): LoggingContext =
+    LoggingContext(
+      eori                    = model.metadata.senderEORI,
+      correlationId           = model.metadata.correlationId,
+      submissionId            = model.submissionId,
+      notificationId          = notificationId,
+      movementReferenceNumber = model.declaration.movementReferenceNumber
+    )
+
+  def apply(model: InterventionResponseNew, notificationId: String): LoggingContext =
     LoggingContext(
       eori                    = model.metadata.senderEORI,
       correlationId           = model.metadata.correlationId,

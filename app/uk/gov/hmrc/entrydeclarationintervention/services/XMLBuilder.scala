@@ -69,6 +69,30 @@ class XMLBuilder {
     //@formatter:on
   }
 
+  def buildXMLNew(intervention: InterventionResponseNew): Elem = {
+    import intervention._
+    //@formatter:off
+    <cc3:CC351A xmlns:cc3="http://ics.dgtaxud.ec/CC351A">
+      <MesSenMES3>{ s"${metadata.senderEORI}/${metadata.senderBranch}" }</MesSenMES3>
+      <MesRecMES6>{ s"${metadata.senderEORI}/${metadata.senderBranch}" }</MesRecMES6>
+      <DatOfPreMES9>{ getDateFromDateTime(metadata.preparationDateTime) }</DatOfPreMES9>
+      <TimOfPreMES10>{ getTimeFromDateTime(metadata.preparationDateTime) }</TimOfPreMES10>
+      <MesIdeMES19>{ metadata.messageIdentification }</MesIdeMES19>
+      <MesTypMES20>{ xmlMessageType(metadata.messageType) }</MesTypMES20>
+      <CorIdeMES25>{ metadata.correlationId }</CorIdeMES25>
+
+      { getHEAHEANew (intervention) }
+      { for(goodsItems <- goods.goodsItems.toSeq) yield getGOOITEGDS(goodsItems) }
+      { for(office <- declaration.officeOfLodgement.toSeq) yield getCUSOFFLON(office)}
+      { for(rep <- parties.representative.toSeq) yield getTRAREP(rep) }
+      { getPERLODSUMDEC(parties.declarant) }
+      { getCUSOFFFENT730( itinerary.officeOfFirstEntry) }
+      { for (carrier <- parties.carrier.toSeq) yield getTRACARENT601(carrier) }
+      { getCUSINT632(customsIntervention.interventions) }
+    </cc3:CC351A>
+    //@formatter:on
+  }
+
   private def getHEAHEA(intervention: InterventionResponse): Elem = {
     import intervention._
     //@formatter:off
@@ -88,6 +112,32 @@ class XMLBuilder {
         yield <ComRefNumHEA>{ commercialReference }</ComRefNumHEA>}
       {for (conveyanceReference <- itinerary.conveyanceReference.toSeq)
         yield <ConRefNumHEA>{ conveyanceReference }</ConRefNumHEA>}
+      <NotDatTimHEA104>{ getDateTimeInXSDFormat(customsIntervention.notificationDateTime) }</NotDatTimHEA104>
+      <DecRegDatTimHEA115>{ getDateTimeInXSDFormat(declaration.registeredDateTime) }</DecRegDatTimHEA115>
+      <DecSubDatTimHEA118>{ getDateTimeInXSDFormat(declaration.submittedDateTime) }</DecSubDatTimHEA118>
+    </HEAHEA>
+    //@formatter:on
+  }
+
+  private def getHEAHEANew(intervention: InterventionResponseNew): Elem = {
+    import intervention._
+    //@formatter:off
+    <HEAHEA>
+      <RefNumHEA4>{ declaration.localReferenceNumber }</RefNumHEA4>
+      <DocNumHEA5>{ declaration.movementReferenceNumber }</DocNumHEA5>
+      {for (modeOfTransportAtBorder <- itinerary.modeOfTransportAtBorder.toSeq)
+      yield <TraModAtBorHEA76>{ modeOfTransportAtBorder }</TraModAtBorHEA76>}
+      {for {
+      identityOfMeansOfCrossingBorder <- itinerary.identityOfMeansOfCrossingBorder.toSeq
+      nationality <- identityOfMeansOfCrossingBorder.nationality.toSeq
+    } yield <NatHEA001>{ nationality }</NatHEA001>}
+      {for (identityOfMeansOfCrossingBorder <- itinerary.identityOfMeansOfCrossingBorder.toSeq)
+      yield <IdeOfMeaOfTraCroHEA85>{ identityOfMeansOfCrossingBorder.identity }</IdeOfMeaOfTraCroHEA85>}
+      {goods.numberOfItems.map(n => <TotNumOfIteHEA305>{n}</TotNumOfIteHEA305>)}
+      {for (commercialReference <- itinerary.commercialReferenceNumber.toSeq)
+      yield <ComRefNumHEA>{ commercialReference }</ComRefNumHEA>}
+      {for (conveyanceReference <- itinerary.conveyanceReference.toSeq)
+      yield <ConRefNumHEA>{ conveyanceReference }</ConRefNumHEA>}
       <NotDatTimHEA104>{ getDateTimeInXSDFormat(customsIntervention.notificationDateTime) }</NotDatTimHEA104>
       <DecRegDatTimHEA115>{ getDateTimeInXSDFormat(declaration.registeredDateTime) }</DecRegDatTimHEA115>
       <DecSubDatTimHEA118>{ getDateTimeInXSDFormat(declaration.submittedDateTime) }</DecSubDatTimHEA118>

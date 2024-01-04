@@ -50,6 +50,8 @@ trait AppConfig {
 
   def defaultTtl: FiniteDuration
 
+  def optionalFieldsFeature: Boolean
+
 }
 
 @Singleton
@@ -86,4 +88,5 @@ class AppConfigImpl @Inject()(config: Configuration, servicesConfig: ServicesCon
 
   lazy val defaultTtl: FiniteDuration = getFiniteDuration(config.get[Configuration](s"mongodb"), "defaultTtl")
 
+  lazy val optionalFieldsFeature: Boolean = servicesConfig.getBoolean("feature.optionalFields")
 }

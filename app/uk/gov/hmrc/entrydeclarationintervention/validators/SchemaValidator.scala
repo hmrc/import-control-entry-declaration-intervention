@@ -57,14 +57,15 @@ class SchemaValidator {
     def allErrors: Seq[SAXParseException] = errors ++ fatalErrors
   }
 
-  val schema: Schema = {
-    val schemaLang = XMLConstants.W3C_XML_SCHEMA_NS_URI
-    val resource   = ResourceUtils.url("xsds/CC351A-v10-0.xsd")
-    SchemaFactory.newInstance(schemaLang).newSchema(resource)
-  }
-
-  def validateSchema(xml: Node): ValidationResult = {
+  def validateSchema(xml: Node, useNew: Boolean = false): ValidationResult = {
     val factory = SAXParserFactory.newInstance() //Parser for XML to check if valid XML
+
+    val schema: Schema = {
+      val schemaLang = XMLConstants.W3C_XML_SCHEMA_NS_URI
+      val schemaDoc = if(useNew) "xsds/CC351A-v10-0New.xsd" else "xsds/CC351A-v10-0.xsd"
+      val resource   = ResourceUtils.url(schemaDoc)
+      SchemaFactory.newInstance(schemaLang).newSchema(resource)
+    }
 
     factory.setNamespaceAware(true)
     factory.setSchema(schema)

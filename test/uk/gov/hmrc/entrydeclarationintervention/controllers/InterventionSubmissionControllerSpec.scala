@@ -64,6 +64,7 @@ class InterventionSubmissionControllerSpec
   "Post a valid intervention message" should {
     "return a 201 Created " in {
       MockAppConfig.eisInboundBearerToken.returns(bearerToken)
+      MockAppConfig.optionalFieldsFeature returns false
       MockAppConfig.validateIncomingJson.returns(false)
       MockInterventionSubmissionService
         .processIntervention(validIntervention.as[InterventionResponse])
@@ -81,6 +82,7 @@ class InterventionSubmissionControllerSpec
       def run(saveError: SaveError, expectedStatus: Int): Unit =
         s"a $saveError error is returned from the service" in {
           MockAppConfig.eisInboundBearerToken.returns(bearerToken)
+          MockAppConfig.optionalFieldsFeature returns false
           MockAppConfig.validateIncomingJson.returns(false)
           MockInterventionSubmissionService
             .processIntervention(validIntervention.as[InterventionResponse])
@@ -102,6 +104,7 @@ class InterventionSubmissionControllerSpec
   "Post a valid message when schema validation is enabled" must {
     "return a 201 Created" in {
       MockAppConfig.eisInboundBearerToken.returns(bearerToken)
+      MockAppConfig.optionalFieldsFeature returns false
       MockAppConfig.validateIncomingJson.returns(true)
       MockInterventionSubmissionService
         .processIntervention(validIntervention.as[InterventionResponse])
@@ -161,6 +164,7 @@ class InterventionSubmissionControllerSpec
                                        |""".stripMargin)
 
       MockAppConfig.validateIncomingJson.returns(true)
+      MockAppConfig.optionalFieldsFeature returns false
       val request =
         FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
       MockAppConfig.eisInboundBearerToken.returns(bearerToken)
@@ -189,6 +193,7 @@ class InterventionSubmissionControllerSpec
       val request =
         FakeRequest().withBody(intervention).withHeaders(HeaderNames.AUTHORIZATION -> s"Bearer $bearerToken")
       MockAppConfig.eisInboundBearerToken.returns(bearerToken)
+      MockAppConfig.optionalFieldsFeature returns false
       val result = controller.postIntervention(request)
 
       status(result) shouldBe Status.BAD_REQUEST

@@ -111,7 +111,7 @@ class InterventionSubmissionServiceSpec
       "an intervention successfully processed despite schema validation failing" in {
         MockAppConfig.validateJsonToXMLTransformation returns true
         MockXMLBuilder.buildXML(interventionReceived) returns rawXml
-        MockSchemaValidator.validateSchema(rawXml) returns failedValidationResult
+        MockSchemaValidator.validateSchema(rawXml, false) returns failedValidationResult
         MockIdGenerator.generateNotificationId returns notificationId
         MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
         MockAppConfig.defaultTtl returns defaultTtl
