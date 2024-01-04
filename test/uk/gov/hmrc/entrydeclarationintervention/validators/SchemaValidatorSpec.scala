@@ -28,10 +28,17 @@ class SchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionValue
 
   "SchemaValidator" when {
     "XML is valid" should {
-      "validate a sample valid xml correctly" in {
-        val xml = ResourceUtils.withInputStreamFor("xmls/Intervention.xml")(XML.load)
+      "validate a sample valid xml correctly" when {
+        "optionalFieldFeature is false" in {
+          val xml = ResourceUtils.withInputStreamFor("xmls/Intervention.xml")(XML.load)
 
-        schemaValidator.validateSchema(xml).isValid shouldBe true
+          schemaValidator.validateSchema(xml).isValid shouldBe true
+        }
+        "optionalFieldFeature is true" in {
+          val xml = ResourceUtils.withInputStreamFor("xmls/InterventionNew.xml")(XML.load)
+
+          schemaValidator.validateSchema(xml, true).isValid shouldBe true
+        }
       }
 
       "fail to validate a invalid xml" in {

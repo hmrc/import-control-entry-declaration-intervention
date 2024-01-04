@@ -28,30 +28,42 @@ class JsonSchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionV
 
   "JsonSchemaValidator" should {
     "return true " when {
-      "a valid message is supplied" in {
-        val intervention: JsValue = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
+      "a valid message is supplied" when {
+        "optionalFieldFeature is false" in {
+          val intervention: JsValue = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
 
-        JsonSchemaValidator.validateJSONAgainstSchema(intervention) shouldBe true
+          JsonSchemaValidator.validateJSONAgainstSchema(intervention) shouldBe true
+        }
+        "optionalFieldFeature is true" in {
+          val intervention: JsValue = ResourceUtils.withInputStreamFor("jsons/InterventionNew.json")(Json.parse)
+
+          JsonSchemaValidator.validateJSONAgainstSchema(intervention,"jsonSchemas/AdvancedInterventionNew.json") shouldBe true
+        }
       }
     }
 
     "return false" when {
-      "an invalid message is supplied" in {
+      "an invalid message is supplied" when {
         val invalidIntervention: JsValue =
-          Json.parse("""|{
-                        |"submissionId": "c75f40a6-a3df-4429-a697-471eeec46435",
-                        |  "metadata": {
-                        |    "senderEORI": "ABCDEFGHIJKLMN",
-                        |    "senderBranch": "ABCDEFGHIJKLMNO",
-                        |    "preparationDateTime": "2020-12-23T14:46:01.000Z",
-                        |    "messageType": "IE351",
-                        |    "messageIdentification": "ABCDE",
-                        |    "receivedDateTime": "2020-12-23T14:46:01.000Z",
-                        |    "correlationId": "12345678901234"
-                        |    }
-                        |  }""".stripMargin)
-
-        JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention) shouldBe false
+          Json.parse(
+            """|{
+               |"submissionId": "c75f40a6-a3df-4429-a697-471eeec46435",
+               |  "metadata": {
+               |    "senderEORI": "ABCDEFGHIJKLMN",
+               |    "senderBranch": "ABCDEFGHIJKLMNO",
+               |    "preparationDateTime": "2020-12-23T14:46:01.000Z",
+               |    "messageType": "IE351",
+               |    "messageIdentification": "ABCDE",
+               |    "receivedDateTime": "2020-12-23T14:46:01.000Z",
+               |    "correlationId": "12345678901234"
+               |    }
+               |  }""".stripMargin)
+        "optionalFieldFeature is false" in {
+          JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention) shouldBe false
+        }
+        "optionalFieldFeature is true" in {
+          JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention, "jsonSchemas/AdvancedInterventionNew.json") shouldBe false
+        }
       }
     }
   }

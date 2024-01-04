@@ -26,7 +26,7 @@ trait MockSchemaValidator extends MockFactory {
 
   object MockSchemaValidator {
     def validateSchema(xml: Node, useNew: Boolean): CallHandler[ValidationResult] =
-      mockSchemaValidator.validateSchema _ expects(xml, useNew)
+      (mockSchemaValidator.validateSchema(_: Node, _: Boolean)).expects(xml, useNew)
   }
 
 }
