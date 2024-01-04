@@ -133,7 +133,8 @@ class XMLBuilder {
     } yield <NatHEA001>{ nationality }</NatHEA001>}
       {for (identityOfMeansOfCrossingBorder <- itinerary.identityOfMeansOfCrossingBorder.toSeq)
       yield <IdeOfMeaOfTraCroHEA85>{ identityOfMeansOfCrossingBorder.identity }</IdeOfMeaOfTraCroHEA85>}
-      {goods.numberOfItems.map(n => <TotNumOfIteHEA305>{n}</TotNumOfIteHEA305>)}
+      {for (numberOfItems <- goods.numberOfItems.toSeq)
+      yield <TotNumOfIteHEA305>{ numberOfItems }</TotNumOfIteHEA305>}
       {for (commercialReference <- itinerary.commercialReferenceNumber.toSeq)
       yield <ComRefNumHEA>{ commercialReference }</ComRefNumHEA>}
       {for (conveyanceReference <- itinerary.conveyanceReference.toSeq)
