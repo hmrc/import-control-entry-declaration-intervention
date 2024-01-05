@@ -17,8 +17,8 @@
 package uk.gov.hmrc.entrydeclarationintervention.utils
 
 import com.codahale.metrics._
-import com.kenshoo.play.metrics.Metrics
 import play.api.Logging
+import com.codahale.metrics.MetricRegistry
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,11 +26,11 @@ trait Timer {
   self: Logging =>
   type Metric = String
 
-  val metrics: Metrics
+  val metrics: MetricRegistry
   val localMetrics = new LocalMetrics
 
   class LocalMetrics {
-    def startTimer(metric: Metric): Timer.Context = metrics.defaultRegistry.timer(s"$metric-timer").time()
+    def startTimer(metric: Metric): Timer.Context = metrics.timer(s"$metric-timer").time()
   }
 
   def timeFuture[A](name: String, metric: Metric)(block: => Future[A])(implicit ec: ExecutionContext): Future[A] = {

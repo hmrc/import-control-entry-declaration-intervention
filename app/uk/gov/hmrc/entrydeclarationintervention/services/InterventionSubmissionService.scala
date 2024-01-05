@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.services
 
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import play.api.Logging
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
@@ -38,7 +38,7 @@ class InterventionSubmissionService @Inject()(
   interventionRepo: InterventionRepo,
   schemaValidator: SchemaValidator,
   idGenerator: IdGenerator,
-  override val metrics: Metrics)(implicit ec: ExecutionContext)
+  override val metrics: MetricRegistry)(implicit ec: ExecutionContext)
     extends Timer
     with Logging {
 

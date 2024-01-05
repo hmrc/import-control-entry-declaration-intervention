@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.services
 
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import play.api.Logging
 
 import javax.inject.{Inject, Singleton}
@@ -27,7 +27,7 @@ import uk.gov.hmrc.entrydeclarationintervention.utils.Timer
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class InterventionRetrievalService @Inject()(interventionRepo: InterventionRepo, override val metrics: Metrics)(
+class InterventionRetrievalService @Inject()(interventionRepo: InterventionRepo, override val metrics: MetricRegistry)(
   implicit ec: ExecutionContext)
     extends Timer
     with Logging {

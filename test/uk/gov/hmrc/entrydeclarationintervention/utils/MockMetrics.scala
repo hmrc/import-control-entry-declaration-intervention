@@ -17,10 +17,5 @@
 package uk.gov.hmrc.entrydeclarationintervention.utils
 
 import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
 
-class MockMetrics extends Metrics {
-  override val defaultRegistry: MetricRegistry = new MetricRegistry()
-
-  override def toJson: String = throw new UnsupportedOperationException
-}
+class MockMetrics extends MetricRegistry

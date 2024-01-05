@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.reporting
 
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import org.scalamock.matchers.Matchers
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
@@ -36,7 +36,7 @@ class ReportSenderSpec extends AnyWordSpecLike with Matchers with OptionValues w
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val mockedMetrics: Metrics = new MockMetrics
+  val mockedMetrics: MetricRegistry = new MockMetrics
 
   val reportSender = new ReportSender(mockAuditHandler, mockedMetrics)
 

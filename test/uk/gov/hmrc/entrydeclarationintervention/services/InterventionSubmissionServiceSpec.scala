@@ -18,7 +18,6 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import java.time.Instant
 import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
 import org.scalamock.matchers.Matchers
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
@@ -30,7 +29,7 @@ import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
 import uk.gov.hmrc.entrydeclarationintervention.models.received.{InterventionResponse, InterventionResponseNew}
 import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRepo
-import uk.gov.hmrc.entrydeclarationintervention.utils.{MockIdGenerator, ResourceUtils, SaveError}
+import uk.gov.hmrc.entrydeclarationintervention.utils.{MockIdGenerator, MockMetrics, ResourceUtils, SaveError}
 import uk.gov.hmrc.entrydeclarationintervention.validators.{MockSchemaValidator, ValidationResult}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -50,13 +49,7 @@ class InterventionSubmissionServiceSpec
     with MockIdGenerator
     with ScalaFutures {
 
-  val mockedMetrics: Metrics = new MockMetrics
-
-  private class MockMetrics extends Metrics {
-    override val defaultRegistry: MetricRegistry = new MetricRegistry()
-
-    override def toJson: String = throw new NotImplementedError
-  }
+  val mockedMetrics: MetricRegistry = new MockMetrics
 
   val service = new InterventionSubmissionService(
     mockAppConfig,

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.entrydeclarationintervention.reporting
 
 import com.google.inject.Inject
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import play.api.Logging
 import uk.gov.hmrc.entrydeclarationintervention.reporting.audit.{AuditEvent, AuditHandler}
 import uk.gov.hmrc.entrydeclarationintervention.utils.Timer
@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReportSender @Inject()(auditHandler: AuditHandler, override val metrics: Metrics)(implicit ec: ExecutionContext)
+class ReportSender @Inject()(auditHandler: AuditHandler, override val metrics: MetricRegistry)(implicit ec: ExecutionContext)
     extends Timer
     with Logging {
   def sendReport[R: EventSources](report: R)(implicit hc: HeaderCarrier): Future[Unit] = {
