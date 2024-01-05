@@ -17,13 +17,12 @@
 package uk.gov.hmrc.entrydeclarationintervention.services
 
 import java.time.Instant
-
 import org.scalatest.OptionValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.libs.json.Json
-import uk.gov.hmrc.entrydeclarationintervention.models.received.{ArbitraryIntervention, InterventionResponse}
+import uk.gov.hmrc.entrydeclarationintervention.models.received.{ArbitraryIntervention, InterventionResponse, InterventionResponseNew}
 import uk.gov.hmrc.entrydeclarationintervention.services.XMLBuilder._
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
 import uk.gov.hmrc.entrydeclarationintervention.validators.SchemaValidator
@@ -55,15 +54,27 @@ class XMLBuilderSpec extends AnyWordSpecLike with Matchers with OptionValues wit
 
   "XMLBuilder" should {
     "return XML formatted correctly" when {
-      "an intervention is supplied" in {
-        val interventionJson = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
-        val intervention     = interventionJson.as[InterventionResponse]
-        val expected         = ResourceUtils.withInputStreamFor("xmls/Intervention.xml")(XML.load)
+      "an intervention is supplied" when {
+        "optionalFieldFeature is false" in {
+          val interventionJson = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
+          val intervention = interventionJson.as[InterventionResponse]
+          val expected = ResourceUtils.withInputStreamFor("xmls/Intervention.xml")(XML.load)
 
-        val xml = xmlBuilder.buildXML(intervention)
-        Utility.trim(xml).text shouldBe Utility.trim(expected).text
-        xml.namespace          shouldBe "http://ics.dgtaxud.ec/CC351A"
-        xml.prefix             shouldBe "cc3"
+          val xml = xmlBuilder.buildXML(intervention)
+          Utility.trim(xml).text shouldBe Utility.trim(expected).text
+          xml.namespace shouldBe "http://ics.dgtaxud.ec/CC351A"
+          xml.prefix shouldBe "cc3"
+        }
+        "optionalFieldFeature is true" in {
+          val interventionJson = ResourceUtils.withInputStreamFor("jsons/InterventionNew.json")(Json.parse)
+          val intervention = interventionJson.as[InterventionResponseNew]
+          val expected = ResourceUtils.withInputStreamFor("xmls/InterventionNew.xml")(XML.load)
+
+          val xml = xmlBuilder.buildXMLNew(intervention)
+          Utility.trim(xml).text shouldBe Utility.trim(expected).text
+          xml.namespace shouldBe "http://ics.dgtaxud.ec/CC351A"
+          xml.prefix shouldBe "cc3"
+        }
       }
 
       "an intervention is supplied with all optional fields" in {
@@ -77,18 +88,32 @@ class XMLBuilderSpec extends AnyWordSpecLike with Matchers with OptionValues wit
         xml.prefix             shouldBe "cc3"
       }
 
-      "generate schema valid XML for all inputs" in {
-//        pending
-        val schemaValidator = new SchemaValidator
+      "generate schema valid XML for all inputs" when {
+        "optionalFieldFeature is false" in {
+          val schemaValidator = new SchemaValidator
 
-        forAll { intervention: InterventionResponse =>
-          val xml = xmlBuilder.buildXML(intervention)
+          forAll { intervention: InterventionResponse =>
+            val xml = xmlBuilder.buildXML(intervention)
 
-          schemaValidator.validateSchema(xml).allErrors.filterNot { ex =>
-            // Ignore type related errors
-            val msg = ex.toString
-            msg.contains("cvc-pattern-valid") || msg.contains("cvc-type.3.1.3") || msg.contains("cvc-enumeration-valid")
-          } shouldBe Nil
+            schemaValidator.validateSchema(xml).allErrors.filterNot { ex =>
+              // Ignore type related errors
+              val msg = ex.toString
+              msg.contains("cvc-pattern-valid") || msg.contains("cvc-type.3.1.3") || msg.contains("cvc-enumeration-valid")
+            } shouldBe Nil
+          }
+        }
+        "optionalFieldFeature is true" in {
+          val schemaValidator = new SchemaValidator
+
+          forAll { intervention: InterventionResponseNew =>
+            val xml = xmlBuilder.buildXMLNew(intervention)
+
+            schemaValidator.validateSchema(xml, true).allErrors.filterNot { ex =>
+              // Ignore type related errors
+              val msg = ex.toString
+              msg.contains("cvc-pattern-valid") || msg.contains("cvc-type.3.1.3") || msg.contains("cvc-enumeration-valid")
+            } shouldBe Nil
+          }
         }
       }
     }
