@@ -45,5 +45,7 @@ trait MockAppConfig extends MockFactory {
       (() => mockAppConfig.validateJsonToXMLTransformation).expects()
 
     def defaultTtl: CallHandler[FiniteDuration] = (() => mockAppConfig.defaultTtl).expects()
+
+    def optionalFieldsFeature: CallHandler[Boolean] = (() => mockAppConfig.optionalFieldsFeature).expects()
   }
 }

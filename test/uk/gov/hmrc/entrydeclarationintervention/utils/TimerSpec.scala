@@ -17,7 +17,7 @@
 package uk.gov.hmrc.entrydeclarationintervention.utils
 
 import akka.util.Timeout
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import org.scalatest.OptionValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -29,7 +29,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
 class TimerSpec extends AnyWordSpecLike with Matchers with OptionValues with Timer with Logging {
-  val metrics: Metrics = new MockMetrics
+  val metrics: MetricRegistry = new MockMetrics
 
   var timeMs: Long = _
 

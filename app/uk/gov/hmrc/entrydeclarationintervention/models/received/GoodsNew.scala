@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.utils
+package uk.gov.hmrc.entrydeclarationintervention.models.received
 
-import com.codahale.metrics.MetricRegistry
+import play.api.libs.json.{Format, Json}
 
-class MockMetrics extends MetricRegistry
+case class GoodsNew(numberOfItems: Option[Int], goodsItems: Option[Seq[GoodsItem]])
+
+object GoodsNew {
+  implicit val jsonFormat: Format[GoodsNew] = Json.format[GoodsNew]
+}

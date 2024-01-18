@@ -1,0 +1,499 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Advanced Intervention",
+  "description": "Advanced Intervention",
+  "type": "object",
+  "properties": {
+    "submissionId": {
+      "$ref": "#/definitions/submissionId"
+    },
+    "metadata": {
+      "$ref": "#/definitions/metadata"
+    },
+    "parties": {
+      "$ref": "#/definitions/parties"
+    },
+    "goods": {
+      "$ref": "#/definitions/goods"
+    },
+    "declaration": {
+      "$ref": "#/definitions/declaration"
+    },
+    "itinerary": {
+      "$ref": "#/definitions/itinerary"
+    },
+    "customsIntervention": {
+      "$ref": "#/definitions/customsIntervention"
+    }
+  },
+  "required": [
+    "submissionId",
+    "metadata",
+    "parties",
+    "goods",
+    "declaration",
+    "itinerary",
+    "customsIntervention"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "submissionId": {
+      "description": "UUID for this submission, shared internally eg:c75f40a6-a3df-4429-a697-471eeec46435",
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36
+    },
+    "declaration": {
+      "type": "object",
+      "properties": {
+        "localReferenceNumber": {
+          "type": "string",
+          "maxLength": 22
+        },
+        "movementReferenceNumber": {
+          "type": "string",
+          "minLength": 18,
+          "maxLength": 18
+        },
+        "registeredDateTime": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "submittedDateTime": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "officeOfLodgement": {
+          "$ref": "#/definitions/customsOffice"
+        }
+      },
+      "required": [
+        "localReferenceNumber",
+        "movementReferenceNumber",
+        "registeredDateTime",
+        "submittedDateTime"
+      ],
+      "additionalProperties": false
+    },
+    "customsOffice": {
+      "type": "string",
+      "maxLength": 8
+    },
+    "metadata": {
+      "description": "includes metadata relating to the submission, such as date of preparation, datetime of receipt, etc...",
+      "type": "object",
+      "properties": {
+        "senderEORI": {
+          "$ref": "#/definitions/eori"
+        },
+        "senderBranch": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "preparationDateTime": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "messageType": {
+          "type": "string",
+          "enum": [
+            "IE351"
+          ]
+        },
+        "messageIdentification": {
+          "type": "string",
+          "maxLength": 14
+        },
+        "receivedDateTime": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "correlationId": {
+          "$ref": "#/definitions/correlationId"
+        }
+      },
+      "required": [
+        "senderEORI",
+        "senderBranch",
+        "preparationDateTime",
+        "messageType",
+        "messageIdentification",
+        "receivedDateTime",
+        "correlationId"
+      ],
+      "additionalProperties": false
+    },
+    "correlationId": {
+      "description": "correlationId for this submission, shared externally with the trader for their request response reconciliation purposes",
+      "type": "string",
+      "minLength": 14,
+      "maxLength": 14
+    },
+    "parties": {
+      "type": "object",
+      "properties": {
+        "declarant": {
+          "$ref": "#/definitions/trader"
+        },
+        "representative": {
+          "$ref": "#/definitions/trader"
+        },
+        "carrier": {
+          "$ref": "#/definitions/trader"
+        }
+      },
+      "required": [
+        "declarant"
+      ],
+      "additionalProperties": false
+    },
+    "goods": {
+      "type": "object",
+      "properties": {
+        "numberOfItems": {
+          "type": "integer"
+        },
+        "goodsItems": {
+          "$ref": "#/definitions/goodsItems"
+        }
+      },
+      "additionalProperties": false
+    },
+    "goodsItems": {
+      "description": "a collection of goods items",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 999,
+      "items": {
+        "$ref": "#/definitions/goodsItem"
+      }
+    },
+    "goodsItem": {
+      "type": "object",
+      "properties": {
+        "itemNumber": {
+          "description": "item number",
+          "type": "string",
+          "maxLength": 5
+        },
+        "commercialReferenceNumber": {
+          "$ref": "#/definitions/commercialReferenceNumber"
+        },
+        "documents": {
+          "$ref": "#/definitions/documents"
+        },
+        "containers": {
+          "$ref": "#/definitions/containers"
+        },
+        "identityOfMeansOfCrossingBorder": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 999,
+          "items": {
+            "$ref": "#/definitions/identityOfMeansOfCrossingBorder"
+          }
+        }
+      },
+      "required": [
+        "itemNumber"
+      ],
+      "additionalProperties": false
+    },
+    "commercialReferenceNumber": {
+      "type": "string",
+      "maxLength": 70
+    },
+    "documents": {
+      "description": "a collection of documents",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 99,
+      "items": {
+        "$ref": "#/definitions/document"
+      }
+    },
+    "document": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "maxLength": 4
+        },
+        "reference": {
+          "type": "string",
+          "maxLength": 35
+        },
+        "language": {
+          "$ref": "#/definitions/languageCode"
+        }
+      },
+      "required": [
+        "type",
+        "reference"
+      ],
+      "additionalProperties": false
+    },
+    "containers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 99,
+      "items": {
+        "$ref": "#/definitions/container"
+      }
+    },
+    "container": {
+      "type": "object",
+      "properties": {
+        "containerNumber": {
+          "type": "string",
+          "maxLength": 17
+        }
+      },
+      "required": [
+        "containerNumber"
+      ],
+      "additionalProperties": false
+    },
+    "identityOfMeansOfCrossingBorder": {
+      "type": "object",
+      "properties": {
+        "nationality": {
+          "type": "string",
+          "maxLength": 2
+        },
+        "identity": {
+          "type": "string",
+          "maxLength": 27
+        },
+        "language": {
+          "$ref": "#/definitions/languageCode"
+        }
+      },
+      "required": [
+        "identity"
+      ],
+      "additionalProperties": false
+    },
+    "itinerary": {
+      "type": "object",
+      "properties": {
+        "modeOfTransportAtBorder": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "8",
+            "10",
+            "11"
+          ]
+        },
+        "identityOfMeansOfCrossingBorder": {
+          "$ref": "#/definitions/identityOfMeansOfCrossingBorder"
+        },
+        "commercialReferenceNumber": {
+          "$ref": "#/definitions/commercialReferenceNumber"
+        },
+        "conveyanceReference": {
+          "type": "string",
+          "maxLength": 35
+        },
+        "officeOfFirstEntry": {
+          "type": "object",
+          "properties": {
+            "reference": {
+              "$ref": "#/definitions/customsOffice"
+            },
+            "expectedDateTimeOfArrival": {
+              "$ref": "#/definitions/dateTime"
+            }
+          },
+          "required": [
+            "reference",
+            "expectedDateTimeOfArrival"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "officeOfFirstEntry"
+      ],
+      "additionalProperties": false
+    },
+    "trader": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/traderContactDetails"
+        },
+        {
+          "properties": {
+            "eori": {
+              "$ref": "#/definitions/eori"
+            }
+          },
+          "required": [
+            "eori"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/definitions/traderContactDetailsAndEORI"
+        }
+      ]
+    },
+    "traderContactDetails": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the trader.",
+          "$ref": "#/definitions/name"
+        },
+        "address": {
+          "description": "address of the trader",
+          "$ref": "#/definitions/address"
+        },
+        "language": {
+          "$ref": "#/definitions/languageCode"
+        }
+      },
+      "required": [
+        "name",
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "traderContactDetailsAndEORI": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the trader.",
+          "$ref": "#/definitions/name"
+        },
+        "address": {
+          "description": "address of the trader",
+          "$ref": "#/definitions/address"
+        },
+        "language": {
+          "$ref": "#/definitions/languageCode"
+        },
+        "eori": {
+          "$ref": "#/definitions/eori"
+        }
+      },
+      "required": [
+        "name",
+        "address",
+        "eori"
+      ],
+      "additionalProperties": false
+    },
+    "eori": {
+      "description": "Ecconomic Operator Registration and Identification number",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 17
+    },
+    "name": {
+      "description": "name",
+      "type": "string",
+      "maxLength": 35
+    },
+    "address": {
+      "description": "address format",
+      "type": "object",
+      "properties": {
+        "streetAndNumber": {
+          "type": "string",
+          "maxLength": 35
+        },
+        "city": {
+          "type": "string",
+          "maxLength": 35
+        },
+        "postalCode": {
+          "type": "string",
+          "maxLength": 9
+        },
+        "countryCode": {
+          "$ref": "#/definitions/countryCode"
+        }
+      },
+      "required": [
+        "streetAndNumber",
+        "city",
+        "postalCode",
+        "countryCode"
+      ],
+      "additionalProperties": false
+    },
+    "customsIntervention": {
+      "type": "object",
+      "properties": {
+        "notificationDateTime": {
+          "$ref": "#/definitions/dateTime"
+        },
+        "interventions": {
+          "$ref": "#/definitions/interventions"
+        }
+      },
+      "required": [
+        "notificationDateTime",
+        "interventions"
+      ],
+      "additionalProperties": false
+    },
+    "interventions": {
+      "description": "a collection of interventions",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 999,
+      "items": {
+        "$ref": "#/definitions/intervention"
+      }
+    },
+    "intervention": {
+      "type": "object",
+      "properties": {
+        "itemNumber": {
+          "type": "string",
+          "maxLength": 5
+        },
+        "code": {
+          "type": "string",
+          "maxLength": 4,
+          "enum": [
+            "A001"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 350
+        },
+        "language": {
+          "$ref": "#/definitions/languageCode"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "additionalProperties": false
+    },
+    "languageCode": {
+      "description": "language code type",
+      "type": "string",
+      "maxLength": 2
+    },
+    "countryCode": {
+      "description": "Country Code type",
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2
+    },
+    "dateTime": {
+      "description": "The timestamp in ISO8601 UTC format: YYYY-MM-DDThh:mm:ss.sssZ",
+      "type": "string",
+      "minLength": 24,
+      "maxLength": 24,
+      "format": "date-time",
+      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z"
+    }
+  }
+}

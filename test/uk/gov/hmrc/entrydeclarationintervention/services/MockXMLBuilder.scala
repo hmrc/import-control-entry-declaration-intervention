@@ -18,7 +18,7 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
+import uk.gov.hmrc.entrydeclarationintervention.models.received.{InterventionResponse, InterventionResponseNew}
 
 import scala.xml.Elem
 
@@ -28,6 +28,9 @@ trait MockXMLBuilder extends MockFactory {
   object MockXMLBuilder {
     def buildXML(interventionReceived: InterventionResponse): CallHandler[Elem] =
       mockXMLBuilder.buildXML _ expects interventionReceived
+
+    def buildXMLNew(interventionReceived: InterventionResponseNew): CallHandler[Elem] =
+      mockXMLBuilder.buildXMLNew _ expects interventionReceived
   }
 
 }

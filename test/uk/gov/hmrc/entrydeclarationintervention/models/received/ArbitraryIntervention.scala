@@ -53,6 +53,18 @@ trait ArbitraryIntervention {
     } yield InterventionResponse(submissionId, metadata, parties, goods, declaration, itinerary, customsIntervention)
   )
 
+  implicit val arbitraryInterventionReceivedNew: Arbitrary[InterventionResponseNew] = Arbitrary(
+    for {
+      submissionId        <- arbitrary[String]
+      metadata            <- arbitrary[Metadata]
+      parties             <- arbitrary[Parties]
+      goods               <- arbitrary[GoodsNew]
+      declaration         <- arbitrary[Declaration]
+      itinerary           <- arbitrary[Itinerary]
+      customsIntervention <- arbitrary[CustomsIntervention]
+    } yield InterventionResponseNew(submissionId, metadata, parties, goods, declaration, itinerary, customsIntervention)
+  )
+
   implicit val arbitraryMetadata: Arbitrary[Metadata] = Arbitrary(
     for {
       senderEORI            <- arbitrary[String]
@@ -135,6 +147,13 @@ trait ArbitraryIntervention {
       numItems   <- arbitrary[Int]
       goodsItems <- arbitrary[Option[Seq[GoodsItem]]]
     } yield Goods(numItems, goodsItems)
+  )
+
+  implicit val arbitraryGoodsNew: Arbitrary[GoodsNew] = Arbitrary(
+    for {
+      numItems   <- arbitrary[Option[Int]]
+      goodsItems <- arbitrary[Option[Seq[GoodsItem]]]
+    } yield GoodsNew(numItems, goodsItems)
   )
 
   implicit val arbitraryTrader: Arbitrary[Trader] = Arbitrary(

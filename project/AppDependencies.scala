@@ -17,10 +17,10 @@ import play.core.PlayVersion.current
 import sbt._
 
 object AppDependencies {
-  val bootstrapVersion = "7.21.0"
+  val bootstrapVersion = "8.4.0"
 
   val compile = Seq(
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"         % "1.3.0",
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"         % "1.7.0",
     "uk.gov.hmrc"       %% "bootstrap-backend-play-28"  % bootstrapVersion,
     "com.github.fge"    %  "json-schema-validator"      % "2.2.14",
     "org.typelevel"     %% "cats-core"                  % "2.10.0",
@@ -29,12 +29,9 @@ object AppDependencies {
 
   val test: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"                  %% "bootstrap-test-play-28" % bootstrapVersion,
-    "com.typesafe.play"            %% "play-test"              % current,
     "org.scalatestplus.play"       %% "scalatestplus-play"     % "5.1.0",
     "org.scalamock"                %% "scalamock"              % "5.2.0",
-    "org.scalatestplus"            %% "scalacheck-1-17"        % "3.2.16.0",
-    "com.github.tomakehurst"       %  "wiremock-jre8"          % "2.35.0",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"   % "2.15.2"
+    "org.scalatestplus"            %% "scalacheck-1-17"        % "3.2.17.0"
   ).map(_ % Test)
 
   val itDependencies: Seq[ModuleID] = Seq()

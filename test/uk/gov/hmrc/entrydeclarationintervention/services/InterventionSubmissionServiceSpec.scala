@@ -17,9 +17,7 @@
 package uk.gov.hmrc.entrydeclarationintervention.services
 
 import java.time.Instant
-
 import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
 import org.scalamock.matchers.Matchers
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
@@ -29,9 +27,9 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
-import uk.gov.hmrc.entrydeclarationintervention.models.received.InterventionResponse
+import uk.gov.hmrc.entrydeclarationintervention.models.received.{InterventionResponse, InterventionResponseNew}
 import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRepo
-import uk.gov.hmrc.entrydeclarationintervention.utils.{MockIdGenerator, ResourceUtils, SaveError}
+import uk.gov.hmrc.entrydeclarationintervention.utils.{MockIdGenerator, MockMetrics, ResourceUtils, SaveError}
 import uk.gov.hmrc.entrydeclarationintervention.validators.{MockSchemaValidator, ValidationResult}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -51,13 +49,7 @@ class InterventionSubmissionServiceSpec
     with MockIdGenerator
     with ScalaFutures {
 
-  val mockedMetrics: Metrics = new MockMetrics
-
-  private class MockMetrics extends Metrics {
-    override val defaultRegistry: MetricRegistry = new MetricRegistry()
-
-    override def toJson: String = throw new NotImplementedError
-  }
+  val mockedMetrics: MetricRegistry = new MockMetrics
 
   val service = new InterventionSubmissionService(
     mockAppConfig,
@@ -95,29 +87,57 @@ class InterventionSubmissionServiceSpec
   val interventionReceived: InterventionResponse =
     ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse).as[InterventionResponse]
 
+  val interventionReceivedNew: InterventionResponseNew =
+    ResourceUtils.withInputStreamFor("jsons/InterventionNew.json")(Json.parse).as[InterventionResponseNew]
+
   "InterventionSubmissionService processIntervention" must {
     "return None" when {
-      "an intervention is supplied and successfully saved" in {
-        MockAppConfig.validateJsonToXMLTransformation returns false
-        MockXMLBuilder.buildXML(interventionReceived) returns rawXml
-        MockIdGenerator.generateNotificationId returns notificationId
-        MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
-        MockAppConfig.defaultTtl returns defaultTtl
-        MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(None)
+      "an intervention is supplied and successfully saved" when {
+        "optionalFieldFeature is false" in {
+          MockAppConfig.validateJsonToXMLTransformation returns false
+          MockXMLBuilder.buildXML(interventionReceived) returns rawXml
+          MockIdGenerator.generateNotificationId returns notificationId
+          MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
+          MockAppConfig.defaultTtl returns defaultTtl
+          MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(None)
 
-        service.processIntervention(interventionReceived).futureValue shouldBe None
+          service.processIntervention(interventionReceived).futureValue shouldBe None
+        }
+        "optionalFieldFeature is true" in {
+          MockAppConfig.validateJsonToXMLTransformation returns false
+          MockXMLBuilder.buildXMLNew(interventionReceivedNew) returns rawXml
+          MockIdGenerator.generateNotificationId returns notificationId
+          MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
+          MockAppConfig.defaultTtl returns defaultTtl
+          MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(None)
+
+          service.processInterventionNew(interventionReceivedNew).futureValue shouldBe None
+        }
       }
 
-      "an intervention successfully processed despite schema validation failing" in {
-        MockAppConfig.validateJsonToXMLTransformation returns true
-        MockXMLBuilder.buildXML(interventionReceived) returns rawXml
-        MockSchemaValidator.validateSchema(rawXml) returns failedValidationResult
-        MockIdGenerator.generateNotificationId returns notificationId
-        MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
-        MockAppConfig.defaultTtl returns defaultTtl
-        MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(None)
+      "an intervention successfully processed despite schema validation failing" when {
+        "optionalFieldFeature is false" in {
+          MockAppConfig.validateJsonToXMLTransformation returns true
+          MockXMLBuilder.buildXML(interventionReceived) returns rawXml
+          MockSchemaValidator.validateSchema(rawXml, false) returns failedValidationResult
+          MockIdGenerator.generateNotificationId returns notificationId
+          MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
+          MockAppConfig.defaultTtl returns defaultTtl
+          MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(None)
 
-        service.processIntervention(interventionReceived).futureValue shouldBe None
+          service.processIntervention(interventionReceived).futureValue shouldBe None
+        }
+        "optionalFieldFeature is true" in {
+          MockAppConfig.validateJsonToXMLTransformation returns true
+          MockXMLBuilder.buildXMLNew(interventionReceivedNew) returns rawXml
+          MockSchemaValidator.validateSchema(rawXml, true) returns failedValidationResult
+          MockIdGenerator.generateNotificationId returns notificationId
+          MockXMLWrapper.wrapXml(notificationId, rawXml) returns wrappedXml
+          MockAppConfig.defaultTtl returns defaultTtl
+          MockInterventionRepo.saveIntervention(interventionModel) returns Future.successful(None)
+
+          service.processInterventionNew(interventionReceivedNew).futureValue shouldBe None
+        }
       }
     }
 
