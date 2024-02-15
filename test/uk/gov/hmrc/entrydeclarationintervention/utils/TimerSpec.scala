@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.utils
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import com.codahale.metrics.MetricRegistry
 import org.scalatest.OptionValues
 import org.scalatest.matchers.should.Matchers
