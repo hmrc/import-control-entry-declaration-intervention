@@ -18,11 +18,12 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.entrydeclarationintervention.models.received.{InterventionResponse, InterventionResponseNew}
 
 import scala.xml.Elem
 
-trait MockXMLBuilder extends MockFactory {
+trait MockXMLBuilder extends TestSuite with MockFactory {
   val mockXMLBuilder: XMLBuilder = mock[XMLBuilder]
 
   object MockXMLBuilder {

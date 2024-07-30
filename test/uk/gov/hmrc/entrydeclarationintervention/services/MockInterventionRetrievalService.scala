@@ -18,11 +18,12 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.entrydeclarationintervention.models._
 
 import scala.concurrent.Future
 
-trait MockInterventionRetrievalService extends MockFactory {
+trait MockInterventionRetrievalService extends TestSuite with MockFactory {
   val mockInterventionRetrievalService: InterventionRetrievalService = mock[InterventionRetrievalService]
 
   object MockInterventionRetrievalService {
