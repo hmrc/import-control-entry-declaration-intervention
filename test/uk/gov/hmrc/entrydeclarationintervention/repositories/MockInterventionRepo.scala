@@ -18,13 +18,14 @@ package uk.gov.hmrc.entrydeclarationintervention.repositories
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel}
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 
 import scala.concurrent.Future
 
-trait MockInterventionRepo extends MockFactory {
+trait MockInterventionRepo extends TestSuite with MockFactory {
   val interventionRepo: InterventionRepo = mock[InterventionRepo]
 
   object MockInterventionRepo {

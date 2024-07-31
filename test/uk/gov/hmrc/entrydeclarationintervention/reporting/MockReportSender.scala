@@ -17,9 +17,10 @@
 package uk.gov.hmrc.entrydeclarationintervention.reporting
 
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait MockReportSender extends MockFactory {
+trait MockReportSender extends TestSuite with MockFactory {
   val mockReportSender: ReportSender = mock[ReportSender]
 
   object MockReportSender {
