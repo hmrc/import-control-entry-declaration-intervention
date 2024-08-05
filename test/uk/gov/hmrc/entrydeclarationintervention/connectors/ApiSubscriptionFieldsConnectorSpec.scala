@@ -31,7 +31,8 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits, Injecting}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -50,7 +51,7 @@ class ApiSubscriptionFieldsConnectorSpec
     .configure("metrics.enabled" -> "false", "auditing.enabled" -> "false")
     .build()
 
-  val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
+  val httpClient: HttpClientV2 = app.injector.instanceOf[HttpClientV2]
 
   private val wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort())
 
