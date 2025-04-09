@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ object AppDependencies {
   val test: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"            %% "bootstrap-test-play-30" % bootstrapVersion,
     "org.scalatestplus.play" %% "scalatestplus-play"     % "7.0.1",
-    "org.scalamock"          %% "scalamock"              % "6.2.0",
+    "org.scalamock"          %% "scalamock"              % "7.3.0",
     "org.scalatestplus"      %% "scalacheck-1-18"        % "3.2.19.0"
   ).map(_ % Test)
 
