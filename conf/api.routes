@@ -1,4 +1,4 @@
 # microservice specific routes
 
-GET         /api/definition                                        uk.gov.hmrc.entrydeclarationintervention.controllers.DocumentationController.definition()
-GET         /api/conf/:version/*file                               uk.gov.hmrc.entrydeclarationintervention.controllers.DocumentationController.conf(version: String, file: String)
+GET         /api/definition                                        uk.gov.hmrc.entrydeclarationintervention.controllers.api.DocumentationController.definition()
+GET         /api/conf/:version/*file                               uk.gov.hmrc.entrydeclarationintervention.controllers.api.DocumentationController.conf(version: String, file: String)
