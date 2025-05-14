@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.entrydeclarationintervention.controllers
+package uk.gov.hmrc.entrydeclarationintervention.controllers.api
 
 import controllers.Assets
 import org.scalamock.matchers.Matchers
@@ -29,7 +29,6 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
-import uk.gov.hmrc.entrydeclarationintervention.controllers.api.DocumentationController
 
 class DocumentationControllerSpec extends AnyWordSpecLike with Matchers with OptionValues with MockAppConfig with Injecting with GuiceOneAppPerSuite {
   override lazy val app: Application = new GuiceApplicationBuilder()
