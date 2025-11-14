@@ -19,7 +19,7 @@ import uk.gov.hmrc.DefaultBuildSettings
 val appName = "import-control-entry-declaration-intervention"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "2.13.17"
 
 lazy val coverageSettings: Seq[Setting[_]] = {
   import scoverage.ScoverageKeys
@@ -68,4 +68,4 @@ lazy val it = project
   .settings(DefaultBuildSettings.itSettings(), libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
   .settings(libraryDependencies ++= AppDependencies.itDependencies)
 
-addCommandAlias("runAllChecks", ";clean;compile;coverage;test;coverageReport")
+addCommandAlias("runAllChecks", ";clean;compile;coverage;test;it/test;coverageReport")
