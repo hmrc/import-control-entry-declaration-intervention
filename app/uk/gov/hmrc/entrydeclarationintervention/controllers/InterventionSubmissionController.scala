@@ -97,7 +97,7 @@ class InterventionSubmissionController @Inject()(
 
   private def getValidationErrors(json: JsValue, useNew: Boolean = false)(implicit lc: LoggingContext): Option[JsValue] = {
     val validateJson = if(useNew) {
-      JsonSchemaValidator.validateJSONAgainstSchema(json, "jsonSchemas/AdvancedInterventionNew.json")
+      JsonSchemaValidator.validateJSONAgainstSchema(json, "conf/jsonSchemas/AdvancedInterventionNew.json")
     } else {
       JsonSchemaValidator.validateJSONAgainstSchema(json)
     }
