@@ -37,7 +37,7 @@ class JsonSchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionV
         "optionalFieldFeature is true" in {
           val intervention: JsValue = ResourceUtils.withInputStreamFor("jsons/InterventionNew.json")(Json.parse)
 
-          JsonSchemaValidator.validateJSONAgainstSchema(intervention,"jsonSchemas/AdvancedInterventionNew.json") shouldBe true
+          JsonSchemaValidator.validateJSONAgainstSchema(intervention,"conf/jsonSchemas/AdvancedInterventionNew.json") shouldBe true
         }
       }
     }
@@ -62,7 +62,7 @@ class JsonSchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionV
           JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention) shouldBe false
         }
         "optionalFieldFeature is true" in {
-          JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention, "jsonSchemas/AdvancedInterventionNew.json") shouldBe false
+          JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention, "conf/jsonSchemas/AdvancedInterventionNew.json") shouldBe false
         }
       }
     }

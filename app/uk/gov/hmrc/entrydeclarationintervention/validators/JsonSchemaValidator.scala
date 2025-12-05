@@ -17,23 +17,24 @@
 package uk.gov.hmrc.entrydeclarationintervention.validators
 
 import java.net.URL
-
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.github.fge.jsonschema.core.report.ProcessingReport
 import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
 
+import java.io.FileInputStream
+
 object JsonSchemaValidator {
 
   private val factory = JsonSchemaFactory.byDefault()
 
-  def validateJSONAgainstSchema(inputDoc: JsValue, schemaDoc: String = "jsonSchemas/AdvancedIntervention.json")(
+  def validateJSONAgainstSchema(inputDoc: JsValue, schemaDoc: String = "conf/jsonSchemas/AdvancedIntervention.json")(
     implicit lc: LoggingContext): Boolean =
     try {
       val mapper: ObjectMapper     = new ObjectMapper()
       val inputJson: JsonNode      = mapper.readTree(inputDoc.toString())
-      val jsonSchema: JsonNode     = mapper.readTree(url(schemaDoc))
+      val jsonSchema: JsonNode     = mapper.readTree(new FileInputStream(schemaDoc))
       val validator: JsonValidator = factory.getValidator
       val report: ProcessingReport = validator.validate(jsonSchema, inputJson)
       if (!report.isSuccess) ContextLogger.error(s"Failed to validate $inputDoc and $report")
