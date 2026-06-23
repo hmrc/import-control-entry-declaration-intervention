@@ -24,7 +24,7 @@ import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
 
 class JsonSchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionValues {
-  implicit val lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId", "mrn")
+  given lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId", "mrn")
 
   "JsonSchemaValidator" should {
     "return true " when {

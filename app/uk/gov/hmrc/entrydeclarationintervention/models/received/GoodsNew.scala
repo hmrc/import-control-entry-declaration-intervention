@@ -21,5 +21,5 @@ import play.api.libs.json.{Format, Json}
 case class GoodsNew(numberOfItems: Option[Int], goodsItems: Option[Seq[GoodsItem]])
 
 object GoodsNew {
-  implicit val jsonFormat: Format[GoodsNew] = Json.format[GoodsNew]
+  given jsonFormat: Format[GoodsNew] = Json.format[GoodsNew]
 }

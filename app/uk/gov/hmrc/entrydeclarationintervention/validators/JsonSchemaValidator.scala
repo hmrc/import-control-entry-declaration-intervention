@@ -31,7 +31,7 @@ object JsonSchemaValidator {
   val basePath: String = System.getProperty("user.dir")
 
   def validateJSONAgainstSchema(inputDoc: JsValue, schemaDoc: String = "conf/jsonSchemas/AdvancedIntervention.json")(
-    implicit lc: LoggingContext): Boolean =
+    using lc: LoggingContext): Boolean =
     try {
       val mapper: ObjectMapper     = new ObjectMapper()
       val inputJson: JsonNode      = mapper.readTree(inputDoc.toString())

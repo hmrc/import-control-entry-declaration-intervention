@@ -90,7 +90,7 @@ class ApiSubscriptionFieldsConnectorSpec
   class Test {
     MockAppConfig.apiSubscriptionFieldsHost.returns(s"http://localhost:$port")
     MockAppConfig.apiGatewayContext.returns("customs/imports/notifications")
-    implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+    given headerCarrier: HeaderCarrier = HeaderCarrier()
     val connector                             = new ApiSubscriptionFieldsConnector(httpClient, mockAppConfig)
 
     def stubRequest(url: String, responseStatus: Int): StubMapping =

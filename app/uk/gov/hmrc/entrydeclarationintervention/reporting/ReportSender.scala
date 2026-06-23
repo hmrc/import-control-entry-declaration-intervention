@@ -25,19 +25,19 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReportSender @Inject()(auditHandler: AuditHandler, override val metrics: MetricRegistry)(implicit ec: ExecutionContext)
+class ReportSender @Inject()(auditHandler: AuditHandler, override val metrics: MetricRegistry)(using ec: ExecutionContext)
     extends Timer
     with Logging {
-  def sendReport[R: EventSources](report: R)(implicit hc: HeaderCarrier): Future[Unit] = {
+  def sendReport[R: EventSources](report: R)(using hc: HeaderCarrier): Future[Unit] = {
 
-    val eventSources: EventSources[R] = implicitly
+    val eventSources: EventSources[R] = summon
 
     eventSources.auditEventFor(report).foreach(event => audit(event))
 
     Future.successful(())
   }
 
-  private def audit[R: EventSources](event: AuditEvent)(implicit hc: HeaderCarrier) =
+  private def audit[R](event: AuditEvent)(using hc: HeaderCarrier) =
     timeFuture("ReportSender audit", "reporting.audit") {
       auditHandler.audit(event)
     }

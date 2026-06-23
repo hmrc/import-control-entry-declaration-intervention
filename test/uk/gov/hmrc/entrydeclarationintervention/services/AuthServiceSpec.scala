@@ -19,12 +19,12 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 import org.scalamock.handlers.CallHandler
 import org.scalamock.matchers.Matchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{Inside, OptionValues}
 import play.api.mvc.Headers
-import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.entrydeclarationintervention.connectors.{MockApiSubscriptionFieldsConnector, MockAuthConnector}
@@ -45,9 +45,9 @@ class AuthServiceSpec
   val X_CLIENT_ID      = "X-Client-Id"
 
 
-  implicit override val patienceConfig: PatienceConfig = PatienceConfig(timeout = Span(500, Millis))
+  override given patienceConfig: PatienceConfig = PatienceConfig(timeout = Span(500, Millis))
 
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+  given ec: ExecutionContext = scala.concurrent.ExecutionContext.global
   val service          = new AuthService(mockAuthConnector, mockApiSubscriptionFieldsConnector)
   val eori             = "GB123"
   val clientId         = "someClientId"
@@ -63,17 +63,17 @@ class AuthServiceSpec
       state             = "Activated",
       delegatedAuthRule = None)
 
-  def stubAuth(implicit hc: HeaderCarrier): CallHandler[Future[Enrolments]] =
+  def stubAuth(using hc: HeaderCarrier): CallHandler[Future[Enrolments]] =
     MockAuthConnector
       .authorise(AuthProviders(AuthProvider.GovernmentGateway), Retrievals.allEnrolments, hc)
 
-  def stubCSPAuth(implicit hc: HeaderCarrier): CallHandler[Future[Unit]] =
+  def stubCSPAuth(using hc: HeaderCarrier): CallHandler[Future[Unit]] =
     MockAuthConnector.authorise(AuthProviders(AuthProvider.PrivilegedApplication), EmptyRetrieval, hc)
 
   "AuthService.authenticate" when {
     "X-Client-Id header present" when {
-      implicit val hc: HeaderCarrier = HeaderCarrier().withExtraHeaders("X-Client-Id" -> clientId)
-      implicit val headers: Headers = Headers(X_CLIENT_ID -> clientId)
+      given hc: HeaderCarrier = HeaderCarrier().withExtraHeaders("X-Client-Id" -> clientId)
+      given headers: Headers = Headers(X_CLIENT_ID -> clientId)
 
       "CSP authentication succeeds" when {
         "authenticated EORI present in subscription fields" when {
@@ -103,17 +103,17 @@ class AuthServiceSpec
     }
 
     "no X-Client-Id header present" when {
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      implicit val headers: Headers = Headers()
+      given hc: HeaderCarrier = HeaderCarrier()
+      given headers: Headers = Headers()
       authenticateBasedOnSSEnrolment { () =>
       }
     }
 
     "X-Client-Id header present with different case" must {
-      implicit val headers: Headers = Headers(X_CLIENT_ID -> clientId)
+      given headers: Headers = Headers(X_CLIENT_ID -> clientId)
 
       "Attempt CSP auth" in {
-        implicit val hc: HeaderCarrier = HeaderCarrier().withExtraHeaders("x-client-id" -> clientId)
+        given hc: HeaderCarrier = HeaderCarrier().withExtraHeaders("x-client-id" -> clientId)
         stubCSPAuth returns Future.successful(())
 
         MockApiSubscriptionFieldsConnector.getAuthenticatedEoriField(clientId) returns  Future.successful(Some(eori))
@@ -121,7 +121,7 @@ class AuthServiceSpec
       }
     }
 
-    def authenticateBasedOnSSEnrolment(stubbings: () => Unit)(implicit hc: HeaderCarrier, headers: Headers): Unit = {
+    def authenticateBasedOnSSEnrolment(stubbings: () => Unit)(using hc: HeaderCarrier, headers: Headers): Unit = {
 
       "return Some(eori)" when {
         "S&S enrolment with an eori" in {

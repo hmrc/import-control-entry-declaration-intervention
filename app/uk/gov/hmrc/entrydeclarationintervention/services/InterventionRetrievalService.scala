@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InterventionRetrievalService @Inject()(interventionRepo: InterventionRepo, override val metrics: MetricRegistry)(
-  implicit ec: ExecutionContext)
+  using ec: ExecutionContext)
     extends Timer
     with Logging {
   def retrieveIntervention(eori: String, notificationId: String): Future[Option[InterventionModel]] =

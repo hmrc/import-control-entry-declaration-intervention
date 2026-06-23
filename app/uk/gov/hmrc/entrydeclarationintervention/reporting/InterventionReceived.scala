@@ -29,9 +29,9 @@ case class InterventionReceived(
 ) extends Report
 
 object InterventionReceived {
-  implicit val eventSources: EventSources[InterventionReceived] = new EventSources[InterventionReceived] {
+  given eventSources: EventSources[InterventionReceived] = new EventSources[InterventionReceived] {
     override def auditEventFor(report: InterventionReceived): Option[AuditEvent] = {
-      import report._
+      import report.*
       val auditEvent = AuditEvent(
         auditType       = "InterventionReceived",
         transactionName = "ENS intervention received from EIS",

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.utils
 
-import com.codahale.metrics._
+import com.codahale.metrics.*
 import play.api.Logging
 import com.codahale.metrics.MetricRegistry
 
@@ -33,7 +33,7 @@ trait Timer {
     def startTimer(metric: Metric): Timer.Context = metrics.timer(s"$metric-timer").time()
   }
 
-  def timeFuture[A](name: String, metric: Metric)(block: => Future[A])(implicit ec: ExecutionContext): Future[A] = {
+  def timeFuture[A](name: String, metric: Metric)(block: => Future[A])(using ec: ExecutionContext): Future[A] = {
     val timer = localMetrics.startTimer(metric)
     block andThen { case _ => stopAndLog(name, timer) }
   }

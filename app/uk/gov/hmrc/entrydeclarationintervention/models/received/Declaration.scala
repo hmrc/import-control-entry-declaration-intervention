@@ -28,5 +28,5 @@ case class Declaration(
   officeOfLodgement: Option[String])
 
 object Declaration {
-  implicit val jsonFormat: Format[Declaration] = Json.format[Declaration]
+  given jsonFormat: Format[Declaration] = Json.format[Declaration]
 }

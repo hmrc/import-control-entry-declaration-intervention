@@ -22,7 +22,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.http.MimeTypes
 import play.api.libs.json.{JsArray, Json}
 import play.api.mvc.Result
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.entrydeclarationintervention.services.test.MockNotificationIdRetrievalService
 

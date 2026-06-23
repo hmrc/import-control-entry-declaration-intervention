@@ -20,12 +20,12 @@ import org.scalamock.matchers.ArgCapture.CaptureOne
 import org.scalamock.matchers.Matchers
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.Json
-import play.api.mvc._
-import play.api.test.Helpers._
+import play.api.mvc.*
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, ResultExtractors}
 import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.entrydeclarationintervention.services.{AuthService, MockAuthService}
@@ -44,7 +44,7 @@ class AuthorisedControllerSpec
     with ScalaFutures
     with MockAuthService {
 
-  implicit lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  given fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   lazy val cc: ControllerComponents = stubControllerComponents()
   lazy val bearerToken              = "Bearer Token"

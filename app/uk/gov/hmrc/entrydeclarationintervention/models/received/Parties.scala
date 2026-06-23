@@ -21,5 +21,5 @@ import play.api.libs.json.{Format, Json}
 case class Parties(declarant: Trader, representative: Option[Trader], carrier: Option[Trader])
 
 object Parties {
-  implicit val jsonFormat: Format[Parties] = Json.format[Parties]
+  given jsonFormat: Format[Parties] = Json.format[Parties]
 }

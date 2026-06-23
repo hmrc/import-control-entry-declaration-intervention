@@ -19,7 +19,7 @@ import uk.gov.hmrc.DefaultBuildSettings
 val appName = "import-control-entry-declaration-intervention"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.18"
+ThisBuild / scalaVersion := "3.3.7"
 
 lazy val coverageSettings: Seq[Setting[_]] = {
   import scoverage.ScoverageKeys
@@ -37,7 +37,6 @@ lazy val coverageSettings: Seq[Setting[_]] = {
     "config.*",
     "testOnly.*",
     "testOnlyDoNotUseInAppConf.*",
-    "views.html.*",
     ".*feedback*.*"
   )
 
@@ -59,13 +58,20 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(coverageSettings: _*)
   .settings(
-    scalacOptions ++= Seq("-Wconf:src=routes/.*:s","-Wconf:cat=unused-imports&src=html/.*:s")
+    scalacOptions ++= Seq(
+      "-Wconf:src=routes/.*:s",
+      "-Wconf:msg=Flag .* set repeatedly:s"
+    )
   )
 
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
   .settings(DefaultBuildSettings.itSettings(), libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
-  .settings(libraryDependencies ++= AppDependencies.itDependencies)
+  .settings(
+    libraryDependencies ++= AppDependencies.itDependencies,
+    scalacOptions ++= Seq(
+      "-Wconf:msg=Flag .* set repeatedly:s")
+  )
 
 addCommandAlias("runAllChecks", ";clean;compile;coverage;test;it/test;coverageReport")

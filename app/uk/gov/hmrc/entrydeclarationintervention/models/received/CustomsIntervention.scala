@@ -23,5 +23,5 @@ import play.api.libs.json.{Format, Json}
 case class CustomsIntervention(notificationDateTime: Instant, interventions: Seq[Intervention])
 
 object CustomsIntervention {
-  implicit val jsonFormat: Format[CustomsIntervention] = Json.format[CustomsIntervention]
+  given jsonFormat: Format[CustomsIntervention] = Json.format[CustomsIntervention]
 }

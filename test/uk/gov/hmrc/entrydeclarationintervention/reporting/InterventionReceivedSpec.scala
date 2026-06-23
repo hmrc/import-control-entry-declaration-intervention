@@ -32,7 +32,7 @@ class InterventionReceivedSpec extends AnyWordSpecLike with Matchers with Option
   )
   "InterventionReceived" must {
     "have the correct associated JSON audit event" in {
-      val event = implicitly[EventSources[InterventionReceived]].auditEventFor(report).get
+      val event = summon[EventSources[InterventionReceived]].auditEventFor(report).get
 
       event.auditType       shouldBe "InterventionReceived"
       event.transactionName shouldBe "ENS intervention received from EIS"

@@ -38,7 +38,7 @@ class InterventionSubmissionService @Inject()(
   interventionRepo: InterventionRepo,
   schemaValidator: SchemaValidator,
   idGenerator: IdGenerator,
-  override val metrics: MetricRegistry)(implicit ec: ExecutionContext)
+  override val metrics: MetricRegistry)(using ec: ExecutionContext)
     extends Timer
     with Logging {
 
@@ -48,7 +48,7 @@ class InterventionSubmissionService @Inject()(
       validateSchema(rawXml)
       val notificationId = idGenerator.generateNotificationId
 
-      implicit val loggingContext: LoggingContext = LoggingContext(intervention, notificationId)
+      given loggingContext: LoggingContext = LoggingContext(intervention, notificationId)
       ContextLogger.info("notification received")
 
       val wrappedXml = xmlWrapper.wrapXml(notificationId, rawXml)
@@ -61,7 +61,7 @@ class InterventionSubmissionService @Inject()(
       validateSchema(rawXml, true)
       val notificationId = idGenerator.generateNotificationId
 
-      implicit val loggingContext: LoggingContext = LoggingContext(intervention, notificationId)
+      given loggingContext: LoggingContext = LoggingContext(intervention, notificationId)
       ContextLogger.info("notification received")
 
       val wrappedXml = xmlWrapper.wrapXml(notificationId, rawXml)
@@ -69,9 +69,9 @@ class InterventionSubmissionService @Inject()(
     }
 
   private def saveIntervention(notificationId: String, intervention: InterventionResponse, interventionXml: Node)(
-    implicit lc: LoggingContext): Future[Option[SaveError]] =
+    using lc: LoggingContext): Future[Option[SaveError]] =
     timeFuture("Service saveIntervention", "saveIntervention.total") {
-      import intervention._
+      import intervention.*
       val xmlString = Utility.trim(interventionXml).toString
 
       interventionRepo
@@ -92,9 +92,9 @@ class InterventionSubmissionService @Inject()(
     }
 
   private def saveInterventionNew(notificationId: String, intervention: InterventionResponseNew, interventionXml: Node)(
-    implicit lc: LoggingContext): Future[Option[SaveError]] =
+    using lc: LoggingContext): Future[Option[SaveError]] =
     timeFuture("Service saveIntervention", "saveIntervention.total") {
-      import intervention._
+      import intervention.*
       val xmlString = Utility.trim(interventionXml).toString
 
       interventionRepo

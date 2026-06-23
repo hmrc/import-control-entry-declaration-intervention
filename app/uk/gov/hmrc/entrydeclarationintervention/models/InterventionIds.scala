@@ -21,5 +21,5 @@ import play.api.libs.json.{Json, Format}
 case class InterventionIds(correlationId: String, notificationId: String)
 
 object InterventionIds {
-  implicit val formats: Format[InterventionIds] = Json.format[InterventionIds]
+  given formats: Format[InterventionIds] = Json.format[InterventionIds]
 }

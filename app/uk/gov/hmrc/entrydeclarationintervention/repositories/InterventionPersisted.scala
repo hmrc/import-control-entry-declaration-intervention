@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.repositories
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.entrydeclarationintervention.models.InterventionModel
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits.jatInstantFormat
 
@@ -46,7 +46,7 @@ private[repositories] case class InterventionPersisted(
 
 private[repositories] object InterventionPersisted {
   def from(intervention: InterventionModel): InterventionPersisted = {
-    import intervention._
+    import intervention.*
 
     InterventionPersisted(
       eori             = eori,
@@ -59,5 +59,5 @@ private[repositories] object InterventionPersisted {
       interventionXml  = interventionXml
     )
   }
-  implicit val format: Format[InterventionPersisted] = Json.format[InterventionPersisted]
+  given format: Format[InterventionPersisted] = Json.format[InterventionPersisted]
 }

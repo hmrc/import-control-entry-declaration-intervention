@@ -20,6 +20,7 @@ import org.mongodb.scala.model.Filters
 
 import java.time.Instant
 import java.util.UUID
+import org.mongodb.scala.ObservableFuture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
@@ -29,7 +30,7 @@ import play.api.test.Helpers.await
 import play.api.test.{DefaultAwaitTimeout, Injecting}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
-import uk.gov.hmrc.entrydeclarationintervention.models._
+import uk.gov.hmrc.entrydeclarationintervention.models.*
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -50,7 +51,7 @@ class InterventionRepoISpec
     await(repository.removeAll())
   }
 
-  override implicit lazy val app: Application = new GuiceApplicationBuilder()
+  override given app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))
     .configure("metrics.enabled" -> "false", "response.max.list" -> listInterventionsLimit.toString)
     .build()
@@ -68,7 +69,7 @@ class InterventionRepoISpec
   val receivedDateTime: Instant  = Instant.parse("2020-12-31T23:59:00Z")
   val housekeepingAt: Instant    = Instant.parse("2021-12-31T23:59:00Z")
 
-  implicit val lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId", "mrn")
+  given lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId", "mrn")
 
   def intervention(
     notificationId: String    = notificationId1,

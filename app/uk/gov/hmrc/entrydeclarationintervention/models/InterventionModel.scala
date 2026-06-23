@@ -31,5 +31,5 @@ case class InterventionModel(
   interventionXml: String)
 
 object InterventionModel {
-  implicit val format: Format[InterventionModel] = Json.format[InterventionModel]
+  given format: Format[InterventionModel] = Json.format[InterventionModel]
 }
