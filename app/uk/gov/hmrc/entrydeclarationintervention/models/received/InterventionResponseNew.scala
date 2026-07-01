@@ -28,7 +28,7 @@ case class InterventionResponseNew(
   customsIntervention: CustomsIntervention)
 
 object InterventionResponseNew {
-  implicit val jsonFormat: Format[InterventionResponseNew] = Json.format[InterventionResponseNew]
+  given jsonFormat: Format[InterventionResponseNew] = Json.format[InterventionResponseNew]
 }
 
 

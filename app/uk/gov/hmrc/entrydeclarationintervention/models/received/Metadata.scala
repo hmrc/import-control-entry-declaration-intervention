@@ -30,5 +30,5 @@ case class Metadata(
   correlationId: String)
 
 object Metadata {
-  implicit val jsonFormat: Format[Metadata] = Json.format[Metadata]
+  given jsonFormat: Format[Metadata] = Json.format[Metadata]
 }

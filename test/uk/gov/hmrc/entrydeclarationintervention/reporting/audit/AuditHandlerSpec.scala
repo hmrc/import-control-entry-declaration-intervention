@@ -42,7 +42,7 @@ class AuditHandlerSpec extends AnyWordSpecLike with Matchers with OptionValues w
 
   val auditHandler = new AuditHandler(mockAuditConnector, mockAppConfig)
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given hc: HeaderCarrier = HeaderCarrier()
 
   val detail: JsObject = JsObject(Seq("detail1" -> JsString("detailValue1")))
 

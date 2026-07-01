@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.ExecutionContext
 
 class NotificationIdController @Inject()(cc: ControllerComponents, service: NotificationIdRetrievalService)(
-  implicit ec: ExecutionContext
+  using ec: ExecutionContext
 ) extends BackendController(cc) {
   def getNotificationIds(submissionId: String): Action[AnyContent] = Action.async { _ =>
     service.retrieveNotificationIds(submissionId).map { notificationIds =>

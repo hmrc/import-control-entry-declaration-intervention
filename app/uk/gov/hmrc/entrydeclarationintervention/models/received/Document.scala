@@ -21,6 +21,6 @@ import play.api.libs.json.{Format, Json}
 case class Document(`type`: String, reference: String, language: Option[String])
 
 object Document {
-  implicit val jsonFormat: Format[Document] = Json.format[Document]
+  given jsonFormat: Format[Document] = Json.format[Document]
 }
 

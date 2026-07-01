@@ -23,11 +23,12 @@ import org.scalacheck.Gen.choose
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ArbitraryIntervention {
-  implicit val arbZonedDateTime: Arbitrary[Instant] =
-    Arbitrary(Gen.choose(0, Long.MaxValue).map(ts => Instant.ofEpochMilli(ts)))
+
+  given arbZonedDateTime: Arbitrary[Instant] =
+    Arbitrary(Gen.choose(0L, Long.MaxValue).map(ts => Instant.ofEpochMilli(ts)))
 
   //The two below lazy vals have been added to circumvent a bug in scalacheck
-  implicit lazy val arbChar: Arbitrary[Char] = Arbitrary {
+  given arbChar: Arbitrary[Char] = Arbitrary {
     // valid ranges are [0x0000, 0xD7FF] and [0xE000, 0xFFFD].
     //
     // ((0xFFFD + 1) - 0xE000) + ((0xD7FF + 1) - 0x0000)
@@ -37,11 +38,11 @@ trait ArbitraryIntervention {
     }
   }
 
-  implicit lazy val arbString: Arbitrary[String] =
+  given arbString: Arbitrary[String] =
     Arbitrary(Gen.stringOf(arbChar.arbitrary))
 
 
-  implicit val arbitraryInterventionReceived: Arbitrary[InterventionResponse] = Arbitrary(
+  given arbitraryInterventionReceived: Arbitrary[InterventionResponse] = Arbitrary(
     for {
       submissionId        <- arbitrary[String]
       metadata            <- arbitrary[Metadata]
@@ -53,7 +54,7 @@ trait ArbitraryIntervention {
     } yield InterventionResponse(submissionId, metadata, parties, goods, declaration, itinerary, customsIntervention)
   )
 
-  implicit val arbitraryInterventionReceivedNew: Arbitrary[InterventionResponseNew] = Arbitrary(
+  given arbitraryInterventionReceivedNew: Arbitrary[InterventionResponseNew] = Arbitrary(
     for {
       submissionId        <- arbitrary[String]
       metadata            <- arbitrary[Metadata]
@@ -65,7 +66,7 @@ trait ArbitraryIntervention {
     } yield InterventionResponseNew(submissionId, metadata, parties, goods, declaration, itinerary, customsIntervention)
   )
 
-  implicit val arbitraryMetadata: Arbitrary[Metadata] = Arbitrary(
+  given arbitraryMetadata: Arbitrary[Metadata] = Arbitrary(
     for {
       senderEORI            <- arbitrary[String]
       senderBranch          <- arbitrary[String]
@@ -84,7 +85,7 @@ trait ArbitraryIntervention {
         correlationId)
   )
 
-  implicit val arbitraryCustomsIntervention: Arbitrary[CustomsIntervention] = Arbitrary(
+  given arbitraryCustomsIntervention: Arbitrary[CustomsIntervention] = Arbitrary(
     for {
       notificationDateTime <- arbitrary[Instant](arbZonedDateTime)
       // Non-empty list...
@@ -92,7 +93,7 @@ trait ArbitraryIntervention {
     } yield CustomsIntervention(notificationDateTime, interventions)
   )
 
-  implicit val arbitraryIntervention: Arbitrary[Intervention] = Arbitrary(
+  given arbitraryIntervention: Arbitrary[Intervention] = Arbitrary(
     for {
       code       <- arbitrary[String]
       itemNumber <- arbitrary[Option[String]]
@@ -101,7 +102,7 @@ trait ArbitraryIntervention {
     } yield Intervention(code, itemNumber, text, language)
   )
 
-  implicit val arbitraryDocument: Arbitrary[Document] = Arbitrary(
+  given arbitraryDocument: Arbitrary[Document] = Arbitrary(
     for {
       documentType      <- arbitrary[String]
       documentReference <- arbitrary[String]
@@ -109,7 +110,7 @@ trait ArbitraryIntervention {
     } yield Document(documentType, documentReference, language)
   )
 
-  implicit val arbitraryAddress: Arbitrary[Address] = Arbitrary(
+  given arbitraryAddress: Arbitrary[Address] = Arbitrary(
     for {
       streetAndNumber <- arbitrary[String]
       city            <- arbitrary[String]
@@ -118,7 +119,7 @@ trait ArbitraryIntervention {
     } yield Address(streetAndNumber, city, postalCode, countryCode)
   )
 
-  implicit val arbitraryIdentityOfMeansOfCrossingBorder: Arbitrary[IdentityOfMeansOfCrossingBorder] = Arbitrary(
+  given arbitraryIdentityOfMeansOfCrossingBorder: Arbitrary[IdentityOfMeansOfCrossingBorder] = Arbitrary(
     for {
       nationality <- arbitrary[Option[String]]
       identity    <- arbitrary[String]
@@ -126,13 +127,13 @@ trait ArbitraryIntervention {
     } yield IdentityOfMeansOfCrossingBorder(identity, nationality, language)
   )
 
-  implicit val arbitraryContainer: Arbitrary[Container] = Arbitrary(
+  given arbitraryContainer: Arbitrary[Container] = Arbitrary(
     for {
       containerNumber <- arbitrary[String]
     } yield Container(containerNumber)
   )
 
-  implicit val arbitraryGoodItem: Arbitrary[GoodsItem] = Arbitrary(
+  given arbitraryGoodItem: Arbitrary[GoodsItem] = Arbitrary(
     for {
       itemNumber                      <- arbitrary[String]
       commercialReferenceNumber       <- arbitrary[Option[String]]
@@ -142,21 +143,21 @@ trait ArbitraryIntervention {
     } yield GoodsItem(itemNumber, commercialReferenceNumber, documents, containers, identityOfMeansOfCrossingBorder)
   )
 
-  implicit val arbitraryGoods: Arbitrary[Goods] = Arbitrary(
+  given arbitraryGoods: Arbitrary[Goods] = Arbitrary(
     for {
       numItems   <- arbitrary[Int]
       goodsItems <- arbitrary[Option[Seq[GoodsItem]]]
     } yield Goods(numItems, goodsItems)
   )
 
-  implicit val arbitraryGoodsNew: Arbitrary[GoodsNew] = Arbitrary(
+  given arbitraryGoodsNew: Arbitrary[GoodsNew] = Arbitrary(
     for {
       numItems   <- arbitrary[Option[Int]]
       goodsItems <- arbitrary[Option[Seq[GoodsItem]]]
     } yield GoodsNew(numItems, goodsItems)
   )
 
-  implicit val arbitraryTrader: Arbitrary[Trader] = Arbitrary(
+  given arbitraryTrader: Arbitrary[Trader] = Arbitrary(
     for {
       name     <- arbitrary[Option[String]]
       address  <- arbitrary[Option[Address]]
@@ -165,7 +166,7 @@ trait ArbitraryIntervention {
     } yield Trader(name, address, language, Some(eori))
   )
 
-  implicit val arbitraryParties: Arbitrary[Parties] = Arbitrary(
+  given arbitraryParties: Arbitrary[Parties] = Arbitrary(
     for {
       declarant      <- arbitrary[Trader]
       representative <- arbitrary[Option[Trader]]
@@ -173,7 +174,7 @@ trait ArbitraryIntervention {
     } yield Parties(declarant, representative, carrier)
   )
 
-  implicit val arbitraryDeclaration: Arbitrary[Declaration] = Arbitrary(
+  given arbitraryDeclaration: Arbitrary[Declaration] = Arbitrary(
     for {
       localReferenceNumber    <- arbitrary[String]
       movementReferenceNumber <- arbitrary[String]
@@ -189,14 +190,14 @@ trait ArbitraryIntervention {
         officeOfLodgement)
   )
 
-  implicit val arbitraryOfficeOfFirstEntry: Arbitrary[OfficeOfFirstEntry] = Arbitrary(
+  given arbitraryOfficeOfFirstEntry: Arbitrary[OfficeOfFirstEntry] = Arbitrary(
     for {
       reference                 <- arbitrary[String]
       expectedDateTimeOfArrival <- arbitrary[Instant](arbZonedDateTime)
     } yield OfficeOfFirstEntry(reference, expectedDateTimeOfArrival)
   )
 
-  implicit val arbitraryItinerary: Arbitrary[Itinerary] = Arbitrary(
+  given arbitraryItinerary: Arbitrary[Itinerary] = Arbitrary(
     for {
       modeOfTransportAtBorder         <- arbitrary[Option[String]]
       identityOfMeansOfCrossingBorder <- arbitrary[Option[IdentityOfMeansOfCrossingBorder]]

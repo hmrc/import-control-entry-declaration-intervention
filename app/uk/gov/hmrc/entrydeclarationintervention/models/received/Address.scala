@@ -21,5 +21,5 @@ import play.api.libs.json.{Format, Json}
 case class Address(streetAndNumber: String, city: String, postalCode: String, countryCode: String)
 
 object Address {
-  implicit val jsonFormat: Format[Address] = Json.format[Address]
+  given jsonFormat: Format[Address] = Json.format[Address]
 }

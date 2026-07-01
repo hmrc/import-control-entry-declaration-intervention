@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.ExecutionContext
 
 class TestInterventionRetrievalController @Inject()(cc: ControllerComponents, service: InterventionRetrievalService)(
-  implicit ec: ExecutionContext)
+  using ec: ExecutionContext)
     extends BackendController(cc) {
   //  Test method -> no auth
   def getFullIntervention(eori: String, notificationId: String): Action[AnyContent] = Action.async { _ =>

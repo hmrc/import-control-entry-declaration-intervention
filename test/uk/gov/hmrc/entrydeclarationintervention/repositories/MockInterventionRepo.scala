@@ -30,7 +30,7 @@ trait MockInterventionRepo extends TestSuite with MockFactory {
 
   object MockInterventionRepo {
     def saveIntervention(intervention: InterventionModel): CallHandler[Future[Option[SaveError]]] =
-      (interventionRepo.save(_:InterventionModel)(_: LoggingContext)).expects(intervention, *)
+      (interventionRepo.save(_:InterventionModel)(using _: LoggingContext)).expects(intervention, *)
 
     def lookupNotificationIds(submissionId: String): CallHandler[Future[Seq[String]]] =
       interventionRepo.lookupNotificationIds _ expects submissionId

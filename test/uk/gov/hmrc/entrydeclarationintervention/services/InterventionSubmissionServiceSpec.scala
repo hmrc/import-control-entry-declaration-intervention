@@ -21,7 +21,7 @@ import com.codahale.metrics.MetricRegistry
 import org.scalamock.matchers.Matchers
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
@@ -34,7 +34,7 @@ import uk.gov.hmrc.entrydeclarationintervention.validators.{MockSchemaValidator,
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.xml.{Elem, SAXParseException}
 
 class InterventionSubmissionServiceSpec
@@ -82,7 +82,7 @@ class InterventionSubmissionServiceSpec
     submissionId,
     wrappedXml.toString
   )
-  implicit val loggingContext: LoggingContext = LoggingContext(eori, correlationId, submissionId, notificationId, "mrn")
+  given loggingContext: LoggingContext = LoggingContext(eori, correlationId, submissionId, notificationId, "mrn")
 
   val interventionReceived: InterventionResponse =
     ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse).as[InterventionResponse]

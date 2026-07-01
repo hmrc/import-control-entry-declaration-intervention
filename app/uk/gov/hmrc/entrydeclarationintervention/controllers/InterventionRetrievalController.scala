@@ -29,38 +29,38 @@ import scala.concurrent.ExecutionContext
 class InterventionRetrievalController @Inject()(
   val authService: AuthService,
   cc: ControllerComponents,
-  service: InterventionRetrievalService)(implicit ec: ExecutionContext)
+  service: InterventionRetrievalService)(using ec: ExecutionContext)
     extends AuthorisedController(cc) {
 
-  def listInterventions(): Action[AnyContent] = authorisedAction().async { userRequest =>
-    ContextLogger.info("Listing interventions")(LoggingContext(eori = Some(userRequest.eori)))
+  def listInterventions: Action[AnyContent] = authorisedAction().async { userRequest =>
+    ContextLogger.info("Listing interventions")(using LoggingContext(eori = Some(userRequest.eori)))
     service.listInterventions(userRequest.eori).map {
       case Nil                  => NoContent
       case interventionMetadata => Ok(listXml(interventionMetadata)).as(MimeTypes.XML)
     }
   }
 
-  def getIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async { implicit userRequest =>
+  def getIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async { userRequest =>
     service.retrieveIntervention(userRequest.eori, notificationId) map {
       case None =>
-        ContextLogger.info("Intervention not found")(
+        ContextLogger.info("Intervention not found")(using
           LoggingContext(eori = Some(userRequest.eori), notificationId = Some(notificationId)))
         NotFound(StandardError.notFound)
       case Some(intervention) =>
-        ContextLogger.info("Intervention fetched")(LoggingContext(intervention))
+        ContextLogger.info("Intervention fetched")(using LoggingContext(intervention))
         Ok(intervention.interventionXml).as(MimeTypes.XML)
     }
   }
 
   def acknowledgeIntervention(notificationId: String): Action[AnyContent] = authorisedAction().async {
-    implicit userRequest =>
+    userRequest =>
       service.acknowledgeIntervention(userRequest.eori, notificationId) map {
         case None =>
-          ContextLogger.info("Intervention not found")(
+          ContextLogger.info("Intervention not found")(using
             LoggingContext(eori = Some(userRequest.eori), notificationId = Some(notificationId)))
           NotFound(StandardError.notFound)
         case Some(intervention) =>
-          ContextLogger.info("Intervention acknowledged")(LoggingContext(intervention))
+          ContextLogger.info("Intervention acknowledged")(using LoggingContext(intervention))
           Ok
       }
   }

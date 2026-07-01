@@ -19,12 +19,12 @@ package uk.gov.hmrc.entrydeclarationintervention.controllers
 import org.scalamock.matchers.Matchers
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.Json
-import play.api.mvc._
-import play.api.test.Helpers._
+import play.api.mvc.*
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, ResultExtractors}
 import uk.gov.hmrc.entrydeclarationintervention.config.MockAppConfig
 import uk.gov.hmrc.http.HeaderCarrier

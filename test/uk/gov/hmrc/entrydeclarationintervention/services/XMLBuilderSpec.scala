@@ -23,7 +23,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.libs.json.Json
 import uk.gov.hmrc.entrydeclarationintervention.models.received.{ArbitraryIntervention, InterventionResponse, InterventionResponseNew}
-import uk.gov.hmrc.entrydeclarationintervention.services.XMLBuilder._
+import uk.gov.hmrc.entrydeclarationintervention.services.XMLBuilder.*
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
 import uk.gov.hmrc.entrydeclarationintervention.validators.SchemaValidator
 
@@ -92,7 +92,7 @@ class XMLBuilderSpec extends AnyWordSpecLike with Matchers with OptionValues wit
         "optionalFieldFeature is false" in {
           val schemaValidator = new SchemaValidator
 
-          forAll { intervention: InterventionResponse =>
+          forAll { (intervention: InterventionResponse) =>
             val xml = xmlBuilder.buildXML(intervention)
 
             schemaValidator.validateSchema(xml).allErrors.filterNot { ex =>
@@ -105,7 +105,7 @@ class XMLBuilderSpec extends AnyWordSpecLike with Matchers with OptionValues wit
         "optionalFieldFeature is true" in {
           val schemaValidator = new SchemaValidator
 
-          forAll { intervention: InterventionResponseNew =>
+          forAll { (intervention: InterventionResponseNew) =>
             val xml = xmlBuilder.buildXMLNew(intervention)
 
             schemaValidator.validateSchema(xml, true).allErrors.filterNot { ex =>

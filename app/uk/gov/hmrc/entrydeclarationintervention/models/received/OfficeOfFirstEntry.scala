@@ -23,5 +23,5 @@ import play.api.libs.json.{Format, Json}
 case class OfficeOfFirstEntry(reference: String, expectedDateTimeOfArrival: Instant)
 
 object OfficeOfFirstEntry {
-  implicit val jsonFormat: Format[OfficeOfFirstEntry] = Json.format[OfficeOfFirstEntry]
+  given jsonFormat: Format[OfficeOfFirstEntry] = Json.format[OfficeOfFirstEntry]
 }

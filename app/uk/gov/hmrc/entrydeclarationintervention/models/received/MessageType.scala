@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.models.received
 
+import cats.Show
 import play.api.libs.json.Format
 import uk.gov.hmrc.entrydeclarationintervention.utils.Enums
 
@@ -24,5 +25,7 @@ sealed trait MessageType
 object MessageType {
   case object IE351 extends MessageType
 
-  implicit val formats: Format[MessageType] = Enums.format[MessageType]
+  given shows: Show[MessageType] = Show.show[MessageType](_.toString)
+  
+  given formats: Format[MessageType] = Enums.format[MessageType]
 }

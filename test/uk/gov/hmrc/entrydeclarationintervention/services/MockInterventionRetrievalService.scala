@@ -19,7 +19,7 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.TestSuite
-import uk.gov.hmrc.entrydeclarationintervention.models._
+import uk.gov.hmrc.entrydeclarationintervention.models.*
 
 import scala.concurrent.Future
 

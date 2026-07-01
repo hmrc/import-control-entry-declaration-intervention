@@ -21,5 +21,5 @@ import play.api.libs.json.{Format, Json}
 case class IdentityOfMeansOfCrossingBorder(identity: String, nationality: Option[String], language: Option[String])
 
 object IdentityOfMeansOfCrossingBorder{
-  implicit val jsonFormat: Format[IdentityOfMeansOfCrossingBorder] = Json.format[IdentityOfMeansOfCrossingBorder]
+  given jsonFormat: Format[IdentityOfMeansOfCrossingBorder] = Json.format[IdentityOfMeansOfCrossingBorder]
 }

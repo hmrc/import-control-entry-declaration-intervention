@@ -19,7 +19,7 @@ package uk.gov.hmrc.entrydeclarationintervention.services
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneOffset}
 
-import uk.gov.hmrc.entrydeclarationintervention.models.received._
+import uk.gov.hmrc.entrydeclarationintervention.models.received.*
 
 import scala.xml.{Elem, Node}
 
@@ -43,10 +43,10 @@ object XMLBuilder {
 
 class XMLBuilder {
 
-  import XMLBuilder._
+  import XMLBuilder.*
 
   def buildXML(intervention: InterventionResponse): Elem = {
-    import intervention._
+    import intervention.*
     //@formatter:off
     <cc3:CC351A xmlns:cc3="http://ics.dgtaxud.ec/CC351A">
       <MesSenMES3>{ s"${metadata.senderEORI}/${metadata.senderBranch}" }</MesSenMES3>
@@ -70,7 +70,7 @@ class XMLBuilder {
   }
 
   def buildXMLNew(intervention: InterventionResponseNew): Elem = {
-    import intervention._
+    import intervention.*
     //@formatter:off
     <cc3:CC351A xmlns:cc3="http://ics.dgtaxud.ec/CC351A">
       <MesSenMES3>{ s"${metadata.senderEORI}/${metadata.senderBranch}" }</MesSenMES3>
@@ -94,7 +94,7 @@ class XMLBuilder {
   }
 
   private def getHEAHEA(intervention: InterventionResponse): Elem = {
-    import intervention._
+    import intervention.*
     //@formatter:off
     <HEAHEA>
       <RefNumHEA4>{ declaration.localReferenceNumber }</RefNumHEA4>
@@ -120,7 +120,7 @@ class XMLBuilder {
   }
 
   private def getHEAHEANew(intervention: InterventionResponseNew): Elem = {
-    import intervention._
+    import intervention.*
     //@formatter:off
     <HEAHEA>
       <RefNumHEA4>{ declaration.localReferenceNumber }</RefNumHEA4>

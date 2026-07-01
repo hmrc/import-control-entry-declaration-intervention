@@ -19,7 +19,7 @@ package uk.gov.hmrc.entrydeclarationintervention.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.Logging
 import play.api.libs.json.{JsError, JsString, JsSuccess, JsValue}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents, Request}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.models.received.{InterventionResponse, InterventionResponseNew}
@@ -34,16 +34,18 @@ class InterventionSubmissionController @Inject()(
   appConfig: AppConfig,
   cc: ControllerComponents,
   service: InterventionSubmissionService,
-  reportSender: ReportSender)(implicit ec: ExecutionContext)
+  reportSender: ReportSender)(using ec: ExecutionContext)
     extends EisInboundAuthorisedController(cc, appConfig) with Logging {
 
-  val postIntervention: Action[JsValue] = authorisedAction.async(parse.json) { implicit request =>
+  val postIntervention: Action[JsValue] = authorisedAction.async(parse.json) { request =>
+    given Request[JsValue] = request
     if(appConfig.optionalFieldsFeature) {
       request.body.validate[InterventionResponseNew] match {
         case JsSuccess(intervention, _) =>
-          implicit val loggingContext: LoggingContext = LoggingContext(intervention)
+          given loggingContext: LoggingContext = LoggingContext(intervention)
           getValidationErrors(request.body, true) match {
-            case Some(errorMsg) => Future.successful(BadRequest(errorMsg))
+            case Some(errorMsg) =>
+              Future.successful(BadRequest(errorMsg))
             case None =>
               service.processInterventionNew(intervention).map { response =>
                 reportSender.sendReport(
@@ -68,7 +70,7 @@ class InterventionSubmissionController @Inject()(
     } else {
       request.body.validate[InterventionResponse] match {
         case JsSuccess(intervention, _) =>
-          implicit val loggingContext: LoggingContext = LoggingContext(intervention)
+          given loggingContext: LoggingContext = LoggingContext(intervention)
           getValidationErrors(request.body) match {
             case Some(errorMsg) => Future.successful(BadRequest(errorMsg))
             case None =>
@@ -95,7 +97,7 @@ class InterventionSubmissionController @Inject()(
     }
   }
 
-  private def getValidationErrors(json: JsValue, useNew: Boolean = false)(implicit lc: LoggingContext): Option[JsValue] = {
+  private def getValidationErrors(json: JsValue, useNew: Boolean = false)(using lc: LoggingContext): Option[JsValue] = {
     val validateJson = if(useNew) {
       JsonSchemaValidator.validateJSONAgainstSchema(json, "conf/jsonSchemas/AdvancedInterventionNew.json")
     } else {

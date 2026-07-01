@@ -21,25 +21,25 @@ import org.mongodb.scala.model.Filters.{and, equal}
 import org.mongodb.scala.model.Projections.{excludeId, fields, include}
 import org.mongodb.scala.model.{IndexModel, IndexOptions}
 import javax.inject.{Inject, Singleton}
-import org.mongodb.scala._
+import org.mongodb.scala.*
 import org.mongodb.scala.bson.{BsonNumber, BsonValue}
-import org.mongodb.scala.model._
-import org.mongodb.scala.model.Filters._
-import org.mongodb.scala.model.Updates._
+import org.mongodb.scala.model.*
+import org.mongodb.scala.model.Filters.*
+import org.mongodb.scala.model.Updates.*
 import play.api.Logging
-import uk.gov.hmrc.mongo._
+import uk.gov.hmrc.mongo.*
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
 import uk.gov.hmrc.entrydeclarationintervention.models.{InterventionIds, InterventionModel, NotificationId}
 import uk.gov.hmrc.entrydeclarationintervention.utils.SaveError
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import uk.gov.hmrc.play.http.logging.Mdc
+import uk.gov.hmrc.mdc.Mdc
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
 
 trait InterventionRepo {
-  def save(intervention: InterventionModel)(implicit lc: LoggingContext): Future[Option[SaveError]]
+  def save(intervention: InterventionModel)(using lc: LoggingContext): Future[Option[SaveError]]
 
   def lookupNotificationIds(submissionId: String): Future[Seq[String]]
 
@@ -57,7 +57,7 @@ trait InterventionRepo {
 }
 
 @Singleton
-class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: MongoComponent, ec: ExecutionContext)
+class InterventionRepoImpl @Inject()(appConfig: AppConfig)(using mongo: MongoComponent, ec: ExecutionContext)
     extends PlayMongoRepository[InterventionPersisted](
       collectionName = "intervention",
       mongoComponent = mongo,
@@ -92,7 +92,7 @@ class InterventionRepoImpl @Inject()(appConfig: AppConfig)(implicit mongo: Mongo
       .toFutureOption()
       .map(_ => ())
 
-  def save(intervention: InterventionModel)(implicit lc: LoggingContext): Future[Option[SaveError]] = {
+  def save(intervention: InterventionModel)(using lc: LoggingContext): Future[Option[SaveError]] = {
     val interventionPersisted = InterventionPersisted.from(intervention)
 
     Mdc

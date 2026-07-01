@@ -21,7 +21,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{Inspectors, OptionValues}
-import play.api.libs.json._
+import play.api.libs.json.*
 
 sealed trait Enum
 
@@ -31,20 +31,43 @@ object Enum {
   case object `enum-two` extends Enum
   case object `enum-three` extends Enum
 
-  implicit val format: Format[Enum] = Enums.format[Enum]
+  given show: Show[Enum] = Show.show[Enum](_.toString)
+
+  given format: Format[Enum] = Enums.format[Enum]
+}
+
+sealed trait Enum2 {
+  def altName: String
+}
+
+object Enum2 {
+  case object `enum-one` extends Enum2 {
+    override def altName: String = "one"
+  }
+
+  case object `enum-two` extends Enum2 {
+    override def altName: String = "two"
+  }
+
+  case object `enum-three` extends Enum2 {
+    override def altName: String = "three"
+  }
+
+  given show: Show[Enum2] = Show.show[Enum2](_.altName)
+  given format: Format[Enum2] = Enums.format[Enum2]
 }
 
 case class Foo[A](someField: A)
 
 object Foo {
-  implicit def fmts[A: Format]: Format[Foo[A]] = Json.format[Foo[A]]
+  given fmts[A: Format]: Format[Foo[A]] = Json.format[Foo[A]]
 }
 
 class EnumsSpec extends AnyWordSpecLike with Matchers with OptionValues with Inspectors {
 
-  import Enum._
+  import Enum.*
 
-  implicit val arbitraryEnumValue: Arbitrary[Enum] = Arbitrary[Enum](Gen.oneOf(`enum-one`, `enum-two`, `enum-three`))
+  given arbitraryEnumValue: Arbitrary[Enum] = Arbitrary[Enum](Gen.oneOf(`enum-one`, `enum-two`, `enum-three`))
 
   "SealedTraitEnumJs  on" must {
 
@@ -59,19 +82,19 @@ class EnumsSpec extends AnyWordSpecLike with Matchers with OptionValues with Ins
           """.stripMargin)
 
     "generates reads" in {
-      forAll(List(`enum-one`, `enum-two`, `enum-three`)) { value: Enum =>
+      forAll(List(`enum-one`, `enum-two`, `enum-three`)) { (value: Enum) =>
         json(value).as[Foo[Enum]] shouldBe Foo(value)
       }
     }
 
     "generates writes" in {
-      forAll(List(`enum-one`, `enum-two`, `enum-three`)) { value: Enum =>
+      forAll(List(`enum-one`, `enum-two`, `enum-three`)) { (value: Enum) =>
         Json.toJson(Foo(value)) shouldBe json(value)
       }
     }
 
     "allow roundtrip" in {
-      forAll(List(`enum-one`, `enum-two`, `enum-three`)) { value: Enum =>
+      forAll(List(`enum-one`, `enum-two`, `enum-three`)) { (value: Enum) =>
         val foo = Foo(value)
         Json.toJson(foo).as[Foo[Enum]] shouldBe foo
       }
@@ -83,25 +106,6 @@ class EnumsSpec extends AnyWordSpecLike with Matchers with OptionValues with Ins
     }
 
     "allows alternative names (specified by method)" in {
-
-      sealed trait Enum2 {
-        def altName: String
-      }
-
-      object Enum2 {
-        case object `enum-one` extends Enum2 {
-          override def altName: String = "one"
-        }
-        case object `enum-two` extends Enum2 {
-          override def altName: String = "two"
-        }
-        case object `enum-three` extends Enum2 {
-          override def altName: String = "three"
-        }
-
-        implicit val show: Show[Enum2]     = Show.show[Enum2](_.altName)
-        implicit val format: Format[Enum2] = Enums.format[Enum2]
-      }
 
       val json = Json.parse("""
                               |{

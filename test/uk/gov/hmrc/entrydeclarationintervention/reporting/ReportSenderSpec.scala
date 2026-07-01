@@ -20,7 +20,7 @@ import com.codahale.metrics.MetricRegistry
 import org.scalamock.matchers.Matchers
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.JsObject
 import uk.gov.hmrc.entrydeclarationintervention.reporting.audit.{AuditEvent, MockAuditHandler}
@@ -34,7 +34,7 @@ class ReportSenderSpec extends AnyWordSpecLike with Matchers with OptionValues w
 
   val auditEvent: AuditEvent = AuditEvent("type", "trans", JsObject.empty)
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given hc: HeaderCarrier = HeaderCarrier()
 
   val mockedMetrics: MetricRegistry = new MockMetrics
 
@@ -43,7 +43,7 @@ class ReportSenderSpec extends AnyWordSpecLike with Matchers with OptionValues w
   "ReportSender" must {
     object Report
 
-    implicit val sources: EventSources[Report.type] = new EventSources[Report.type] {
+    given sources: EventSources[Report.type] = new EventSources[Report.type] {
       override def auditEventFor(report: Report.type): Option[AuditEvent] = Some(auditEvent)
     }
 

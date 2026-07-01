@@ -21,6 +21,6 @@ import play.api.libs.json.{Format, Json}
 case class Container(containerNumber: String)
 
 object Container {
-  implicit val jsonFormat: Format[Container] = Json.format[Container]
+  given jsonFormat: Format[Container] = Json.format[Container]
 }
 

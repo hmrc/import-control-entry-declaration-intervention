@@ -21,8 +21,8 @@ import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
 case class NotificationId(value: String) extends AnyVal
 
 object NotificationId {
-  implicit val writes: Writes[NotificationId] = new Writes[NotificationId] {
+  given writes: Writes[NotificationId] = new Writes[NotificationId] {
     def writes(notificationId: NotificationId): JsValue = Json.obj("notificationId" -> notificationId.value)
   }
-  implicit val reads: Reads[NotificationId] = (JsPath \ "notificationId").read[String].map(NotificationId.apply)
+  given reads: Reads[NotificationId] = (JsPath \ "notificationId").read[String].map(NotificationId.apply)
 }

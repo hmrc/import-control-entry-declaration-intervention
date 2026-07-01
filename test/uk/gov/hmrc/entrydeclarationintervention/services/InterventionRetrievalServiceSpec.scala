@@ -21,9 +21,9 @@ import com.codahale.metrics.MetricRegistry
 import org.scalamock.matchers.Matchers
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpecLike
-import uk.gov.hmrc.entrydeclarationintervention.models._
+import uk.gov.hmrc.entrydeclarationintervention.models.*
 import uk.gov.hmrc.entrydeclarationintervention.repositories.MockInterventionRepo
 import uk.gov.hmrc.entrydeclarationintervention.utils.MockMetrics
 
