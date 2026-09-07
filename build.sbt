@@ -20,6 +20,7 @@ val appName = "import-control-entry-declaration-intervention"
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.7"
+ThisBuild / dependencyOverrides ++= AppDependencies.jacksonOverrides
 
 lazy val coverageSettings: Seq[Setting[_]] = {
   import scoverage.ScoverageKeys

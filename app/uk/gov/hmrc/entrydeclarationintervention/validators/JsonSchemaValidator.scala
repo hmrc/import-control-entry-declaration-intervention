@@ -18,33 +18,41 @@ package uk.gov.hmrc.entrydeclarationintervention.validators
 
 import java.net.URL
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.github.fge.jsonschema.core.report.ProcessingReport
-import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
+import com.networknt.schema.{Schema, SchemaRegistry, SpecificationVersion}
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.entrydeclarationintervention.logging.{ContextLogger, LoggingContext}
 
 import java.io.FileInputStream
+import scala.jdk.CollectionConverters.*
+import scala.util.Using
 
 object JsonSchemaValidator {
 
-  private val factory = JsonSchemaFactory.byDefault()
+  private val mapper: ObjectMapper = new ObjectMapper()
+
+  private val registry: SchemaRegistry = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_4)
+
   val basePath: String = System.getProperty("user.dir")
 
   def validateJSONAgainstSchema(inputDoc: JsValue, schemaDoc: String = "conf/jsonSchemas/AdvancedIntervention.json")(
-    using lc: LoggingContext): Boolean =
+    using lc: LoggingContext): Either[List[String], Unit] =
     try {
-      val mapper: ObjectMapper     = new ObjectMapper()
-      val inputJson: JsonNode      = mapper.readTree(inputDoc.toString())
-      val jsonSchema: JsonNode     = mapper.readTree(new FileInputStream(s"$basePath/$schemaDoc"))
-      val validator: JsonValidator = factory.getValidator
-      val report: ProcessingReport = validator.validate(jsonSchema, inputJson)
-      if (!report.isSuccess) ContextLogger.error(s"Failed to validate $inputDoc and $report")
+      val inputJson: JsonNode = mapper.readTree(inputDoc.toString())
 
-      report.isSuccess
+      val schema: Schema =
+        Using.resource(new FileInputStream(s"$basePath/$schemaDoc"))(in => registry.getSchema(in))
+
+      val errors: List[String] = schema.validate(inputJson).asScala.toList.map(_.getMessage)
+      if (errors.nonEmpty) {
+        ContextLogger.error(s"Failed to validate $inputDoc and $errors")
+        Left(errors)
+      } else {
+        Right(())
+      }
     } catch {
       case e: Exception =>
         ContextLogger.error(s"Failed to validate $inputDoc", e)
-        false
+        Left(List(e.getMessage))
     }
 
   def url(resourceName: String): URL = Thread.currentThread().getContextClassLoader.getResource(resourceName)

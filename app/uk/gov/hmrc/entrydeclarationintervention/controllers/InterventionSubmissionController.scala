@@ -18,7 +18,7 @@ package uk.gov.hmrc.entrydeclarationintervention.controllers
 
 import javax.inject.{Inject, Singleton}
 import play.api.Logging
-import play.api.libs.json.{JsError, JsString, JsSuccess, JsValue}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Request}
 import uk.gov.hmrc.entrydeclarationintervention.config.AppConfig
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
@@ -97,15 +97,23 @@ class InterventionSubmissionController @Inject()(
     }
   }
 
-  private def getValidationErrors(json: JsValue, useNew: Boolean = false)(using lc: LoggingContext): Option[JsValue] = {
-    val validateJson = if(useNew) {
-      JsonSchemaValidator.validateJSONAgainstSchema(json, "conf/jsonSchemas/AdvancedInterventionNew.json")
-    } else {
-      JsonSchemaValidator.validateJSONAgainstSchema(json)
-    }
+  private def getValidationErrors(json: JsValue, useNew: Boolean = false)
+                                 (using lc: LoggingContext): Option[JsValue] = {
+    if (!appConfig.validateIncomingJson) None
+    else {
+      val schemaDoc =
+        if (useNew) "conf/jsonSchemas/AdvancedInterventionNew.json"
+        else "conf/jsonSchemas/AdvancedIntervention.json"
 
-    if (appConfig.validateIncomingJson && !validateJson) {
-      Some(JsString("Failed to validate JSON against schema"))
-    } else { None }
+      JsonSchemaValidator.validateJSONAgainstSchema(json, schemaDoc) match {
+        case Right(_) => None
+        case Left(errors) =>
+          Some(
+            Json.obj(
+              "message" -> "Failed to validate JSON against schema",
+              "errors"  -> errors
+            ))
+      }
+    }
   }
 }

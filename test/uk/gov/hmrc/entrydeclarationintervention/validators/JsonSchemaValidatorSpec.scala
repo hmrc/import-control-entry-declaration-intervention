@@ -16,33 +16,33 @@
 
 package uk.gov.hmrc.entrydeclarationintervention.validators
 
-import org.scalatest.OptionValues
+import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.entrydeclarationintervention.logging.LoggingContext
 import uk.gov.hmrc.entrydeclarationintervention.utils.ResourceUtils
 
-class JsonSchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionValues {
+class JsonSchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionValues with EitherValues {
   given lc: LoggingContext = LoggingContext("eori", "correlationId", "submissionId", "notificationId", "mrn")
 
   "JsonSchemaValidator" should {
-    "return true " when {
+    "return Right(())" when {
       "a valid message is supplied" when {
         "optionalFieldFeature is false" in {
           val intervention: JsValue = ResourceUtils.withInputStreamFor("jsons/Intervention.json")(Json.parse)
 
-          JsonSchemaValidator.validateJSONAgainstSchema(intervention) shouldBe true
+          JsonSchemaValidator.validateJSONAgainstSchema(intervention) shouldBe Right(())
         }
         "optionalFieldFeature is true" in {
           val intervention: JsValue = ResourceUtils.withInputStreamFor("jsons/InterventionNew.json")(Json.parse)
 
-          JsonSchemaValidator.validateJSONAgainstSchema(intervention,"conf/jsonSchemas/AdvancedInterventionNew.json") shouldBe true
+          JsonSchemaValidator.validateJSONAgainstSchema(intervention, "conf/jsonSchemas/AdvancedInterventionNew.json") shouldBe Right(())
         }
       }
     }
 
-    "return false" when {
+    "return Left with the collected validation errors" when {
       "an invalid message is supplied" when {
         val invalidIntervention: JsValue =
           Json.parse(
@@ -59,10 +59,15 @@ class JsonSchemaValidatorSpec extends AnyWordSpecLike with Matchers with OptionV
                |    }
                |  }""".stripMargin)
         "optionalFieldFeature is false" in {
-          JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention) shouldBe false
+          val result = JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention)
+
+          result.left.value should not be empty
         }
         "optionalFieldFeature is true" in {
-          JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention, "conf/jsonSchemas/AdvancedInterventionNew.json") shouldBe false
+          val result =
+            JsonSchemaValidator.validateJSONAgainstSchema(invalidIntervention, "conf/jsonSchemas/AdvancedInterventionNew.json")
+
+          result.left.value should not be empty
         }
       }
     }
